@@ -41,7 +41,7 @@ export default {
     return {
       login: {
         username: 'zhangsun',
-        password: '123'
+        password: '1234567'
       },
       loginRules: {
         // 验证用户名

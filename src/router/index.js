@@ -26,4 +26,22 @@ const router = new VueRouter({
   routes
 })
 
+// 路由访问拦截器
+router.beforeEach((to, from, next) => {
+  // to : 将要访问的路径
+  // from: 从哪个页面来
+  // next: 放行
+  if (to.path === '/login') {
+    return next()
+  }
+
+  // 拦截认证
+  const token = window.sessionStorage.getItem('token')
+  if (!token) {
+    return next('/login')
+  }
+
+  // 放行
+  next()
+})
 export default router
