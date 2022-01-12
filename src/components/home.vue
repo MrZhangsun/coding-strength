@@ -8,48 +8,30 @@
     <el-button type="info" @click="logout">退出</el-button>
   </el-header>
   <el-container>
-    <el-aside width="200px">
-    <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo"
-      @open="handleOpen"
-      @close="handleClose"
-      background-color="#333744"
-      text-color="#fff"
-      active-text-color="#ffd04b">
-      <el-submenu index="1">
-        <template slot="title">
-          <i class="el-icon-location"></i>
-          <span>一级菜单1</span>
-        </template>
-        <el-submenu index="1-1">
+    <el-aside :width="isColloaspMenu ? '64px' : '175px'">
+      <el-button class="collaspBtn" @click="collaspMenu">{{colloaspFlag}}</el-button>
+      <el-menu
+        :unique-opened="true"
+        :collapse="isColloaspMenu"
+        :collapse-transition="false"
+        default-active="2"
+        class="el-menu-vertical-demo"
+        background-color="#333744"
+        text-color="#fff"
+        active-text-color="#ffd04b">
+        <el-submenu :index="menu.id + ''" v-for="menu in menuTree " :key="menu.id">
           <template slot="title">
+            <i :class="menu.icon"></i>
+            <span>{{menu.menuName}}</span>
+          </template>
+
+          <el-menu-item v-for="item in menu.children" :key="item.id">
             <i class="el-icon-location"></i>
-            <span>一级菜单1-1</span>
-          </template>
-          <el-menu-item index="1-1-1">
-            <i class="el-icon-menu"></i>
-            <span>菜单项1-1-1</span>
+            <span>{{item.menuName}}</span>
           </el-menu-item>
+
         </el-submenu>
-        <el-menu-item index="1-2">
-          <template slot="title">
-            <i class="el-icon-menu"></i>
-            <span>菜单项1-2</span>
-          </template>
-        </el-menu-item>
-        <el-menu-item index="1-3">
-          <template slot="title">
-            <i class="el-icon-menu"></i>
-            <span>菜单项1-3</span>
-          </template>
-        </el-menu-item>
-      </el-submenu>
-      <el-menu-item index="2">
-        <i class="el-icon-menu"></i>
-        <span>一级菜单2</span>
-      </el-menu-item>
-    </el-menu>
+      </el-menu>
     </el-aside>
     <el-main>
       Main
@@ -60,11 +42,36 @@
 
 <script>
 export default {
+  created () {
+    this.loadMenuTree()
+  },
+
+  data () {
+    return {
+      menuTree: [],
+      isColloaspMenu: false,
+      colloaspFlag: '<<<'
+    }
+  },
+
   methods: {
     logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
       this.$message.success('退出成功!')
+    },
+    async loadMenuTree () {
+      const { data: res } = await this.$http.get('/menus')
+      if (res.status !== 200) {
+        return this.$message.error('获取菜单失败!')
+      }
+
+      this.menuTree = res.data
+      console.log(res.data)
+    },
+    collaspMenu () {
+      this.isColloaspMenu = !this.isColloaspMenu
+      this.colloaspFlag = this.isColloaspMenu ? '>>>' : '<<<'
     }
   }
 }
@@ -97,13 +104,30 @@ export default {
   .el-aside {
     background-color: #333744;
     color: #fff;
-    text-align: center;
-    line-height: 200px;
   }
   .el-main {
     background-color: #eaedf1;
     color: #000;
     text-align: center;
     line-height: 160px;
+  }
+  .icon-font {
+    margin-right: 10px;
+  }
+  .el-menu {
+    border-right: none;
+  }
+  .collaspBtn {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: #6a6d77;
+    color: #fff;
+    border-radius: 0px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    line-height: 24px;
+    font-size: 18px;
+    border-color: #6a6d77;
   }
 </style>

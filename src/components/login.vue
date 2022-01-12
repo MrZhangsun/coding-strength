@@ -75,7 +75,6 @@ export default {
   },
   methods: {
     resetFileds () {
-      console.log(this)
       this.$refs.loginRef.resetFields()
     },
     submit () {
@@ -88,7 +87,6 @@ export default {
           return this.$message.error('登录失败')
         }
 
-        console.log(res.data)
         this.$message.success('登录成功')
         // 1. 保存token
         window.sessionStorage.setItem('token', res.data.token)
