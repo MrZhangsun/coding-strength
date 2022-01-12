@@ -11,7 +11,6 @@ axios.defaults.baseURL = 'http://localhost:10110/api/'
 // HTTP认证拦截器
 axios.interceptors.request.use(config => {
   config.headers.Authorization = window.sessionStorage.getItem('token')
-  console.log(config)
   return config
 })
 Vue.prototype.$http = axios

@@ -69,14 +69,12 @@ export default {
       }
 
       this.menuTree = res.data
-      console.log(res.data)
     },
     collaspMenu () {
       this.isColloaspMenu = !this.isColloaspMenu
       this.colloaspFlag = this.isColloaspMenu ? '>>>' : '<<<'
     },
     clickMenuItem (activePath) {
-      console.log(activePath)
       this.defaultActive = activePath
     }
   }
