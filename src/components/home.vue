@@ -12,9 +12,10 @@
       <el-button class="collaspBtn" @click="collaspMenu">{{colloaspFlag}}</el-button>
       <el-menu
         :unique-opened="true"
+        :router="true"
         :collapse="isColloaspMenu"
         :collapse-transition="false"
-        default-active="2"
+        :default-active="defaultActive"
         class="el-menu-vertical-demo"
         background-color="#333744"
         text-color="#fff"
@@ -25,7 +26,7 @@
             <span>{{menu.menuName}}</span>
           </template>
 
-          <el-menu-item v-for="item in menu.children" :key="item.id">
+          <el-menu-item @click="clickMenuItem(item.path)" :index="item.path" v-for="item in menu.children" :key="item.id">
             <i class="el-icon-location"></i>
             <span>{{item.menuName}}</span>
           </el-menu-item>
@@ -34,7 +35,7 @@
       </el-menu>
     </el-aside>
     <el-main>
-      Main
+      <router-view/>
     </el-main>
   </el-container>
 </el-container>
@@ -50,7 +51,8 @@ export default {
     return {
       menuTree: [],
       isColloaspMenu: false,
-      colloaspFlag: '<<<'
+      colloaspFlag: '<<<',
+      defaultActive: '/home11'
     }
   },
 
@@ -72,6 +74,10 @@ export default {
     collaspMenu () {
       this.isColloaspMenu = !this.isColloaspMenu
       this.colloaspFlag = this.isColloaspMenu ? '>>>' : '<<<'
+    },
+    clickMenuItem (activePath) {
+      console.log(activePath)
+      this.defaultActive = activePath
     }
   }
 }
