@@ -17,44 +17,41 @@
         </el-col>
       </el-row>
       <!-- 表格区 -->
-      <el-table :data="userList" style="width: 100%" height="500px" :border="true" stripe>
-        <el-table-column type="index" label="#"/>
+      <el-table :data="userList" :border="true" stripe :header-cell-style="{'text-align':'center'}">
+        <el-table-column type="index" label="#" align="center"/>
         <el-table-column
           prop="userId"
           label="ID"
-          width="60">
-        </el-table-column>
+          align="center"/>
         <el-table-column
           prop="username"
           label="账号"
-          width="180">
-        </el-table-column>
+          width="185px"
+          align="center"/>
         <el-table-column
           prop="name"
           label="姓名"
-          width="120">
-        </el-table-column>
+          align="center"/>
         <el-table-column
           prop="age"
           label="年龄"
-          width="100">
-        </el-table-column>
+          align="center"/>
         <el-table-column
           prop="gender"
           label="性别"
-          width="100">
-        </el-table-column>
+          align="center"/>
         <el-table-column
           prop="useStatus"
           label="状态"
-          width="100">
+          align="center">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.useStatus"/>
           </template>
         </el-table-column>
         <el-table-column
           label="操作"
-          width="220">
+          width="200px"
+          align="center">
           <template>
             <el-button type="primary" icon="el-icon-edit" size="mini" />
             <el-button type="danger" icon="el-icon-delete" size="mini" />
@@ -114,17 +111,8 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-  .bg-purple {
-    background: #d3dce6;
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: 36px;
-  }
-  .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
+  .el-table {
+    width: 100%;
+    height: 100%;
   }
 </style>

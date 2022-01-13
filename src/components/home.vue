@@ -113,7 +113,10 @@ export default {
     background-color: #eaedf1;
     color: #000;
     text-align: center;
-    line-height: 160px;
+    padding-top: 20px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
   }
   .icon-font {
     margin-right: 10px;
@@ -125,13 +128,12 @@ export default {
     width: 100%;
     padding: 10px;
     text-align: center;
-    background-color: #6a6d77;
+    background-color: #333744;
     color: #fff;
     border-radius: 0px;
     cursor: pointer;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     line-height: 24px;
-    font-size: 18px;
     border-color: #6a6d77;
   }
 </style>
