@@ -8,8 +8,8 @@
     <el-card>
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input placeholder="search by username" v-model="pageInfo.query" @input="onInput" @clear="getUserList" clearable>
+            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -45,7 +45,7 @@
           label="状态"
           align="center">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.useStatus"/>
+            <el-switch v-model="scope.row.useStatus" @change="updateUserStatus(scope.row.userId, scope.row.useStatus)"/>
           </template>
         </el-table-column>
         <el-table-column
@@ -86,12 +86,14 @@ export default {
       pageInfo: {
         pageNum: 1,
         pageSize: 10,
-        total: 0
+        total: 0,
+        query: ''
       }
     }
   },
   methods: {
     async getUserList () {
+      console.log(this.pageInfo)
       const { data: res } = await this.$http.get('/users', { params: this.pageInfo })
       if (res.status !== 200) {
         return this.$message.error('获取用户列表数据失败!')
@@ -106,6 +108,21 @@ export default {
     handleCurrentChange (newPage) {
       this.pageInfo.pageNum = newPage
       this.getUserList()
+    },
+    async updateUserStatus (userId, newStatus) {
+      const params = {
+        userId: userId,
+        useStatus: newStatus
+      }
+      const { data: res } = await this.$http.put('/user/' + userId, params)
+      if (res.status !== 200) {
+        return this.$message.error('状态更新失败!')
+      }
+
+      this.$message.success('更新成功!')
+    },
+    onInput () {
+      this.$forceUpdate()
     }
   }
 }
