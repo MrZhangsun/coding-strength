@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'default-passive-events'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'

@@ -13,7 +13,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加用户</el-button>
+          <el-button type="primary" @click="addUserDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
       <!-- 表格区 -->
@@ -72,6 +72,46 @@
         :total="pageInfo.total">
       </el-pagination>
     </el-card>
+
+    <!-- 添加用户对话框 -->
+    <el-dialog
+      title="新增用户"
+      :visible.sync="addUserDialogVisible"
+      width="50%">
+      <!-- 表单项 -->
+      <el-form ref="addUserFormRef" :model="addUserForm" :rules="addUserFormRules" label-width="120px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addUserForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nickName">
+          <el-input v-model="addUserForm.nickName"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="addUserForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="gender">
+          <el-radio-group v-model="addUserForm.gender">
+            <el-radio label="男"></el-radio>
+            <el-radio label="女"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年龄" prop="age">
+          <el-input-number v-model="addUserForm.age"
+            :min="1"
+            :max="120">
+          </el-input-number>
+        </el-form-item>
+        <el-form-item label="状态" prop="useStatus">
+          <el-switch v-model="addUserForm.useStatus"></el-switch>
+        </el-form-item>
+      </el-form>
+      <!-- 按钮 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitAddUserRequest">确定</el-button>
+        <el-button type="danger" :before-close="handleClose"  @click="addUserDialogVisible = false">取消</el-button>
+        <el-button type="info" @click="resetAddUserForm">重置</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -81,6 +121,14 @@ export default {
     this.getUserList()
   },
   data () {
+    const usernameValidator = (rule, value, callback) => {
+      const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
+      const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
+      if (regEn.test(value) || regCn.test(value)) {
+        return callback(new Error('名称中不能包含特殊字符'))
+      }
+      // callback
+    }
     return {
       userList: [],
       pageInfo: {
@@ -88,12 +136,38 @@ export default {
         pageSize: 10,
         total: 0,
         query: ''
+      },
+      addUserDialogVisible: false,
+      addUserForm: {
+        username: '',
+        nickName: '',
+        name: '',
+        gender: '',
+        age: 0,
+        useStatus: true
+      },
+      addUserFormRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'blur' },
+          { validator: usernameValidator, trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' },
+          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'bulr' },
+          { validator: usernameValidator, trigger: 'blur' }
+        ],
+        gender: [
+          { required: true, message: '请选择性别', trigger: 'change' }
+        ],
+        age: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ]
       }
     }
   },
   methods: {
     async getUserList () {
-      console.log(this.pageInfo)
       const { data: res } = await this.$http.get('/users', { params: this.pageInfo })
       if (res.status !== 200) {
         return this.$message.error('获取用户列表数据失败!')
@@ -123,6 +197,33 @@ export default {
     },
     onInput () {
       this.$forceUpdate()
+    },
+    resetAddUserForm () {
+      this.$refs.addUserFormRef.resetFields()
+    },
+    submitAddUserRequest () {
+      this.$refs.addUserFormRef.validate(async valid => {
+        if (!valid) {
+          return
+        }
+        console.log(this.addUserForm)
+        const { data: res } = await this.$http.post('/user', this.addUserForm)
+        console.log(res)
+        if (res.status !== 200) {
+          return this.$message.error('新增用户失败')
+        }
+        this.getUserList()
+        this.$message.success('添加成功')
+        // 成功之后,关闭对话框
+        this.addUserDialogVisible = false
+      })
+    },
+    handleClose (done) {
+      this.$confirm('确定要关闭对话框?')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {})
     }
   }
 }
