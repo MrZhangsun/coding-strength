@@ -77,7 +77,8 @@
     <el-dialog
       title="新增用户"
       :visible.sync="addUserDialogVisible"
-      width="50%">
+      width="50%"
+      :before-close="handleClose">
       <!-- 表单项 -->
       <el-form ref="addUserFormRef" :model="addUserForm" :rules="addUserFormRules" label-width="120px">
         <el-form-item label="用户名" prop="username">
@@ -127,7 +128,7 @@ export default {
       if (regEn.test(value) || regCn.test(value)) {
         return callback(new Error('名称中不能包含特殊字符'))
       }
-      // callback
+      callback()
     }
     return {
       userList: [],
@@ -206,9 +207,7 @@ export default {
         if (!valid) {
           return
         }
-        console.log(this.addUserForm)
         const { data: res } = await this.$http.post('/user', this.addUserForm)
-        console.log(res)
         if (res.status !== 200) {
           return this.$message.error('新增用户失败')
         }
