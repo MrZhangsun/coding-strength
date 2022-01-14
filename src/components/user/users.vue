@@ -55,7 +55,7 @@
           <template
             slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.userId)" />
-            <el-button type="danger" icon="el-icon-delete" size="mini" />
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="showDeleteConfirm(scope.row.userId)" />
             <el-tooltip effect="dark" content="设置" :enterable="false" placement="top">
               <el-button type="warning" icon="el-icon-setting" size="mini" />
             </el-tooltip>
@@ -322,6 +322,31 @@ export default {
     },
     editDialogClosed () {
       this.$refs.editUserFormRef.resetFields()
+    },
+    showDeleteConfirm (userId) {
+      this.$confirm('确定要删除当前记录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http.delete('/user/' + userId)
+          .then(res => {
+            if (res.status !== 200) {
+              return this.$message.error(res.message)
+            }
+
+            this.getUserList()
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
     }
   }
 }
