@@ -52,8 +52,9 @@
           label="操作"
           width="200px"
           align="center">
-          <template>
-            <el-button type="primary" icon="el-icon-edit" size="mini" />
+          <template
+            slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.userId)" />
             <el-button type="danger" icon="el-icon-delete" size="mini" />
             <el-tooltip effect="dark" content="设置" :enterable="false" placement="top">
               <el-button type="warning" icon="el-icon-setting" size="mini" />
@@ -113,6 +114,48 @@
         <el-button type="info" @click="resetAddUserForm">重置</el-button>
       </span>
     </el-dialog>
+
+    <!-- 编辑用户对话框 -->
+    <el-dialog
+      ref="editUserDialogRef"
+      title="编辑用户"
+      :visible.sync="editUserDialogVisible"
+      width="50%"
+      :before-close="handleClose"
+      @close="editDialogClosed">
+      <!-- 表单项 -->
+      <el-form ref="editUserFormRef" :model="editUserForm" :rules="editUserFormRules" label-width="120px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="editUserForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nickName">
+          <el-input v-model="editUserForm.nickName"></el-input>
+        </el-form-item>
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="editUserForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="gender">
+          <el-radio-group v-model="editUserForm.gender">
+            <el-radio label="男"></el-radio>
+            <el-radio label="女"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年龄" prop="age">
+          <el-input-number v-model="editUserForm.age"
+            :min="1"
+            :max="120">
+          </el-input-number>
+        </el-form-item>
+        <el-form-item label="状态" prop="useStatus">
+          <el-switch v-model="editUserForm.useStatus"></el-switch>
+        </el-form-item>
+      </el-form>
+      <!-- 按钮 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitEditUserRequest">确定</el-button>
+        <el-button type="danger" :before-close="handleClose"  @click="editUserDialogVisible = false">取消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -139,18 +182,45 @@ export default {
         query: ''
       },
       addUserDialogVisible: false,
+      editUserDialogVisible: false,
       addUserForm: {
         username: '',
         nickName: '',
         name: '',
         gender: '',
         age: 0,
-        useStatus: true
+        useStatus: undefined
+      },
+      editUserForm: {
+        username: '',
+        nickName: '',
+        name: '',
+        gender: '',
+        age: 0,
+        useStatus: undefined
       },
       addUserFormRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'blur' },
+          { validator: usernameValidator, trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' },
+          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'bulr' },
+          { validator: usernameValidator, trigger: 'blur' }
+        ],
+        gender: [
+          { required: true, message: '请选择性别', trigger: 'change' }
+        ],
+        age: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ]
+      },
+      editUserFormRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
           { validator: usernameValidator, trigger: 'blur' }
         ],
         name: [
@@ -217,12 +287,41 @@ export default {
         this.addUserDialogVisible = false
       })
     },
+    showEditDialog (userId) {
+      this.$http.get('/user/' + userId)
+        .then(res => {
+          if (res.data.status !== 200) {
+            return this.$message.error(res.data.message)
+          }
+          this.editUserForm = res.data
+          this.editUserDialogVisible = true
+        })
+    },
+    submitEditUserRequest () {
+      this.$refs.editUserFormRef.validate((valid) => {
+        if (!valid) {
+          return
+        }
+        this.$http.put('/user/' + this.editUserForm.userId, this.editUserForm)
+          .then(res => {
+            if (res.data.status !== 200) {
+              return this.$message.error(res.data.message)
+            }
+            this.$message.success('修改成功!')
+            this.editUserDialogVisible = false
+            this.getUserList()
+          })
+      })
+    },
     handleClose (done) {
       this.$confirm('确定要关闭对话框?')
         .then(_ => {
           done()
         })
         .catch(_ => {})
+    },
+    editDialogClosed () {
+      this.$refs.editUserFormRef.resetFields()
     }
   }
 }
