@@ -31,7 +31,7 @@ const routes = [
       },
       {
         name: 'User',
-        path: '/users',
+        path: 'users',
         component: User
       }
     ]
