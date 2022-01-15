@@ -23,12 +23,12 @@
         <el-submenu :index="menu.id + ''" v-for="menu in menuTree " :key="menu.id">
           <template slot="title">
             <i :class="menu.icon"></i>
-            <span>{{menu.menuName}}</span>
+            <span>{{menu.name}}</span>
           </template>
 
-          <el-menu-item @click="clickMenuItem(item.path)" :index="item.path" v-for="item in menu.children" :key="item.id">
-            <i class="el-icon-location"></i>
-            <span>{{item.menuName}}</span>
+          <el-menu-item @click="clickMenuItem(item.routePath)" :index="item.routePath" v-for="item in menu.children" :key="item.id">
+            <i :class="item.icon"></i>
+            <span>{{item.name}}</span>
           </el-menu-item>
 
         </el-submenu>
