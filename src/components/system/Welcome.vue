@@ -1,5 +1,5 @@
 <template>
   <div>
-    Welcome to Xi'An
+    <h3> Welcome to Coding Strength</h3>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
 <el-container class="home_container">
   <el-header>
-    <div>
+    <div class="title">
       <img src="../../assets/logo.png" alt="">
       <span>代码统计系统</span>
     </div>
@@ -9,7 +9,11 @@
   </el-header>
   <el-container>
     <el-aside :width="isColloaspMenu ? '64px' : '175px'">
-      <el-button class="collaspBtn" @click="collaspMenu">{{colloaspFlag}}</el-button>
+      <div class="collaspBtn" @click="collaspMenu">
+          <svg class="icon" aria-hidden="true">
+            <use :xlink:href="colloaspFlag"></use>
+          </svg>
+      </div>
       <el-menu
         :unique-opened="true"
         :router="true"
@@ -51,7 +55,7 @@ export default {
     return {
       menuTree: [],
       isColloaspMenu: false,
-      colloaspFlag: '<<<',
+      colloaspFlag: '#icon-Right-1',
       defaultActive: '/home11'
     }
   },
@@ -72,7 +76,7 @@ export default {
     },
     collaspMenu () {
       this.isColloaspMenu = !this.isColloaspMenu
-      this.colloaspFlag = this.isColloaspMenu ? '>>>' : '<<<'
+      this.colloaspFlag = this.isColloaspMenu ? '#icon-Right-1' : '#icon-Left-1'
     },
     clickMenuItem (activePath) {
       this.defaultActive = activePath
@@ -87,7 +91,7 @@ export default {
     height: 100%;
   }
   .el-header {
-    background-color: #373d41;
+    background-color: #333744;
     color: #fff;
     text-align: left;
     line-height: 60px;
@@ -121,19 +125,23 @@ export default {
   .icon-font {
     margin-right: 10px;
   }
+ .icon {
+    width: 0.8em;
+    height: 0.8em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+  }
   .el-menu {
     border-right: none;
   }
   .collaspBtn {
-    width: 100%;
-    padding: 10px;
-    text-align: center;
     background-color: #333744;
-    color: #fff;
-    border-radius: 0px;
     cursor: pointer;
-    letter-spacing: 0.05em;
-    line-height: 24px;
-    border-color: #6a6d77;
+    line-height: 30px;
+    text-align: center;
+  }
+  .title {
+    padding-left: 20px;
   }
 </style>

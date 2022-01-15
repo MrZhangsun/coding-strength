@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 import './assets/css/global.css'
+import './fonts/iconfont.js'
 import axios from 'axios'
 
 // 配置http请求
