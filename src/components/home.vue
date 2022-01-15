@@ -64,7 +64,7 @@ export default {
     },
     async loadMenuTree () {
       const { data: res } = await this.$http.get('/menus')
-      if (res.status !== 200) {
+      if (res.code !== 200) {
         return this.$message.error('获取菜单失败!')
       }
 

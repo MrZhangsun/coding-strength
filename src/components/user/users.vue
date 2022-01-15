@@ -240,7 +240,7 @@ export default {
   methods: {
     async getUserList () {
       const { data: res } = await this.$http.get('/users', { params: this.pageInfo })
-      if (res.status !== 200) {
+      if (res.code !== 200) {
         return this.$message.error('获取用户列表数据失败!')
       }
       this.userList = res.data
@@ -260,7 +260,7 @@ export default {
         useStatus: newStatus
       }
       const { data: res } = await this.$http.put('/user/' + userId, params)
-      if (res.status !== 200) {
+      if (res.code !== 200) {
         return this.$message.error('状态更新失败!')
       }
 
@@ -278,7 +278,7 @@ export default {
           return
         }
         const { data: res } = await this.$http.post('/user', this.addUserForm)
-        if (res.status !== 200) {
+        if (res.code !== 200) {
           return this.$message.error('新增用户失败')
         }
         this.getUserList()
@@ -290,7 +290,7 @@ export default {
     showEditDialog (userId) {
       this.$http.get('/user/' + userId)
         .then(res => {
-          if (res.data.status !== 200) {
+          if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
           }
           this.editUserForm = res.data
@@ -304,7 +304,7 @@ export default {
         }
         this.$http.put('/user/' + this.editUserForm.userId, this.editUserForm)
           .then(res => {
-            if (res.data.status !== 200) {
+            if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
             }
             this.$message.success('修改成功!')
@@ -331,7 +331,7 @@ export default {
       }).then(() => {
         this.$http.delete('/user/' + userId)
           .then(res => {
-            if (res.status !== 200) {
+            if (res.code !== 200) {
               return this.$message.error(res.message)
             }
 

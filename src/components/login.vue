@@ -40,8 +40,8 @@ export default {
   data () {
     return {
       login: {
-        username: 'zhangsun',
-        password: '1234567'
+        username: 'zhangsunjiankun',
+        password: '123456'
       },
       loginRules: {
         // 验证用户名
@@ -52,8 +52,8 @@ export default {
             trigger: 'blur'
           }, {
             min: 3,
-            max: 10,
-            message: '长度在3~10之间',
+            max: 20,
+            message: '长度在3~20之间',
             trigger: 'blur'
           }
         ],
@@ -65,7 +65,7 @@ export default {
             trigger: 'blur'
           }, {
             min: 6,
-            max: 15,
+            max: 20,
             message: '长度在6~15之间',
             trigger: 'blur'
           }
@@ -83,8 +83,8 @@ export default {
           return
         }
         const res = await this.$http.post('/login', this.login)
-        if (res.data.status !== 200) {
-          return this.$message.error('登录失败')
+        if (res.data.code !== 200) {
+          return this.$message.error(res.data.message)
         }
 
         this.$message.success('登录成功')
