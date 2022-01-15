@@ -2,7 +2,7 @@
 <el-container class="home_container">
   <el-header>
     <div>
-      <img src="../assets/logo.png" alt="">
+      <img src="../../assets/logo.png" alt="">
       <span>代码统计系统</span>
     </div>
     <el-button type="info" @click="logout">退出</el-button>
