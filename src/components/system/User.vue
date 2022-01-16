@@ -5,69 +5,119 @@
       <el-breadcrumb-item>用户中心</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
+
     <el-card>
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="search by username" v-model="pageInfo.query" @input="onInput" @clear="getUserList" clearable>
-            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+          <el-input
+            placeholder="search by username"
+            v-model="pageInfo.query"
+            @input="onInput"
+            @clear="getUserList"
+            clearable
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getUserList"
+            ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addUserDialogVisible = true">添加用户</el-button>
+          <el-button
+            type="primary"
+            @click="addUserDialogVisible = true"
+          >添加用户</el-button>
         </el-col>
       </el-row>
-      <!-- 表格区 -->
-      <el-table :data="userList" :border="true" stripe :header-cell-style="{'text-align':'center'}">
-        <el-table-column type="index" label="#" align="center"/>
+      <!-- 用户列表 -->
+      <el-table
+        :data="userList"
+        :border="true"
+        stripe
+        :header-cell-style="{'text-align':'center'}"
+      >
+        <el-table-column
+          type="index"
+          label="#"
+          align="center"
+        />
         <el-table-column
           prop="id"
           label="ID"
-          align="center"/>
+          align="center"
+        />
         <el-table-column
           prop="name"
           label="姓名"
-          align="center"/>
+          align="center"
+        />
         <el-table-column
           prop="sex"
           label="性别"
-          align="center">
+          align="center"
+        >
           <template slot-scope="scope">
-              <span v-if="scope.row.sex == '0'">未知</span>
-              <span v-if="scope.row.sex == '1'">男</span>
-              <span v-if="scope.row.sex == '2'">女</span>
+            <span v-if="scope.row.sex == '0'">未知</span>
+            <span v-if="scope.row.sex == '1'">男</span>
+            <span v-if="scope.row.sex == '2'">女</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="mobile"
           label="手机"
           width="185px"
-          align="center"/>
+          align="center"
+        />
         <el-table-column
           prop="email"
           label="邮箱"
-          align="center"/>
+          align="center"
+        />
         <el-table-column
           prop="active"
           label="状态"
-          align="center">
+          align="center"
+        >
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.active"
+            <el-switch
+              v-model="scope.row.active"
               :active-value="1"
               :inactive-value="0"
               active-color="#13ce66"
-              @change="updateUserStatus(scope.row.id, scope.row.active)"/>
+              @change="updateUserStatus(scope.row.id, scope.row.active)"
+            />
           </template>
         </el-table-column>
         <el-table-column
           label="操作"
           width="200px"
-          align="center">
-          <template
-            slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)" />
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="showDeleteConfirm(scope.row.id)" />
-            <el-tooltip effect="dark" content="设置" :enterable="false" placement="top">
-              <el-button type="warning" icon="el-icon-setting" size="mini" />
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="showEditDialog(scope.row.id)"
+            />
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="showDeleteConfirm(scope.row.id)"
+            />
+            <el-tooltip
+              effect="dark"
+              content="设置"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+              />
             </el-tooltip>
           </template>
         </el-table-column>
@@ -80,7 +130,8 @@
         :page-sizes="[10, 50, 100, 200, 500, 1000]"
         :page-size="pageInfo.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="pageInfo.total">
+        :total="pageInfo.total"
+      >
       </el-pagination>
     </el-card>
 
@@ -89,22 +140,44 @@
       title="新增用户"
       :visible.sync="addUserDialogVisible"
       width="50%"
-      :before-close="handleClose">
+      :before-close="handleClose"
+    >
       <!-- 表单项 https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload -->
-      <el-form ref="addUserFormRef" :model="addUserForm" :rules="addUserFormRules" label-width="120px">
+      <el-form
+        ref="addUserFormRef"
+        :model="addUserForm"
+        :rules="addUserFormRules"
+        label-width="120px"
+      >
         <!-- 用户头像 -->
-        <el-form-item label="头像" prop="avatar">
+        <el-form-item
+          label="头像"
+          prop="avatar"
+        >
           <!-- 头像显示 -->
           <div calss="demo-image">
-            <el-image id="image" style="width:100px; height: 100px" :src="addUserForm.avatar + '?' + Date()"
-              fit="cover">
+            <el-image
+              id="image"
+              style="width:100px; height: 100px"
+              :src="addUserForm.avatar + '?' + Date()"
+              fit="cover"
+            >
             </el-image>
-            <el-button type="text" title="修改头像" @click="uploadProfile = true">
+            <el-button
+              type="text"
+              title="修改头像"
+              @click="uploadProfile = true"
+            >
               修改头像
             </el-button>
           </div>
           <!-- 上传头像弹窗 -->
-          <el-dailog title="上传头像" width="420px" :visible.sync="uploadProfile" :before-close="beforeDailogClose">
+          <el-dialog
+            title="上传头像"
+            width="420px"
+            :visible.sync="uploadProfile"
+            :before-close="beforeDialogClose"
+          >
             <!-- drag upload -->
             <el-upload
               class="upload-demo"
@@ -113,64 +186,124 @@
               accept="image/*"
               list-type="picture"
               :multiple="false"
-              :auto-upload="false"
+              :auto-upload="true"
               action="no_use"
-              :http-request="uploadPicturePost"
-              :on-change="onChangeUpload">
+              :http-request="uploadAvatarRequest"
+              :on-change="onChangeUpload"
+            >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处,<em>点击上传</em></div>
               <div class="el-upload__tip">只能上传png,不大于2MB</div>
             </el-upload>
             <!-- 图片预览子弹框 -->
-            <el-dailog width="30%" title="头像预览" :visibal.sync="confirmProfile" :append-to-body="true" :before-close="beforeDailogClose">
+            <el-dialog
+              width="30%"
+              title="头像预览"
+              :visibal.sync="confirmProfile"
+              :append-to-body="true"
+              :before-close="beforeDialogClose"
+            >
               确认更改头像如下嘛? <br>
               <div align="center">
-                <el-image style="width: 200px; height: 200px;" :src="previewImageUrl" fit=cover></el-image>
+                <el-image
+                  style="width: 200px; height: 200px;"
+                  :src="avatarPreviewUrl"
+                  fit=cover
+                ></el-image>
               </div>
-              <div slot="footer" class="dailog-footer">
+              <div
+                slot="footer"
+                class="dialog-footer"
+              >
                 <el-button class="confirmCancel">换一个</el-button>
-                <el-button type="primary" class="confirmSubmit">确认</el-button>
+                <el-button
+                  type="primary"
+                  class="confirmSubmit"
+                >确认</el-button>
               </div>
-            </el-dailog>
-          </el-dailog>
+            </el-dialog>
+            <div
+              slot="footer"
+              class="dialog-footer"
+            >
+              <el-button @click="cancelAvatarUpload">取 消</el-button>
+              <!-- <el-button type="primary" @click="confirmProfile = true">打开内层 Dialog</el-button>-->
+            </div>
+          </el-dialog>
         </el-form-item>
         <!-- 个人信息 -->
-        <el-form-item label="姓名" prop="name">
+        <el-form-item
+          label="姓名"
+          prop="name"
+        >
           <el-input v-model="addUserForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="性别" prop="sex">
+        <el-form-item
+          label="性别"
+          prop="sex"
+        >
           <el-radio-group v-model="addUserForm.sex">
-            <el-radio label="男"></el-radio>
-            <el-radio label="女"></el-radio>
+            <el-radio label="0">未知</el-radio>
+            <el-radio label="1">男</el-radio>
+            <el-radio label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
+        <el-form-item
+          label="手机号"
+          prop="mobile"
+        >
           <el-input v-model="addUserForm.mobile"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
           <el-input v-model="addUserForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="状态" prop="active">
+        <el-form-item
+          label="状态"
+          prop="active"
+        >
           <el-switch
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="addUserForm.active"></el-switch>
+            v-model="addUserForm.active"
+          ></el-switch>
         </el-form-item>
-        <el-form-item label="个人简介" prop="introduction">
-          <el-input type="textarea" placeholder="请输入个人简介, 不超过1000字"
+        <el-form-item
+          label="个人简介"
+          prop="introduction"
+        >
+          <el-input
+            type="textarea"
+            placeholder="请输入个人简介, 不超过1000字"
             v-model="addUserForm.introduction"
             :autosize="{ minRow: 5, maxRow: 10 }"
             maxlength="1000"
-            show-word-limit>
+            show-word-limit
+          >
           </el-input>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitAddUserRequest">确定</el-button>
-        <el-button type="danger" :before-close="handleClose"  @click="addUserDialogVisible = false">取消</el-button>
-        <el-button type="info" @click="resetAddUserForm">重置</el-button>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitAddUserRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="addUserDialogVisible = false"
+        >取消</el-button>
+        <el-button
+          type="info"
+          @click="resetAddUserForm"
+        >重置</el-button>
       </span>
     </el-dialog>
 
@@ -181,38 +314,78 @@
       :visible.sync="editUserDialogVisible"
       width="50%"
       :before-close="handleClose"
-      @close="editDialogClosed">
+      @close="editDialogClosed"
+    >
       <!-- 表单项 -->
-      <el-form ref="editUserFormRef" :model="editUserForm" :rules="editUserFormRules" label-width="120px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="editUserForm.username" disabled></el-input>
+      <el-form
+        ref="editUserFormRef"
+        :model="editUserForm"
+        :rules="editUserFormRules"
+        label-width="120px"
+      >
+        <el-form-item
+          label="用户名"
+          prop="username"
+        >
+          <el-input
+            v-model="editUserForm.username"
+            disabled
+          ></el-input>
         </el-form-item>
-        <el-form-item label="昵称" prop="nickName">
+        <el-form-item
+          label="昵称"
+          prop="nickName"
+        >
           <el-input v-model="editUserForm.nickName"></el-input>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
+        <el-form-item
+          label="姓名"
+          prop="name"
+        >
           <el-input v-model="editUserForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-radio-group v-model="editUserForm.gender">
-            <el-radio label="男"></el-radio>
-            <el-radio label="女"></el-radio>
+        <el-form-item
+          label="性别"
+          prop="sex"
+        >
+          <el-radio-group v-model="addUserForm.sex">
+            <el-radio label="0">未知</el-radio>
+            <el-radio label="1">男</el-radio>
+            <el-radio label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="年龄" prop="age">
-          <el-input-number v-model="editUserForm.age"
+        <el-form-item
+          label="年龄"
+          prop="age"
+        >
+          <el-input-number
+            v-model="editUserForm.age"
             :min="1"
-            :max="120">
+            :max="120"
+          >
           </el-input-number>
         </el-form-item>
-        <el-form-item label="状态" prop="useStatus">
+        <el-form-item
+          label="状态"
+          prop="useStatus"
+        >
           <el-switch v-model="editUserForm.useStatus"></el-switch>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitEditUserRequest">确定</el-button>
-        <el-button type="danger" :before-close="handleClose"  @click="editUserDialogVisible = false">取消</el-button>
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitEditUserRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="editUserDialogVisible = false"
+        >取消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -224,11 +397,28 @@ export default {
     this.getUserList()
   },
   data () {
-    const SpecialCharValidator = (rule, value, callback) => {
+    // 特殊字符校验
+    const specialCharValidator = (rule, value, callback) => {
       const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
       const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
       if (regEn.test(value) || regCn.test(value)) {
         return callback(new Error('名称中不能包含特殊字符'))
+      }
+      callback()
+    }
+    // 手机号码校验
+    const mobileValidator = (rule, value, callback) => {
+      const result = this.Validator.isPhone(value)
+      if (!result) {
+        return callback(new Error('请输入合法的手机号码'))
+      }
+      callback()
+    }
+    // 邮箱校验
+    const emailValidator = (rule, value, callback) => {
+      const result = this.Validator.isEmail(value)
+      if (!result) {
+        return callback(new Error('请输入合法的邮箱'))
       }
       callback()
     }
@@ -243,6 +433,10 @@ export default {
       addUserDialogVisible: false,
       editUserDialogVisible: false,
       avatarUrl: '',
+      avatarPreviewUrl: '',
+      // 上传头像对话框显示与否
+      uploadProfile: false,
+      confirmProfile: false,
       addUserForm: {
         name: '',
         sex: '',
@@ -265,64 +459,82 @@ export default {
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
           { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
-          { validator: SpecialCharValidator, trigger: 'blur' }
+          { validator: specialCharValidator, trigger: 'blur' }
         ],
         sex: [
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         mobile: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+          { required: true, message: '请输入手机', trigger: 'blur' },
+          { validator: mobileValidator, trigger: 'blur' }
         ],
         email: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: emailValidator, trigger: 'blur' }
         ],
         active: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
+          { required: true, message: '是否启用', trigger: 'blur' }
         ],
         introduction: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
+          { required: false }
         ],
         avatar: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
+          { required: false }
         ]
       },
       editUserFormRules: {
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
-          { validator: usernameValidator, trigger: 'blur' }
-        ],
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'bulr' },
-          { validator: usernameValidator, trigger: 'blur' }
+          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
         ],
-        gender: [
+        sex: [
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
-        age: [
-          { required: true, message: '请输入年龄', trigger: 'blur' }
+        mobile: [
+          { required: true, message: '请输入手机', trigger: 'blur' },
+          { validator: mobileValidator, trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: emailValidator, trigger: 'blur' }
+        ],
+        active: [
+          { required: true, message: '是否启用', trigger: 'blur' }
+        ],
+        introduction: [
+          { required: false }
+        ],
+        avatar: [
+          { required: false }
         ]
       }
     }
   },
   methods: {
-    async getUserList () {
-      const { data: res } = await this.$http.get('/users', { params: this.pageInfo })
-      if (res.code !== 200) {
-        return this.$message.error('获取用户列表数据失败!')
-      }
-      this.userList = res.data.list
-      this.pageInfo.total = res.data.total
+    // 获取用户列表
+    getUserList () {
+      this.$http.get('/users', { params: this.pageInfo })
+        .then(res => {
+          if (res.data.code !== 200) {
+            return this.$message.error(res.data.message)
+          }
+          this.userList = res.data.data.list
+          this.pageInfo.total = res.data.total
+          console.log(res.data.data)
+        })
     },
+    // 分页单位调整,重新刷新列表
     handleSizeChange (newSize) {
       this.pageInfo.pageSize = newSize
       this.getUserList()
     },
+    // 下一页
     handleCurrentChange (newPage) {
       this.pageInfo.pageNum = newPage
       this.getUserList()
     },
+    // 更新用户状态
     updateUserStatus (userId, newStatus) {
       const params = {
         userId: userId,
@@ -336,27 +548,33 @@ export default {
           this.$message.success('更新成功!')
         })
     },
+    // 强制刷新输入框,解决无法输入问题
     onInput () {
       this.$forceUpdate()
     },
+    // 重置新增表单
     resetAddUserForm () {
       this.$refs.addUserFormRef.resetFields()
     },
+    // 新增请求
     submitAddUserRequest () {
-      this.$refs.addUserFormRef.validate(async valid => {
+      this.$refs.addUserFormRef.validate(valid => {
         if (!valid) {
           return
         }
-        const { data: res } = await this.$http.post('/user', this.addUserForm)
-        if (res.code !== 200) {
-          return this.$message.error('新增用户失败')
-        }
-        this.getUserList()
-        this.$message.success('添加成功')
-        // 成功之后,关闭对话框
-        this.addUserDialogVisible = false
+        this.$http.post('/user', this.addUserForm)
+          .then(res => {
+            if (res.data.code !== 200) {
+              return this.$message.error(res.data.message)
+            }
+            this.getUserList()
+            this.$message.success('添加成功')
+            // 成功之后,关闭对话框
+            this.addUserDialogVisible = false
+          })
       })
     },
+    // 显示编辑对话框
     showEditDialog (userId) {
       this.$http.get('/user/' + userId)
         .then(res => {
@@ -367,6 +585,7 @@ export default {
           this.editUserDialogVisible = true
         })
     },
+    // 编辑提交
     submitEditUserRequest () {
       this.$refs.editUserFormRef.validate((valid) => {
         if (!valid) {
@@ -383,16 +602,19 @@ export default {
           })
       })
     },
+    // 对话框关闭提示
     handleClose (done) {
       this.$confirm('确定要关闭对话框?')
         .then(_ => {
           done()
         })
-        .catch(_ => {})
+        .catch(_ => { })
     },
+    // 对话框关闭, 清空数据
     editDialogClosed () {
       this.$refs.editUserFormRef.resetFields()
     },
+    // 显示删除确认框
     showDeleteConfirm (userId) {
       this.$confirm('确定要删除当前记录?', '提示', {
         confirmButtonText: '确定',
@@ -418,9 +640,11 @@ export default {
         })
       })
     },
+    // 头像上传
     handleAvatarSuccess (res, file) {
       this.avatarUrl = URL.createObjectURL(file.raw)
     },
+    // 头像上传前校验
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 / 1024 < 2
@@ -432,13 +656,77 @@ export default {
         this.$message.error('Avatar picture size can not exceed 2MB!')
       }
       return isJPG && isLt2M
+    },
+    // 自定义上传方法
+    uploadAvatarRequest (file) {
+      const notify = this.$notify
+      const requestParams = new FormData()
+      const _this = this
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      }
+      requestParams.append('file', file.file)
+      requestParams.append('path', '/coding-strength')
+      this.$axios.post('/user/uploadImage', requestParams, headers)
+        .then(function (res) {
+          // Post成功，上传图片成功
+          if (res.data.successful) {
+            _this.ruleFormPersonalInfo.url = res.data.data.imageUrl
+            notify.success(
+              {
+                message: '成功修改头像'
+              })
+            // 关闭，并清空列表
+            _this.confirmProfile = false
+            _this.uploadProfile = false
+            _this.$refs.uploadRef.clearFiles()
+            _this.reload() // 全局方法，重新加载页面
+            return true
+          } else {
+            // Post成功，但上传图片失败
+            notify.error(
+              {
+                message: res.data.message
+              })
+          }
+        }).catch(function (err) {
+          notify.error(
+            {
+              message: err.toString()
+            })
+        })
+      return false
+    },
+    onChangeUpload (file) {
+      // 预保存上传的图片
+      this.previewImgURL = URL.createObjectURL(file.raw)
+      this.confirmProfile = true // 预览图片
+    },
+    /* 上传头像对话框 */
+    beforeDialogClose (done) { // 用户临时退出上传头像，应清空
+      this.$refs.uploadRef.clearFiles()
+      done()
+    },
+    cancelAvatarUpload () { // 用户临时退出上传头像，应清空
+      this.uploadProfile = false
+      this.$refs.uploadRef.clearFiles()
+    },
+    confirmCancel () {
+      this.confirmProfile = false
+      this.uploadProfile = true
+      this.previewImgURL = null
+      this.$refs.uploadRef.clearFiles()
+    },
+    confirmSubmit () {
+      // post上传头像 存到数据库，显示在个人中心
+      this.$refs.uploadRef.submit()
     }
   }
 }
 </script>
 <style lang="less" scoped>
-  .el-table {
-    width: 100%;
-    height: 100%;
-  }
+.el-table {
+  width: 100%;
+  height: 100%;
+}
 </style>

@@ -241,5 +241,18 @@ export default {
       }
     }
     return age
+  },
+
+  /**
+  * 15.邮箱校验
+  * true 说明合格
+  */
+  isEmail (email) {
+    const emailReg = /^([a-zA-Z0-9]+[_|_|\-|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,6}$/
+    if (emailReg.test(email)) {
+      return true
+    } else {
+      return false
+    }
   }
 }
