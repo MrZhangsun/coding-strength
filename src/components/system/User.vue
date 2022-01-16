@@ -20,32 +20,42 @@
       <el-table :data="userList" :border="true" stripe :header-cell-style="{'text-align':'center'}">
         <el-table-column type="index" label="#" align="center"/>
         <el-table-column
-          prop="userId"
+          prop="id"
           label="ID"
-          align="center"/>
-        <el-table-column
-          prop="username"
-          label="账号"
-          width="185px"
           align="center"/>
         <el-table-column
           prop="name"
           label="姓名"
           align="center"/>
         <el-table-column
-          prop="age"
-          label="年龄"
-          align="center"/>
-        <el-table-column
-          prop="gender"
+          prop="sex"
           label="性别"
+          align="center">
+          <template slot-scope="scope">
+              <span v-if="scope.row.sex == '0'">未知</span>
+              <span v-if="scope.row.sex == '1'">男</span>
+              <span v-if="scope.row.sex == '2'">女</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="mobile"
+          label="手机"
+          width="185px"
           align="center"/>
         <el-table-column
-          prop="useStatus"
+          prop="email"
+          label="邮箱"
+          align="center"/>
+        <el-table-column
+          prop="active"
           label="状态"
           align="center">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.useStatus" @change="updateUserStatus(scope.row.userId, scope.row.useStatus)"/>
+            <el-switch v-model="scope.row.active"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              @change="updateUserStatus(scope.row.id, scope.row.active)"/>
           </template>
         </el-table-column>
         <el-table-column
@@ -54,8 +64,8 @@
           align="center">
           <template
             slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.userId)" />
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="showDeleteConfirm(scope.row.userId)" />
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row.id)" />
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="showDeleteConfirm(scope.row.id)" />
             <el-tooltip effect="dark" content="设置" :enterable="false" placement="top">
               <el-button type="warning" icon="el-icon-setting" size="mini" />
             </el-tooltip>
@@ -103,8 +113,8 @@
             :max="120">
           </el-input-number>
         </el-form-item>
-        <el-form-item label="状态" prop="useStatus">
-          <el-switch v-model="addUserForm.useStatus"></el-switch>
+        <el-form-item label="状态" prop="active">
+          <el-switch v-model="addUserForm.active"></el-switch>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
@@ -202,12 +212,12 @@ export default {
       addUserFormRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'blur' },
+          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
           { validator: usernameValidator, trigger: 'blur' }
         ],
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 3, max: 10, message: '请输入3~10个字符', trigger: 'bulr' },
+          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'bulr' },
           { validator: usernameValidator, trigger: 'blur' }
         ],
         gender: [
@@ -243,8 +253,8 @@ export default {
       if (res.code !== 200) {
         return this.$message.error('获取用户列表数据失败!')
       }
-      this.userList = res.data
-      this.pageInfo.total = res.total
+      this.userList = res.data.list
+      this.pageInfo.total = res.data.total
     },
     handleSizeChange (newSize) {
       this.pageInfo.pageSize = newSize
