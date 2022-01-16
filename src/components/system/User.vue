@@ -153,86 +153,35 @@
         <el-form-item
           label="头像"
           prop="avatar"
+          style="height: 80px"
         >
-          <!-- 头像显示 -->
-          <div calss="demo-image">
-            <el-image
-              id="image"
-              style="width:100px; height: 100px"
-              :src="addUserForm.avatar + '?' + Date()"
-              fit="cover"
-            >
-            </el-image>
-            <el-button
-              type="text"
-              title="上传头像"
-              @click="uploadProfile = true"
-            >
-              选择头像
-            </el-button>
-          </div>
-          <!-- 上传头像弹窗 -->
-          <el-dialog
-            title="上传头像"
-            width="420px"
-            :visible.sync="uploadProfile"
-            :before-close="beforeDialogClose"
+          <el-upload
+            class="avatar-uploader"
+            action="no_use"
+            :http-request="uploadAvatarRequest"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :on-change="onChangeUpload"
+            ref="uploadRef"
+            :drag="false"
+            accept="image/*"
+            list-type="picture"
+            :multiple="false"
+            :auto-upload="true"
           >
-            <!-- drag upload -->
-            <el-upload
-              class="upload-demo"
-              ref="uploadRef"
-              :drag="true"
-              accept="image/*"
-              list-type="picture"
-              :multiple="false"
-              :auto-upload="true"
-              action="no_use"
-              :http-request="uploadAvatarRequest"
-              :on-change="onChangeUpload"
-            >
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处,<em>点击上传</em></div>
-              <div class="el-upload__tip">只能上传png,不大于2MB</div>
-            </el-upload>
-            <!-- 图片预览子弹框 -->
-            <el-dialog
-              width="30%"
-              title="头像预览"
-              :visibal.sync="confirmProfile"
-              :append-to-body="true"
-              :before-close="beforeDialogClose"
-            >
-              确认更改头像如下嘛? <br>
-              <div align="center">
-                <el-image
-                  style="width: 200px; height: 200px;"
-                  :src="avatarPreviewUrl"
-                  fit=cover
-                ></el-image>
-              </div>
-              <div
-                slot="footer"
-                class="dialog-footer"
+            <div class="avatar">
+              <img
+                v-if="addUserForm.avatar"
+                :src="addUserForm.avatar"
+                class="avatar"
               >
-                <el-button class="confirmCancel">换一个</el-button>
-                <el-button
-                  type="primary"
-                  class="confirmSubmit"
-                >确认</el-button>
-              </div>
-            </el-dialog>
-            <div
-              slot="footer"
-              class="dialog-footer"
-            >
-              <el-button @click="cancelAvatarUpload">取 消</el-button>
-              <el-button
-                type="primary"
-                @click="confirmProfile = true"
-              >打开内层 Dialog</el-button>
+              <i
+                v-else
+                class="el-icon-plus avatar-uploader-icon"
+              ></i>
             </div>
-          </el-dialog>
+          </el-upload>
         </el-form-item>
         <!-- 个人信息 -->
         <el-form-item
@@ -721,5 +670,33 @@ export default {
 .el-table {
   width: 100%;
   height: 100%;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 80px;
+  height: 80px;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+}
+.avatar {
+  width: 80px;
+  height: 80px;
+  display: block;
+  background-color: #fff;
+  border: 1px dashed #0f0d0d;
+  border-radius: 6px;
 }
 </style>
