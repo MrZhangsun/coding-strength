@@ -5,6 +5,7 @@ import router from './router'
 import './plugins/element.js'
 import './assets/css/global.css'
 import './fonts/iconfont.js'
+import Validator from './utils/validator.js'
 import axios from 'axios'
 
 // 配置http请求
@@ -16,7 +17,7 @@ axios.interceptors.request.use(config => {
   return config
 })
 Vue.prototype.$http = axios
-
+Vue.prototype.Validator = Validator
 Vue.config.productionTip = false
 
 new Vue({

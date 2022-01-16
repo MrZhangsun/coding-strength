@@ -90,31 +90,80 @@
       :visible.sync="addUserDialogVisible"
       width="50%"
       :before-close="handleClose">
-      <!-- 表单项 -->
+      <!-- 表单项 https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload -->
       <el-form ref="addUserFormRef" :model="addUserForm" :rules="addUserFormRules" label-width="120px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="addUserForm.username"></el-input>
+        <!-- 用户头像 -->
+        <el-form-item label="头像" prop="avatar">
+          <!-- 头像显示 -->
+          <div calss="demo-image">
+            <el-image id="image" style="width:100px; height: 100px" :src="addUserForm.avatar + '?' + Date()"
+              fit="cover">
+            </el-image>
+            <el-button type="text" title="修改头像" @click="uploadProfile = true">
+              修改头像
+            </el-button>
+          </div>
+          <!-- 上传头像弹窗 -->
+          <el-dailog title="上传头像" width="420px" :visible.sync="uploadProfile" :before-close="beforeDailogClose">
+            <!-- drag upload -->
+            <el-upload
+              class="upload-demo"
+              ref="uploadRef"
+              :drag="true"
+              accept="image/*"
+              list-type="picture"
+              :multiple="false"
+              :auto-upload="false"
+              action="no_use"
+              :http-request="uploadPicturePost"
+              :on-change="onChangeUpload">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处,<em>点击上传</em></div>
+              <div class="el-upload__tip">只能上传png,不大于2MB</div>
+            </el-upload>
+            <!-- 图片预览子弹框 -->
+            <el-dailog width="30%" title="头像预览" :visibal.sync="confirmProfile" :append-to-body="true" :before-close="beforeDailogClose">
+              确认更改头像如下嘛? <br>
+              <div align="center">
+                <el-image style="width: 200px; height: 200px;" :src="previewImageUrl" fit=cover></el-image>
+              </div>
+              <div slot="footer" class="dailog-footer">
+                <el-button class="confirmCancel">换一个</el-button>
+                <el-button type="primary" class="confirmSubmit">确认</el-button>
+              </div>
+            </el-dailog>
+          </el-dailog>
         </el-form-item>
-        <el-form-item label="昵称" prop="nickName">
-          <el-input v-model="addUserForm.nickName"></el-input>
-        </el-form-item>
+        <!-- 个人信息 -->
         <el-form-item label="姓名" prop="name">
           <el-input v-model="addUserForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-radio-group v-model="addUserForm.gender">
+        <el-form-item label="性别" prop="sex">
+          <el-radio-group v-model="addUserForm.sex">
             <el-radio label="男"></el-radio>
             <el-radio label="女"></el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="年龄" prop="age">
-          <el-input-number v-model="addUserForm.age"
-            :min="1"
-            :max="120">
-          </el-input-number>
+        <el-form-item label="手机号" prop="mobile">
+          <el-input v-model="addUserForm.mobile"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addUserForm.email"></el-input>
         </el-form-item>
         <el-form-item label="状态" prop="active">
-          <el-switch v-model="addUserForm.active"></el-switch>
+          <el-switch
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            v-model="addUserForm.active"></el-switch>
+        </el-form-item>
+        <el-form-item label="个人简介" prop="introduction">
+          <el-input type="textarea" placeholder="请输入个人简介, 不超过1000字"
+            v-model="addUserForm.introduction"
+            :autosize="{ minRow: 5, maxRow: 10 }"
+            maxlength="1000"
+            show-word-limit>
+          </el-input>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
@@ -175,7 +224,7 @@ export default {
     this.getUserList()
   },
   data () {
-    const usernameValidator = (rule, value, callback) => {
+    const SpecialCharValidator = (rule, value, callback) => {
       const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
       const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
       if (regEn.test(value) || regCn.test(value)) {
@@ -193,37 +242,47 @@ export default {
       },
       addUserDialogVisible: false,
       editUserDialogVisible: false,
+      avatarUrl: '',
       addUserForm: {
-        username: '',
-        nickName: '',
         name: '',
-        gender: '',
-        age: 0,
-        useStatus: undefined
+        sex: '',
+        mobile: '',
+        email: '',
+        active: 0,
+        introduction: '',
+        avatar: ''
       },
       editUserForm: {
-        username: '',
-        nickName: '',
         name: '',
-        gender: '',
-        age: 0,
-        useStatus: undefined
+        sex: '',
+        mobile: '',
+        email: '',
+        active: 0,
+        introduction: '',
+        avatar: ''
       },
       addUserFormRules: {
-        username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
-          { validator: usernameValidator, trigger: 'blur' }
-        ],
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'bulr' },
-          { validator: usernameValidator, trigger: 'blur' }
+          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
+          { validator: SpecialCharValidator, trigger: 'blur' }
         ],
-        gender: [
+        sex: [
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
-        age: [
+        mobile: [
+          { required: true, message: '请选择性别', trigger: 'change' }
+        ],
+        email: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ],
+        active: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ],
+        introduction: [
+          { required: true, message: '请输入年龄', trigger: 'blur' }
+        ],
+        avatar: [
           { required: true, message: '请输入年龄', trigger: 'blur' }
         ]
       },
@@ -264,17 +323,18 @@ export default {
       this.pageInfo.pageNum = newPage
       this.getUserList()
     },
-    async updateUserStatus (userId, newStatus) {
+    updateUserStatus (userId, newStatus) {
       const params = {
         userId: userId,
         useStatus: newStatus
       }
-      const { data: res } = await this.$http.put('/user/' + userId, params)
-      if (res.code !== 200) {
-        return this.$message.error('状态更新失败!')
-      }
-
-      this.$message.success('更新成功!')
+      this.$http.put('/user/' + userId, params)
+        .then(res => {
+          if (res.data.code !== 200) {
+            return this.$message.error(res.data.message)
+          }
+          this.$message.success('更新成功!')
+        })
     },
     onInput () {
       this.$forceUpdate()
@@ -357,6 +417,21 @@ export default {
           message: '已取消'
         })
       })
+    },
+    handleAvatarSuccess (res, file) {
+      this.avatarUrl = URL.createObjectURL(file.raw)
+    },
+    beforeAvatarUpload (file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG) {
+        this.$message.error('Avatar picture must be JPG format!')
+      }
+      if (!isLt2M) {
+        this.$message.error('Avatar picture size can not exceed 2MB!')
+      }
+      return isJPG && isLt2M
     }
   }
 }
