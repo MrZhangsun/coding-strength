@@ -165,7 +165,7 @@
             :on-change="onChangeUpload"
             ref="uploadRef"
             :drag="false"
-            accept="image/*"
+            accept="image/png, image/jpeg"
             list-type="picture"
             :multiple="false"
             :auto-upload="true"
@@ -275,21 +275,41 @@
         :rules="editUserFormRules"
         label-width="120px"
       >
+        <!-- 用户头像 -->
         <el-form-item
-          label="用户名"
-          prop="username"
+          label="头像"
+          prop="avatar"
+          style="height: 80px"
         >
-          <el-input
-            v-model="editUserForm.username"
-            disabled
-          ></el-input>
+          <el-upload
+            class="avatar-uploader"
+            action="no_use"
+            :http-request="uploadAvatarRequest"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+            :on-change="onChangeUpload"
+            ref="editAvatarRef"
+            :drag="false"
+            accept="image/png, image/jpeg"
+            list-type="picture"
+            :multiple="false"
+            :auto-upload="true"
+          >
+            <div class="avatar">
+              <img
+                v-if="editUserForm.avatar"
+                :src="editUserForm.avatar"
+                class="avatar"
+              >
+              <i
+                v-else
+                class="el-icon-plus avatar-uploader-icon"
+              ></i>
+            </div>
+          </el-upload>
         </el-form-item>
-        <el-form-item
-          label="昵称"
-          prop="nickName"
-        >
-          <el-input v-model="editUserForm.nickName"></el-input>
-        </el-form-item>
+        <!-- 个人信息 -->
         <el-form-item
           label="姓名"
           prop="name"
@@ -300,28 +320,48 @@
           label="性别"
           prop="sex"
         >
-          <el-radio-group v-model="addUserForm.sex">
+          <el-radio-group v-model="editUserForm.sex">
             <el-radio label="0">未知</el-radio>
             <el-radio label="1">男</el-radio>
             <el-radio label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          label="年龄"
-          prop="age"
+          label="手机号"
+          prop="mobile"
         >
-          <el-input-number
-            v-model="editUserForm.age"
-            :min="1"
-            :max="120"
-          >
-          </el-input-number>
+          <el-input v-model="editUserForm.mobile"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="邮箱"
+          prop="email"
+        >
+          <el-input v-model="editUserForm.email"></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
-          prop="useStatus"
+          prop="active"
         >
-          <el-switch v-model="editUserForm.useStatus"></el-switch>
+          <el-switch
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            v-model="editUserForm.active"
+          ></el-switch>
+        </el-form-item>
+        <el-form-item
+          label="个人简介"
+          prop="introduction"
+        >
+          <el-input
+            type="textarea"
+            placeholder="请输入个人简介, 不超过1000字"
+            v-model="editUserForm.introduction"
+            :autosize="{ minRow: 10, maxRow: 10 }"
+            maxlength="1000"
+            show-word-limit
+          >
+          </el-input>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
@@ -412,7 +452,7 @@ export default {
       addUserFormRules: {
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
+          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
           { validator: specialCharValidator, trigger: 'blur' }
         ],
         sex: [
@@ -439,7 +479,7 @@ export default {
       editUserFormRules: {
         name: [
           { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 3, max: 30, message: '请输入3~30个字符', trigger: 'blur' },
+          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
           { validator: specialCharValidator, trigger: 'blur' }
         ],
         sex: [
@@ -474,7 +514,7 @@ export default {
             return this.$message.error(res.data.message)
           }
           this.userList = res.data.data.list
-          this.pageInfo.total = res.data.total
+          this.pageInfo.total = res.data.data.total
         })
     },
     // 分页单位调整,重新刷新列表
@@ -524,6 +564,7 @@ export default {
             this.$message.success('添加成功')
             // 成功之后,关闭对话框
             this.addUserDialogVisible = false
+            this.$refs.addUserFormRef.resetFields()
           })
       })
     },
@@ -534,7 +575,7 @@ export default {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
           }
-          this.editUserForm = res.data
+          this.editUserForm = res.data.data
           this.editUserDialogVisible = true
         })
     },
@@ -544,7 +585,7 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.put('/user/' + this.editUserForm.userId, this.editUserForm)
+        this.$http.put('/user/' + this.editUserForm.id, this.editUserForm)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
@@ -576,8 +617,8 @@ export default {
       }).then(() => {
         this.$http.delete('/user/' + userId)
           .then(res => {
-            if (res.code !== 200) {
-              return this.$message.error(res.message)
+            if (res.data.code !== 200) {
+              return this.$message.error(res.data.message)
             }
 
             this.getUserList()
@@ -599,16 +640,12 @@ export default {
     },
     // 头像上传前校验
     beforeAvatarUpload (file) {
-      const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 / 1024 < 2
 
-      if (!isJPG) {
-        this.$message.error('Avatar picture must be JPG format!')
-      }
       if (!isLt2M) {
         this.$message.error('Avatar picture size can not exceed 2MB!')
       }
-      return isJPG && isLt2M
+      return isLt2M
     },
     // 自定义上传方法
     uploadAvatarRequest (file) {
@@ -643,25 +680,6 @@ export default {
       this.previewImgURL = URL.createObjectURL(file.raw)
       this.confirmProfile = true // 预览图片
       console.log(this.previewImgURL)
-    },
-    /* 上传头像对话框 */
-    beforeDialogClose (done) { // 用户临时退出上传头像，应清空
-      this.$refs.uploadRef.clearFiles()
-      done()
-    },
-    cancelAvatarUpload () { // 用户临时退出上传头像，应清空
-      this.uploadProfile = false
-      this.$refs.uploadRef.clearFiles()
-    },
-    confirmCancel () {
-      this.confirmProfile = false
-      this.uploadProfile = true
-      this.previewImgURL = null
-      this.$refs.uploadRef.clearFiles()
-    },
-    confirmSubmit () {
-      // post上传头像 存到数据库，显示在个人中心
-      this.$refs.uploadRef.submit()
     }
   }
 }
