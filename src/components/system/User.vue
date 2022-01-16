@@ -395,6 +395,8 @@
 </template>
 
 <script>
+import { uploadFile } from '../../utils/upload.js'
+
 export default {
   created () {
     this.getUserList()
@@ -539,8 +541,8 @@ export default {
     // 更新用户状态
     updateUserStatus (userId, newStatus) {
       const params = {
-        userId: userId,
-        useStatus: newStatus
+        id: userId,
+        active: newStatus
       }
       this.$http.put('/user/' + userId, params)
         .then(res => {
@@ -661,6 +663,7 @@ export default {
     },
     // 自定义上传方法
     uploadAvatarRequest (file) {
+      uploadFile(file, '/coding-strength', false)
       const requestParams = new FormData()
       const headers = {
         'Content-Type': 'multipart/form-data'
