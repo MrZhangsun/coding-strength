@@ -142,7 +142,7 @@
       width="50%"
       :before-close="handleClose"
     >
-      <!-- 表单项 https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload -->
+      <!-- 表单项 -->
       <el-form
         ref="addUserFormRef"
         :model="addUserForm"
@@ -165,10 +165,10 @@
             </el-image>
             <el-button
               type="text"
-              title="修改头像"
+              title="上传头像"
               @click="uploadProfile = true"
             >
-              修改头像
+              选择头像
             </el-button>
           </div>
           <!-- 上传头像弹窗 -->
@@ -227,7 +227,10 @@
               class="dialog-footer"
             >
               <el-button @click="cancelAvatarUpload">取 消</el-button>
-              <!-- <el-button type="primary" @click="confirmProfile = true">打开内层 Dialog</el-button>-->
+              <el-button
+                type="primary"
+                @click="confirmProfile = true"
+              >打开内层 Dialog</el-button>
             </div>
           </el-dialog>
         </el-form-item>
@@ -521,7 +524,6 @@ export default {
           }
           this.userList = res.data.data.list
           this.pageInfo.total = res.data.total
-          console.log(res.data.data)
         })
     },
     // 分页单位调整,重新刷新列表
@@ -659,41 +661,28 @@ export default {
     },
     // 自定义上传方法
     uploadAvatarRequest (file) {
-      const notify = this.$notify
       const requestParams = new FormData()
-      const _this = this
       const headers = {
         'Content-Type': 'multipart/form-data'
       }
       requestParams.append('file', file.file)
       requestParams.append('path', '/coding-strength')
-      this.$axios.post('/user/uploadImage', requestParams, headers)
-        .then(function (res) {
-          // Post成功，上传图片成功
-          if (res.data.successful) {
-            _this.ruleFormPersonalInfo.url = res.data.data.imageUrl
-            notify.success(
-              {
-                message: '成功修改头像'
-              })
-            // 关闭，并清空列表
-            _this.confirmProfile = false
-            _this.uploadProfile = false
-            _this.$refs.uploadRef.clearFiles()
-            _this.reload() // 全局方法，重新加载页面
-            return true
-          } else {
-            // Post成功，但上传图片失败
-            notify.error(
-              {
-                message: res.data.message
-              })
+      requestParams.append('uniqueName', false)
+      this.$http.post('https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload', requestParams, headers)
+        .then(res => {
+          if (res.data.code !== 200) {
+            return this.$message.error(res.data.message)
           }
-        }).catch(function (err) {
-          notify.error(
-            {
-              message: err.toString()
-            })
+
+          this.addUserForm.avatar = res.data.data.uri
+          // 关闭，并清空列表
+          this.confirmProfile = false
+          this.uploadProfile = false
+          this.$refs.uploadRef.clearFiles()
+          // this.reload()
+          return this.$message.success('上传成功')
+        }).catch(error => {
+          console.error(error)
         })
       return false
     },
@@ -701,6 +690,7 @@ export default {
       // 预保存上传的图片
       this.previewImgURL = URL.createObjectURL(file.raw)
       this.confirmProfile = true // 预览图片
+      console.log(this.previewImgURL)
     },
     /* 上传头像对话框 */
     beforeDialogClose (done) { // 用户临时退出上传头像，应清空
