@@ -63,7 +63,8 @@
           label="密码"
           width="185px"
           align="center"
-        />
+        >
+        </el-table-column>
         <el-table-column
           prop="url"
           label="地址"
@@ -165,7 +166,7 @@
         </el-form-item>
         <el-form-item
           label="密码"
-          prop="mobile"
+          prop="password"
         >
           <el-input
             type="password"
@@ -174,7 +175,7 @@
         </el-form-item>
         <el-form-item
           label="状态"
-          prop="active"
+          prop="status"
         >
           <el-switch
             :active-value="1"
@@ -235,72 +236,37 @@
         :rules="editRepositoryFormRules"
         label-width="120px"
       >
-        <!-- 代码仓库头像 -->
+        <!-- 仓库信息 -->
         <el-form-item
-          label="头像"
-          prop="avatar"
-          style="height: 80px"
-        >
-          <el-upload
-            class="avatar-uploader"
-            action="no_use"
-            :http-request="uploadAvatarRequest"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload"
-            :on-change="onChangeUpload"
-            ref="editAvatarRef"
-            :drag="false"
-            accept="image/png, image/jpeg"
-            list-type="picture"
-            :multiple="false"
-            :auto-upload="true"
-          >
-            <div class="avatar">
-              <img
-                v-if="editRepositoryForm.avatar"
-                :src="editRepositoryForm.avatar"
-                class="avatar"
-              >
-              <i
-                v-else
-                class="el-icon-plus avatar-uploader-icon"
-              ></i>
-            </div>
-          </el-upload>
-        </el-form-item>
-        <!-- 个人信息 -->
-        <el-form-item
-          label="姓名"
+          label="项目名称"
           prop="name"
         >
           <el-input v-model="editRepositoryForm.name"></el-input>
         </el-form-item>
         <el-form-item
-          label="性别"
-          prop="sex"
+          label="仓库地址"
+          prop="url"
         >
-          <el-radio-group v-model="editRepositoryForm.sex">
-            <el-radio label="0">未知</el-radio>
-            <el-radio label="1">男</el-radio>
-            <el-radio label="2">女</el-radio>
-          </el-radio-group>
+          <el-input v-model="editRepositoryForm.url"></el-input>
         </el-form-item>
         <el-form-item
-          label="手机号"
-          prop="mobile"
+          label="账号"
+          prop="username"
         >
-          <el-input v-model="editRepositoryForm.mobile"></el-input>
+          <el-input v-model="editRepositoryForm.username"></el-input>
         </el-form-item>
         <el-form-item
-          label="邮箱"
-          prop="email"
+          label="密码"
+          prop="password"
         >
-          <el-input v-model="editRepositoryForm.email"></el-input>
+          <el-input
+            type="password"
+            v-model="editRepositoryForm.password"
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
-          prop="active"
+          prop="status"
         >
           <el-switch
             :active-value="1"
@@ -310,15 +276,15 @@
           ></el-switch>
         </el-form-item>
         <el-form-item
-          label="个人简介"
-          prop="introduction"
+          label="仓库简介"
+          prop="description"
         >
           <el-input
             type="textarea"
-            placeholder="请输入个人简介, 不超过1000字"
-            v-model="editRepositoryForm.introduction"
-            :autosize="{ minRow: 10, maxRow: 10 }"
-            maxlength="1000"
+            placeholder="请输入仓库简介, 不超过500字"
+            v-model="editRepositoryForm.description"
+            :autosize="{ minRow: 5, maxRow: 10 }"
+            maxlength="500"
             show-word-limit
           >
           </el-input>
@@ -542,7 +508,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/system/repository/' + repositoryId)
+        this.$http.delete('/coding/repository/' + repositoryId)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
