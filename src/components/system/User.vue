@@ -321,9 +321,9 @@
           prop="sex"
         >
           <el-radio-group v-model="editUserForm.sex">
-            <el-radio label="0">未知</el-radio>
-            <el-radio label="1">男</el-radio>
-            <el-radio label="2">女</el-radio>
+            <el-radio :label="0">未知</el-radio>
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
@@ -508,7 +508,7 @@ export default {
   methods: {
     // 获取用户列表
     getUserList () {
-      this.$http.get('/users', { params: this.pageInfo })
+      this.$http.get('/system/users', { params: this.pageInfo })
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
@@ -533,7 +533,7 @@ export default {
         id: userId,
         active: newStatus
       }
-      this.$http.put('/user/' + userId, params)
+      this.$http.put('/system/user/' + userId, params)
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
@@ -555,7 +555,7 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.post('/user', this.addUserForm)
+        this.$http.post('/system/user', this.addUserForm)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
@@ -570,7 +570,7 @@ export default {
     },
     // 显示编辑对话框
     showEditDialog (userId) {
-      this.$http.get('/user/' + userId)
+      this.$http.get('/system/user/' + userId)
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
@@ -585,7 +585,7 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.put('/user/' + this.editUserForm.id, this.editUserForm)
+        this.$http.put('/system/user/' + this.editUserForm.id, this.editUserForm)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
@@ -615,7 +615,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/user/' + userId)
+        this.$http.delete('/system/user/' + userId)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
