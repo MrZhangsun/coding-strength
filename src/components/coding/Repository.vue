@@ -13,26 +13,26 @@
             placeholder="search by repository name"
             v-model="pageInfo.query"
             @input="onInput"
-            @clear="getUserList"
+            @clear="getRepositoryList"
             clearable
           >
             <el-button
               slot="append"
               icon="el-icon-search"
-              @click="getUserList"
+              @click="getRepositoryList"
             ></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
           <el-button
             type="primary"
-            @click="addUserDialogVisible = true"
+            @click="addRepositoryDialogVisible = true"
           >添加代码库</el-button>
         </el-col>
       </el-row>
-      <!-- 用户列表 -->
+      <!-- 代码仓库列表 -->
       <el-table
-        :data="userList"
+        :data="repositoryList"
         :border="true"
         stripe
         :header-cell-style="{'text-align':'center'}"
@@ -49,43 +49,38 @@
         />
         <el-table-column
           prop="name"
-          label="姓名"
+          label="项目名称"
           align="center"
         />
         <el-table-column
-          prop="sex"
-          label="性别"
+          prop="username"
+          label="账号"
           align="center"
         >
-          <template slot-scope="scope">
-            <span v-if="scope.row.sex == '0'">未知</span>
-            <span v-if="scope.row.sex == '1'">男</span>
-            <span v-if="scope.row.sex == '2'">女</span>
-          </template>
         </el-table-column>
         <el-table-column
-          prop="mobile"
-          label="手机"
+          prop="password"
+          label="密码"
           width="185px"
           align="center"
         />
         <el-table-column
-          prop="email"
-          label="邮箱"
+          prop="url"
+          label="地址"
           align="center"
         />
         <el-table-column
-          prop="active"
+          prop="status"
           label="状态"
           align="center"
         >
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.active"
+              v-model="scope.row.status"
               :active-value="1"
               :inactive-value="0"
               active-color="#13ce66"
-              @change="updateUserStatus(scope.row.id, scope.row.active)"
+              @change="updateRepositoryStatus(scope.row.id, scope.row.active)"
             />
           </template>
         </el-table-column>
@@ -135,82 +130,47 @@
       </el-pagination>
     </el-card>
 
-    <!-- 添加用户对话框 -->
+    <!-- 添加代码仓库对话框 -->
     <el-dialog
-      title="新增用户"
-      :visible.sync="addUserDialogVisible"
+      title="新增代码仓库"
+      :visible.sync="addRepositoryDialogVisible"
       width="50%"
       :before-close="handleClose"
     >
       <!-- 表单项 -->
       <el-form
-        ref="addUserFormRef"
-        :model="addUserForm"
-        :rules="addUserFormRules"
+        ref="addRepositoryFormRef"
+        :model="addRepositoryForm"
+        :rules="addRepositoryFormRules"
         label-width="120px"
       >
-        <!-- 用户头像 -->
+        <!-- 仓库信息 -->
         <el-form-item
-          label="头像"
-          prop="avatar"
-          style="height: 80px"
-        >
-          <el-upload
-            class="avatar-uploader"
-            action="no_use"
-            :http-request="uploadAvatarRequest"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-            :before-upload="beforeAvatarUpload"
-            :on-change="onChangeUpload"
-            ref="uploadRef"
-            :drag="false"
-            accept="image/png, image/jpeg"
-            list-type="picture"
-            :multiple="false"
-            :auto-upload="true"
-          >
-            <div class="avatar">
-              <img
-                v-if="addUserForm.avatar"
-                :src="addUserForm.avatar"
-                class="avatar"
-              >
-              <i
-                v-else
-                class="el-icon-plus avatar-uploader-icon"
-              ></i>
-            </div>
-          </el-upload>
-        </el-form-item>
-        <!-- 个人信息 -->
-        <el-form-item
-          label="姓名"
+          label="项目名称"
           prop="name"
         >
-          <el-input v-model="addUserForm.name"></el-input>
+          <el-input v-model="addRepositoryForm.name"></el-input>
         </el-form-item>
         <el-form-item
-          label="性别"
-          prop="sex"
+          label="仓库地址"
+          prop="url"
         >
-          <el-radio-group v-model="addUserForm.sex">
-            <el-radio label="0">未知</el-radio>
-            <el-radio label="1">男</el-radio>
-            <el-radio label="2">女</el-radio>
-          </el-radio-group>
+          <el-input v-model="addRepositoryForm.url"></el-input>
         </el-form-item>
         <el-form-item
-          label="手机号"
+          label="账号"
+          prop="username"
+        >
+          <el-input v-model="addRepositoryForm.username"></el-input>
+        </el-form-item>
+        <el-form-item
+          label="密码"
           prop="mobile"
         >
-          <el-input v-model="addUserForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item
-          label="邮箱"
-          prop="email"
-        >
-          <el-input v-model="addUserForm.email"></el-input>
+          <el-input
+            type="password"
+            v-model="addRepositoryForm.password"
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
@@ -220,19 +180,19 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="addUserForm.active"
+            v-model="addRepositoryForm.active"
           ></el-switch>
         </el-form-item>
         <el-form-item
-          label="个人简介"
-          prop="introduction"
+          label="仓库简介"
+          prop="description"
         >
           <el-input
             type="textarea"
-            placeholder="请输入个人简介, 不超过1000字"
-            v-model="addUserForm.introduction"
+            placeholder="请输入仓库简介, 不超过500字"
+            v-model="addRepositoryForm.description"
             :autosize="{ minRow: 5, maxRow: 10 }"
-            maxlength="1000"
+            maxlength="500"
             show-word-limit
           >
           </el-input>
@@ -245,37 +205,37 @@
       >
         <el-button
           type="primary"
-          @click="submitAddUserRequest"
+          @click="submitAddRepositoryRequest"
         >确定</el-button>
         <el-button
           type="danger"
           :before-close="handleClose"
-          @click="addUserDialogVisible = false"
+          @click="addRepositoryDialogVisible = false"
         >取消</el-button>
         <el-button
           type="info"
-          @click="resetAddUserForm"
+          @click="resetAddRepositoryForm"
         >重置</el-button>
       </span>
     </el-dialog>
 
-    <!-- 编辑用户对话框 -->
+    <!-- 编辑代码仓库对话框 -->
     <el-dialog
-      ref="editUserDialogRef"
-      title="编辑用户"
-      :visible.sync="editUserDialogVisible"
+      ref="editRepositoryDialogRef"
+      title="编辑代码仓库"
+      :visible.sync="editRepositoryDialogVisible"
       width="50%"
       :before-close="handleClose"
       @close="editDialogClosed"
     >
       <!-- 表单项 -->
       <el-form
-        ref="editUserFormRef"
-        :model="editUserForm"
-        :rules="editUserFormRules"
+        ref="editRepositoryFormRef"
+        :model="editRepositoryForm"
+        :rules="editRepositoryFormRules"
         label-width="120px"
       >
-        <!-- 用户头像 -->
+        <!-- 代码仓库头像 -->
         <el-form-item
           label="头像"
           prop="avatar"
@@ -298,8 +258,8 @@
           >
             <div class="avatar">
               <img
-                v-if="editUserForm.avatar"
-                :src="editUserForm.avatar"
+                v-if="editRepositoryForm.avatar"
+                :src="editRepositoryForm.avatar"
                 class="avatar"
               >
               <i
@@ -314,13 +274,13 @@
           label="姓名"
           prop="name"
         >
-          <el-input v-model="editUserForm.name"></el-input>
+          <el-input v-model="editRepositoryForm.name"></el-input>
         </el-form-item>
         <el-form-item
           label="性别"
           prop="sex"
         >
-          <el-radio-group v-model="editUserForm.sex">
+          <el-radio-group v-model="editRepositoryForm.sex">
             <el-radio label="0">未知</el-radio>
             <el-radio label="1">男</el-radio>
             <el-radio label="2">女</el-radio>
@@ -330,13 +290,13 @@
           label="手机号"
           prop="mobile"
         >
-          <el-input v-model="editUserForm.mobile"></el-input>
+          <el-input v-model="editRepositoryForm.mobile"></el-input>
         </el-form-item>
         <el-form-item
           label="邮箱"
           prop="email"
         >
-          <el-input v-model="editUserForm.email"></el-input>
+          <el-input v-model="editRepositoryForm.email"></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
@@ -346,7 +306,7 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="editUserForm.active"
+            v-model="editRepositoryForm.active"
           ></el-switch>
         </el-form-item>
         <el-form-item
@@ -356,7 +316,7 @@
           <el-input
             type="textarea"
             placeholder="请输入个人简介, 不超过1000字"
-            v-model="editUserForm.introduction"
+            v-model="editRepositoryForm.introduction"
             :autosize="{ minRow: 10, maxRow: 10 }"
             maxlength="1000"
             show-word-limit
@@ -371,12 +331,12 @@
       >
         <el-button
           type="primary"
-          @click="submitEditUserRequest"
+          @click="submitEditRepositoryRequest"
         >确定</el-button>
         <el-button
           type="danger"
           :before-close="handleClose"
-          @click="editUserDialogVisible = false"
+          @click="editRepositoryDialogVisible = false"
         >取消</el-button>
       </span>
     </el-dialog>
@@ -388,152 +348,119 @@ import { uploadFile } from '../../utils/upload.js'
 
 export default {
   created () {
-    this.getUserList()
+    this.getRepositoryList()
   },
   data () {
-    // 特殊字符校验
-    const specialCharValidator = (rule, value, callback) => {
-      const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
-      const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
-      if (regEn.test(value) || regCn.test(value)) {
-        return callback(new Error('名称中不能包含特殊字符'))
-      }
-      callback()
-    }
-    // 手机号码校验
-    const mobileValidator = (rule, value, callback) => {
-      const result = this.Validator.isPhone(value)
-      if (!result) {
-        return callback(new Error('请输入合法的手机号码'))
-      }
-      callback()
-    }
-    // 邮箱校验
-    const emailValidator = (rule, value, callback) => {
-      const result = this.Validator.isEmail(value)
-      if (!result) {
-        return callback(new Error('请输入合法的邮箱'))
+    // git@code.aliyun.com:vevorcenter/vevor-center.git
+    // https://code.aliyun.com/vevorcenter/vevor-center.git
+    const urlValidator = (rule, value, callback) => {
+      const repositoryUrlRegx = /^(http(s)?:\/\/([^/]+?\/){2}|git@[^:]+:[^/]+?\/).*?.git$/
+      const isUrl = repositoryUrlRegx.test(value)
+
+      console.log(isUrl)
+      if (!isUrl) {
+        return callback(new Error('请输入合法的Git仓库URL'))
       }
       callback()
     }
     return {
-      userList: [],
+      repositoryList: [],
       pageInfo: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
         query: ''
       },
-      addUserDialogVisible: false,
-      editUserDialogVisible: false,
+      addRepositoryDialogVisible: false,
+      editRepositoryDialogVisible: false,
       avatarUrl: '',
       avatarPreviewUrl: '',
       // 上传头像对话框显示与否
       uploadProfile: false,
       confirmProfile: false,
-      addUserForm: {
+      addRepositoryForm: {
         name: '',
-        sex: '',
-        mobile: '',
-        email: '',
-        active: 0,
-        introduction: '',
-        avatar: ''
+        url: '',
+        username: '',
+        password: '',
+        status: '',
+        description: ''
       },
-      editUserForm: {
+      editRepositoryForm: {
         name: '',
-        sex: '',
-        mobile: '',
-        email: '',
-        active: 0,
-        introduction: '',
-        avatar: ''
+        url: '',
+        username: '',
+        password: '',
+        status: '',
+        description: ''
       },
-      addUserFormRules: {
+      addRepositoryFormRules: {
+        url: [
+          { required: true, message: '请输入仓库地址', trigger: 'blur' },
+          { validator: urlValidator, trigger: 'blur' }
+        ],
         name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
-          { validator: specialCharValidator, trigger: 'blur' }
+          { required: true, message: '请输入项目名称', trigger: 'blur' }
         ],
-        sex: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+        username: [
+          { required: true, message: '请输入账号', trigger: 'blur' }
         ],
-        mobile: [
-          { required: true, message: '请输入手机', trigger: 'blur' },
-          { validator: mobileValidator, trigger: 'blur' }
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: emailValidator, trigger: 'blur' }
-        ],
-        active: [
-          { required: true, message: '是否启用', trigger: 'blur' }
-        ],
-        introduction: [
-          { required: false }
-        ],
-        avatar: [
-          { required: false }
+        status: [
+          { required: true, message: '是否启用', trigger: 'change' }
         ]
       },
-      editUserFormRules: {
+      editRepositoryFormRules: {
+        url: [
+          { required: true, message: '请输入仓库地址', trigger: 'blur' },
+          { validator: urlValidator, trigger: 'blur' }
+        ],
         name: [
-          { required: true, message: '请输入姓名', trigger: 'blur' },
-          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
-          { validator: specialCharValidator, trigger: 'blur' }
+          { required: true, message: '请输入项目名称', trigger: 'blur' }
         ],
-        sex: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+        username: [
+          { required: true, message: '请输入账号', trigger: 'blur' }
         ],
-        mobile: [
-          { required: true, message: '请输入手机', trigger: 'blur' },
-          { validator: mobileValidator, trigger: 'blur' }
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: emailValidator, trigger: 'blur' }
-        ],
-        active: [
-          { required: true, message: '是否启用', trigger: 'blur' }
-        ],
-        introduction: [
-          { required: false }
-        ],
-        avatar: [
-          { required: false }
+        status: [
+          { required: true, message: '是否启用', trigger: 'change' }
         ]
       }
     }
   },
   methods: {
-    // 获取用户列表
-    getUserList () {
-      this.$http.get('/system/users', { params: this.pageInfo })
+    // 获取代码仓库列表
+    getRepositoryList () {
+      this.$http.get('/coding/repositories', { params: this.pageInfo })
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
           }
-          this.userList = res.data.data.list
+          this.repositoryList = res.data.data.list
           this.pageInfo.total = res.data.data.total
         })
     },
     // 分页单位调整,重新刷新列表
     handleSizeChange (newSize) {
       this.pageInfo.pageSize = newSize
-      this.getUserList()
+      this.getRepositoryList()
     },
     // 下一页
     handleCurrentChange (newPage) {
       this.pageInfo.pageNum = newPage
-      this.getUserList()
+      this.getRepositoryList()
     },
-    // 更新用户状态
-    updateUserStatus (userId, newStatus) {
+    // 更新代码仓库状态
+    updateRepositoryStatus (repositoryId, newStatus) {
       const params = {
-        id: userId,
-        active: newStatus
+        id: repositoryId,
+        status: newStatus
       }
-      this.$http.put('/system/user/' + userId, params)
+      this.$http.put('/coding/repository/' + repositoryId, params)
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
@@ -546,53 +473,53 @@ export default {
       this.$forceUpdate()
     },
     // 重置新增表单
-    resetAddUserForm () {
-      this.$refs.addUserFormRef.resetFields()
+    resetAddRepositoryForm () {
+      this.$refs.addRepositoryFormRef.resetFields()
     },
     // 新增请求
-    submitAddUserRequest () {
-      this.$refs.addUserFormRef.validate(valid => {
+    submitAddRepositoryRequest () {
+      this.$refs.addRepositoryFormRef.validate(valid => {
         if (!valid) {
           return
         }
-        this.$http.post('/user', this.addUserForm)
+        this.$http.post('/coding/repository', this.addRepositoryForm)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
             }
-            this.getUserList()
+            this.getRepositoryList()
             this.$message.success('添加成功')
             // 成功之后,关闭对话框
-            this.addUserDialogVisible = false
-            this.$refs.addUserFormRef.resetFields()
+            this.addRepositoryDialogVisible = false
+            this.$refs.addRepositoryFormRef.resetFields()
           })
       })
     },
     // 显示编辑对话框
-    showEditDialog (userId) {
-      this.$http.get('/system/user/' + userId)
+    showEditDialog (repositoryId) {
+      this.$http.get('/coding/repository/' + repositoryId)
         .then(res => {
           if (res.data.code !== 200) {
             return this.$message.error(res.data.message)
           }
-          this.editUserForm = res.data.data
-          this.editUserDialogVisible = true
+          this.editRepositoryForm = res.data.data
+          this.editRepositoryDialogVisible = true
         })
     },
     // 编辑提交
-    submitEditUserRequest () {
-      this.$refs.editUserFormRef.validate((valid) => {
+    submitEditRepositoryRequest () {
+      this.$refs.editRepositoryFormRef.validate((valid) => {
         if (!valid) {
           return
         }
-        this.$http.put('/system/user/' + this.editUserForm.id, this.editUserForm)
+        this.$http.put('/coding/repository/' + this.editRepositoryForm.id, this.editRepositoryForm)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
             }
             this.$message.success('修改成功!')
-            this.editUserDialogVisible = false
-            this.getUserList()
+            this.editRepositoryDialogVisible = false
+            this.getRepositoryList()
           })
       })
     },
@@ -606,22 +533,22 @@ export default {
     },
     // 对话框关闭, 清空数据
     editDialogClosed () {
-      this.$refs.editUserFormRef.resetFields()
+      this.$refs.editRepositoryFormRef.resetFields()
     },
     // 显示删除确认框
-    showDeleteConfirm (userId) {
+    showDeleteConfirm (repositoryId) {
       this.$confirm('确定要删除当前记录?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/system/user/' + userId)
+        this.$http.delete('/system/repository/' + repositoryId)
           .then(res => {
             if (res.data.code !== 200) {
               return this.$message.error(res.data.message)
             }
 
-            this.getUserList()
+            this.getRepositoryList()
             this.$message({
               type: 'success',
               message: '删除成功'
@@ -663,7 +590,7 @@ export default {
             return this.$message.error(res.data.message)
           }
 
-          this.addUserForm.avatar = res.data.data.uri
+          this.addRepositoryForm.avatar = res.data.data.uri
           // 关闭，并清空列表
           this.confirmProfile = false
           this.uploadProfile = false
