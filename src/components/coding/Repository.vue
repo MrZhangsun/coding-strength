@@ -53,22 +53,10 @@
           align="center"
         />
         <el-table-column
-          prop="username"
-          label="账号"
-          align="center"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="password"
-          label="密码"
-          width="185px"
-          align="center"
-        >
-        </el-table-column>
-        <el-table-column
           prop="url"
           label="地址"
-          align="center"
+          width="330px"
+          align="left"
         />
         <el-table-column
           prop="status"
@@ -159,21 +147,6 @@
           <el-input v-model="addRepositoryForm.url"></el-input>
         </el-form-item>
         <el-form-item
-          label="账号"
-          prop="username"
-        >
-          <el-input v-model="addRepositoryForm.username"></el-input>
-        </el-form-item>
-        <el-form-item
-          label="密码"
-          prop="password"
-        >
-          <el-input
-            type="password"
-            v-model="addRepositoryForm.password"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
           label="状态"
           prop="status"
         >
@@ -181,7 +154,7 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="addRepositoryForm.active"
+            v-model="addRepositoryForm.status"
           ></el-switch>
         </el-form-item>
         <el-form-item
@@ -250,21 +223,6 @@
           <el-input v-model="editRepositoryForm.url"></el-input>
         </el-form-item>
         <el-form-item
-          label="账号"
-          prop="username"
-        >
-          <el-input v-model="editRepositoryForm.username"></el-input>
-        </el-form-item>
-        <el-form-item
-          label="密码"
-          prop="password"
-        >
-          <el-input
-            type="password"
-            v-model="editRepositoryForm.password"
-          ></el-input>
-        </el-form-item>
-        <el-form-item
           label="状态"
           prop="status"
         >
@@ -272,7 +230,7 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="editRepositoryForm.active"
+            v-model="editRepositoryForm.status"
           ></el-switch>
         </el-form-item>
         <el-form-item
@@ -320,12 +278,9 @@ export default {
     // git@code.aliyun.com:vevorcenter/vevor-center.git
     // https://code.aliyun.com/vevorcenter/vevor-center.git
     const urlValidator = (rule, value, callback) => {
-      const repositoryUrlRegx = /^(http(s)?:\/\/([^/]+?\/){2}|git@[^:]+:[^/]+?\/).*?.git$/
-      const isUrl = repositoryUrlRegx.test(value)
-
-      console.log(isUrl)
+      const isUrl = this.Validator.isSshRepositoryURL(value)
       if (!isUrl) {
-        return callback(new Error('请输入合法的Git仓库URL'))
+        return callback(new Error('请输入SSH协议的地址'))
       }
       callback()
     }
@@ -368,14 +323,8 @@ export default {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' }
         ],
-        username: [
-          { required: true, message: '请输入账号', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ],
         status: [
-          { required: true, message: '是否启用', trigger: 'change' }
+          { required: true, message: '是否启用', trigger: 'blur' }
         ]
       },
       editRepositoryFormRules: {
@@ -386,14 +335,8 @@ export default {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' }
         ],
-        username: [
-          { required: true, message: '请输入账号', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
-        ],
         status: [
-          { required: true, message: '是否启用', trigger: 'change' }
+          { required: true, message: '是否启用', trigger: 'blur' }
         ]
       }
     }
@@ -567,12 +510,6 @@ export default {
           console.error(error)
         })
       return false
-    },
-    onChangeUpload (file) {
-      // 预保存上传的图片
-      this.previewImgURL = URL.createObjectURL(file.raw)
-      this.confirmProfile = true // 预览图片
-      console.log(this.previewImgURL)
     }
   }
 }
