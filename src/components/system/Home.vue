@@ -88,13 +88,14 @@ export default {
       this.$router.push('/login')
       this.$message.success('退出成功!')
     },
-    async loadMenuTree () {
-      const { data: res } = await this.$http.get('/system/menus')
-      if (res.code !== 200) {
-        return this.$message.error('获取菜单失败!')
-      }
-
-      this.menuTree = res.data
+    loadMenuTree () {
+      this.$http.get('/system/menus')
+        .then(res => {
+          if (res.data.code !== 200) {
+            return this.$message.error(res.data.message)
+          }
+          this.menuTree = res.data.data
+        })
     },
     collaspMenu () {
       this.isColloaspMenu = !this.isColloaspMenu

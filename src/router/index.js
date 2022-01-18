@@ -10,6 +10,7 @@ import Logger from '../components/coding/Logger.vue'
 import Menu from '../components/system/Menu.vue'
 import Account from '../components/system/Account.vue'
 import User from '../components/system/User.vue'
+import SystemLogger from '../components/system/Logger.vue'
 
 Vue.use(VueRouter)
 
@@ -83,6 +84,11 @@ const routes = [
         name: '用户管理',
         path: 'user',
         component: User
+      },
+      {
+        name: '系统日志',
+        path: 'logger',
+        component: SystemLogger
       }
     ]
   }
