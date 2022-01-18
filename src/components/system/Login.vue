@@ -103,8 +103,10 @@ export default {
 
         this.$message.success('登录成功')
         // 1. 保存token
-        window.sessionStorage.setItem('token', res.data.token)
-        // 2. 页面跳转
+        window.sessionStorage.setItem('token', res.data.data.token)
+        window.sessionStorage.setItem('username', res.data.data.username)
+        window.sessionStorage.setItem('avatar', 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+        // 3. 页面跳转
         this.$router.push('/home')
       })
     }

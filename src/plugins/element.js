@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { Loading, Image, Upload, RadioGroup, Radio, Dialog, Pagination, Tooltip, Switch, Table, TableColumn, Row, Col, Card, BreadcrumbItem, Breadcrumb, Button, Form, FormItem, InputNumber, Input, Message, MessageBox, Container, Aside, Header, Main, Footer, Menu, Submenu, MenuItem, MenuItemGroup } from 'element-ui'
+import { Dropdown, DropdownMenu, DropdownItem, Avatar, Loading, Image, Upload, RadioGroup, Radio, Dialog, Pagination, Tooltip, Switch, Table, TableColumn, Row, Col, Card, BreadcrumbItem, Breadcrumb, Button, Form, FormItem, InputNumber, Input, Message, MessageBox, Container, Aside, Header, Main, Footer, Menu, Submenu, MenuItem, MenuItemGroup } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.use(Button)
@@ -32,5 +32,9 @@ Vue.use(RadioGroup)
 Vue.use(Upload)
 Vue.use(Image)
 Vue.use(Loading)
+Vue.use(Avatar)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
 Vue.prototype.$message = Message
 Vue.prototype.$confirm = MessageBox.confirm

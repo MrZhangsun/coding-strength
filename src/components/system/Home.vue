@@ -1,17 +1,32 @@
 <template>
   <el-container class="home_container">
     <el-header>
-      <div class="title">
+      <div class="logo-div">
         <img
           src="../../assets/logo.png"
           alt=""
         >
         <span>代码统计系统</span>
       </div>
-      <el-button
-        type="info"
-        @click="logout"
-      >退出</el-button>
+      <div class="logout-div">
+        <div
+          class="avatar-div"
+          @click="isDisplayLogout = (isDisplayLogout == 'block' ? 'none' : 'block')"
+        >
+          <el-avatar
+            :src="this.globalAvatar"
+            icon="el-icon-user-solid"
+            :size="35"
+          >
+          </el-avatar>
+        </div>
+        <span class="username">{{this.globalUsername}}</span>
+        <el-button
+          class="logoutBtn"
+          :style="{'display': isDisplayLogout}"
+          @click="logout"
+        >退出</el-button>
+      </div>
     </el-header>
     <el-container>
       <el-aside :width="isColloaspMenu ? '64px' : '175px'">
@@ -71,6 +86,8 @@
 export default {
   created () {
     this.loadMenuTree()
+    this.globalUsername = window.sessionStorage.getItem('username')
+    this.globalAvatar = window.sessionStorage.getItem('avatar')
   },
 
   data () {
@@ -78,7 +95,10 @@ export default {
       menuTree: [],
       isColloaspMenu: false,
       colloaspFlag: '#icon-Right-1',
-      defaultActive: '/home11'
+      defaultActive: '/home11',
+      isDisplayLogout: 'none',
+      globalUsername: '',
+      globalAvatar: ''
     }
   },
 
@@ -118,19 +138,29 @@ export default {
   color: #fff;
   text-align: left;
   line-height: 60px;
+  height: 200px;
   display: flex;
   justify-content: space-between;
   padding-left: 0%;
   align-items: center;
-  font-size: 20px;
-  > div {
-    display: flex;
-    justify-content: flex-start;
-    height: 100%;
-    > span {
-      margin-left: 20px;
-    }
-  }
+}
+.logo-div {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 20px;
+  height: 100%;
+  width: 200px;
+  font-size: 18px;
+  color: rgb(252, 235, 5);
+}
+.logout-div {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  width: 150px;
+}
+.avatar-div {
+  padding: 10px;
 }
 .el-aside {
   background-color: #333744;
@@ -166,5 +196,9 @@ export default {
 }
 .title {
   padding-left: 20px;
+}
+.logoutBtn {
+  position: fixed;
+  top: 60px;
 }
 </style>
