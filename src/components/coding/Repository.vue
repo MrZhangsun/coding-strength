@@ -93,14 +93,15 @@
             />
             <el-tooltip
               effect="dark"
-              content="设置"
+              content="详情"
               :enterable="false"
               placement="top"
             >
               <el-button
                 type="warning"
-                icon="el-icon-setting"
+                icon="el-icon-info"
                 size="mini"
+                @click="showDetailDialog(scope.row.id)"
               />
             </el-tooltip>
           </template>
@@ -264,6 +265,74 @@
         >取消</el-button>
       </span>
     </el-dialog>
+    <!-- 代码仓库详情对话框 -->
+    <el-dialog
+      ref="detailRepositoryDialogRef"
+      :visible.sync="detailRepositoryDialogVisible"
+      width="50%"
+    >
+      <el-descriptions
+        class="margin-top"
+        title="仓库详情"
+        :column="4"
+        direction="horizontals"
+        border
+        colon
+        :labelStyle="detailLabelStyle"
+        :contentStyle="detailContentStyle"
+      >
+        <el-descriptions-item
+          label="仓库编号"
+          :span="2"
+        >{{detialRepositoryForm.id}}</el-descriptions-item>
+        <el-descriptions-item
+          label="项目名称"
+          :span="2"
+        >{{detialRepositoryForm.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="仓库地址"
+          :span="4"
+        >{{detialRepositoryForm.url}}</el-descriptions-item>
+        <el-descriptions-item
+          label="仓库账号"
+          :span="2"
+        >{{detialRepositoryForm.username}}</el-descriptions-item>
+        <el-descriptions-item
+          label="账号密码"
+          :span="2"
+        >{{detialRepositoryForm.password}}</el-descriptions-item>
+        <el-descriptions-item
+          label="贡献者数量"
+          :span="2"
+        >{{detialRepositoryForm.totalAuthors}}</el-descriptions-item>
+        <el-descriptions-item
+          label="分支数量"
+          :span="2"
+        >{{detialRepositoryForm.totalBranches}}</el-descriptions-item>
+        <el-descriptions-item
+          label="项目周期"
+          :span="4"
+        >
+          {{detialRepositoryForm.totalAge}} days, {{detialRepositoryForm.activeAge}} active days ({{detialRepositoryForm.activeAge * 100 / detialRepositoryForm.totalAge}}%)
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="解析状态"
+          :span="4"
+        >
+          <el-switch
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            v-model="detialRepositoryForm.status"
+            disabled
+          ></el-switch>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="项目简介"
+          :span="4"
+        >{{detialRepositoryForm.description}}</el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </div>
 </template>
 
@@ -294,6 +363,7 @@ export default {
       },
       addRepositoryDialogVisible: false,
       editRepositoryDialogVisible: false,
+      detailRepositoryDialogVisible: false,
       avatarUrl: '',
       avatarPreviewUrl: '',
       // 上传头像对话框显示与否
@@ -314,6 +384,26 @@ export default {
         password: '',
         status: '',
         description: ''
+      },
+      detialRepositoryForm: {
+        id: '',
+        name: '',
+        url: '',
+        username: '',
+        password: '',
+        status: '',
+        description: '',
+        totalAuthors: '',
+        totalBranches: '',
+        totalAge: '',
+        avtiveAge: ''
+      },
+      detailLabelStyle: {
+        width: '100px',
+        'text-align': 'left'
+      },
+      detailContentStyle: {
+        'font-size': '12px'
       },
       addRepositoryFormRules: {
         url: [
@@ -413,6 +503,17 @@ export default {
           }
           this.editRepositoryForm = res.data.data
           this.editRepositoryDialogVisible = true
+        })
+    },
+    // 详情对话框
+    showDetailDialog (repositoryId) {
+      this.$http.get('/coding/repository/' + repositoryId)
+        .then(res => {
+          if (res.data.code !== 200) {
+            return this.$message.error(res.data.message)
+          }
+          this.detialRepositoryForm = res.data.data
+          this.detailRepositoryDialogVisible = true
         })
     },
     // 编辑提交

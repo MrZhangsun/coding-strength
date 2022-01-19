@@ -10,9 +10,9 @@ import axios from 'axios'
 import { Loading } from 'element-ui'
 
 // 配置http请求
-axios.defaults.baseURL = 'http://192.168.1.3:10110/api/'
+axios.defaults.baseURL = 'http://localhost:10110/api/'
 let loading = null
-const loadingSwitch = true
+const loadingSwitch = false
 const loadOption = {
   fullscreen: true,
   lock: true,

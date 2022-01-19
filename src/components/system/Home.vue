@@ -6,7 +6,7 @@
           src="../../assets/logo.png"
           alt=""
         >
-        <span>代码统计系统</span>
+        <span>Coding Strength Top</span>
       </div>
       <div class="logout-div">
         <div
@@ -149,7 +149,7 @@ export default {
   justify-content: space-between;
   padding-left: 20px;
   height: 100%;
-  width: 200px;
+  width: 230px;
   font-size: 18px;
   color: rgb(252, 235, 5);
 }
