@@ -316,6 +316,12 @@
           {{detialRepositoryForm.totalAge}} days, {{detialRepositoryForm.activeAge}} active days ({{detialRepositoryForm.activeAge * 100 / detialRepositoryForm.totalAge}}%)
         </el-descriptions-item>
         <el-descriptions-item
+          label="统计时间"
+          :span="4"
+        >
+          {{detialRepositoryForm.updatedTime}}
+        </el-descriptions-item>
+        <el-descriptions-item
           label="解析状态"
           :span="4"
         >
@@ -332,6 +338,16 @@
           :span="4"
         >{{detialRepositoryForm.description}}</el-descriptions-item>
       </el-descriptions>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="danger"
+          @click="detailRepositoryDialogVisible = false"
+        >返回</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -396,7 +412,8 @@ export default {
         totalAuthors: '',
         totalBranches: '',
         totalAge: '',
-        avtiveAge: ''
+        avtiveAge: '',
+        updatedTime: ''
       },
       detailLabelStyle: {
         width: '100px',
