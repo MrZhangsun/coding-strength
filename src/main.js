@@ -8,7 +8,10 @@ import './fonts/iconfont.js'
 import Validator from './utils/validator.js'
 import axios from 'axios'
 import { Loading } from 'element-ui'
+import * as echarts from 'echarts'
 
+// 配置echarts
+Vue.prototype.$echarts = echarts
 // 配置http请求
 axios.defaults.baseURL = 'http://localhost:10110/api/'
 let loading = null

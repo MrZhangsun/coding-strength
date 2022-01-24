@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/system/Login.vue'
 import Home from '../components/system/Home.vue'
-import Welcome from '../components/system/Welcome.vue'
+import Activity from '../components/system/Activity.vue'
 import Repository from '../components/coding/Repository.vue'
 import Reporter from '../components/coding/Reporter.vue'
 import Analysis from '../components/coding/Analysis.vue'
@@ -29,12 +29,12 @@ const routes = [
     name: '主页',
     path: '/home',
     component: Home,
-    redirect: '/welcome',
+    redirect: '/activity',
     children: [
       {
         name: '首页',
-        path: '/welcome',
-        component: Welcome
+        path: '/activity',
+        component: Activity
       }
     ]
   },
