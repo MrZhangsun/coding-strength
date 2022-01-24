@@ -1,57 +1,142 @@
 <template>
   <div>
-    <h3> Welcome to Coding Strength</h3>
-    <h3> 当日、本周、本月、本季度统计图</h3>
-    <h3> 活跃仓库, 活跃分支</h3>
-    <h3> 活跃Author</h3>
-
+    <h3>统计仓库分支、作者、天数、活跃天数</h3>
     <div
-      id="main"
-      style="width: 600px;height:400px;"
+      id="repository"
+      class="row-chart"
+    ></div>
+    <h3>今日活跃仓库TOP5</h3>
+    <div
+      id="active-repository"
+      class="row-chart"
+    ></div>
+    <h3>今日活跃分支TOP5</h3>
+    <div
+      id="active-branch"
+      class="row-chart"
+    ></div>
+    <h3>今日活跃AUTHOR TOP5</h3>
+    <div
+      id="active-author"
+      class="row-chart"
     ></div>
   </div>
 </template>
 <script>
+let repositoryStatisticChart
+let activeRepositoryChart
+// let chart2
 export default {
+  created () {
+    // this.getData()
+  },
+  destroyed () {
+    // 销毁组建,防止内存泄漏
+    repositoryStatisticChart.dispose()
+    activeRepositoryChart.dispose()
+  },
   mounted () {
-    this.draw()
+    repositoryStatisticChart = this.$echarts.init(document.getElementById('repository'), 'infographic')
+    activeRepositoryChart = this.$echarts.init(document.getElementById('active-repository'), 'infographic')
+    // 使用刚指定的配置项和数据显示图表。
+    repositoryStatisticChart.setOption(this.repositoryOptions)
+    activeRepositoryChart.setOption(this.activeRepositoryOptions)
+    // 监听页面尺寸变化事件, 动态修改图表尺寸
+    window.addEventListener('resize', () => {
+      this.screenWidth = window.innerWidth
+      console.log(window.innerWidth)
+      repositoryStatisticChart.resize()
+      activeRepositoryChart.resize()
+    })
+    repositoryStatisticChart.on('click', (params) => {
+      this.$router.push('/coding/repository')
+    })
   },
   data () {
     return {
-      options: {
-
+      activeRepositoryOptions: {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        xAxis: {
+          type: 'value'
+        },
+        yAxis: {
+          type: 'category'
+        },
+        dataset: {
+          source: [
+            ['system', 'Commits'],
+            ['业务系统', 3],
+            ['中台', 4],
+            ['接口中心', 3],
+            ['公共', 1],
+            ['工具', 3]
+          ]
+        },
+        series: [
+          {
+            type: 'bar'
+          }
+        ]
+      },
+      repositoryOptions: {
+        legend: {
+          type: 'scroll',
+          orient: 'horizontal',
+          right: 'center',
+          bottom: 0,
+          top: 'bottom',
+          backgroundColor: '#ccc'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        dataset: {
+          source: [
+            ['system', '分支数量', '开发者数量', '库龄', '活跃天数'],
+            ['业务系统', 43.3, 85.8, 93.7, 100],
+            ['中台', 83.1, 73.4, 55.1, 100],
+            ['接口中心', 86.4, 65.2, 82.5, 100],
+            ['接口中心2', 86.4, 65.2, 82.5, 100],
+            ['接口中心3', 86.4, 65.2, 82.5, 100],
+            ['接口中心10', 86.4, 65.2, 82.5, 100],
+            ['接口中心11', 86.4, 65.2, 82.5, 100],
+            ['工具', 72.4, 53.9, 39.1, 100]
+          ]
+        },
+        xAxis: { type: 'category' },
+        yAxis: {},
+        series: [
+          { type: 'bar' },
+          { type: 'bar' },
+          { type: 'bar' },
+          { type: 'bar' }
+        ]
       }
     }
   },
   methods: {
-    draw () {
-      const myChart = this.$echarts.init(document.getElementById('main'))
-      // 指定图表的配置项和数据
-      var option = {
-        title: {
-          text: 'ECharts 入门示例'
-        },
-        tooltip: {},
-        legend: {
-          data: ['销量']
-        },
-        xAxis: {
-          data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-        },
-        yAxis: {},
-        series: [
-          {
-            name: '销量',
-            type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
-          }
-        ]
-      }
-      // 使用刚指定的配置项和数据显示图表。
-      myChart.setOption(option)
+    // https://echarts.apache.org/examples/data/asset/data/flare.json
+    getData () {
+      this.$http.get('https://echarts.apache.org/examples/data/asset/data/flare.json')
+        .then(res => {
+          console.log(res)
+          this.data = res.data
+        })
     }
   }
 }
 </script>
 <style lang="less" scoped>
+.row-chart {
+  widows: 100%;
+  height: 400px;
+}
 </style>
