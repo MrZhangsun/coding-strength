@@ -8,26 +8,61 @@
 
     <el-card>
       <el-row :gutter="20">
-        <el-col :span="8">
+        <el-col :span="5">
           <el-input
-            placeholder="search by repository name"
-            v-model="pageInfo.query"
+            placeholder="请输入项目名称"
+            v-model="pageInfo.name"
             @input="onInput"
             @clear="getRepositoryList"
             clearable
           >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getRepositoryList"
-            ></el-button>
           </el-input>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="5">
+          <el-input
+            placeholder="请输入仓库地址"
+            v-model="pageInfo.url"
+            @input="onInput"
+            @clear="getRepositoryList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="3">
+          <el-select
+            v-model="pageInfo.status"
+            clearable
+            placeholder="请选择状态"
+            @clear="getRepositoryList"
+            @change="getRepositoryList"
+          >
+            <el-option
+              key="1"
+              label="启用"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="0"
+              label="禁用"
+              value="0"
+            >
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="3">
           <el-button
             type="primary"
+            icon="el-icon-search"
+            @click="getRepositoryList"
+          >搜索</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
             @click="addRepositoryDialogVisible = true"
-          >添加代码库</el-button>
+          >添加仓库</el-button>
         </el-col>
       </el-row>
       <!-- 代码仓库列表 -->
@@ -69,7 +104,7 @@
               :active-value="1"
               :inactive-value="0"
               active-color="#13ce66"
-              @change="updateRepositoryStatus(scope.row.id, scope.row.active)"
+              @change="updateRepositoryStatus(scope.row.id, scope.row.status)"
             />
           </template>
         </el-table-column>
