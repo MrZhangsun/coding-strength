@@ -558,8 +558,14 @@
 </template>
 
 <script>
-import { uploadFile } from '../../utils/upload.js'
-import { queryUserById } from '../../api/system'
+import { uploadFile } from '../../utils/upload'
+import {
+  queryUserById,
+  deleteUserById,
+  addUser,
+  editUser,
+  queryByConditions
+} from '../../api/system/user'
 export default {
   created () {
     this.getUserList()
@@ -699,13 +705,13 @@ export default {
   methods: {
     // 获取用户列表
     getUserList () {
-      this.$http.get('/system/users', { params: this.pageInfo })
+      queryByConditions(this.pageInfo)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.userList = res.data.data.list
-          this.pageInfo.total = res.data.data.total
+          this.userList = res.data.list
+          this.pageInfo.total = res.data.total
         })
     },
     // 分页单位调整,重新刷新列表
@@ -724,10 +730,10 @@ export default {
         id: userId,
         active: newStatus
       }
-      this.$http.put('/system/user/' + userId, params)
+      editUser(userId, params)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
           this.$message.success('更新成功!')
         })
@@ -746,10 +752,10 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.post('/system/user', this.addUserForm)
+        addUser(this.addUserForm)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
             this.getUserList()
             this.$message.success('添加成功')
@@ -761,12 +767,12 @@ export default {
     },
     // 显示编辑对话框
     showEditDialog (userId) {
-      this.$http.get('/system/user/' + userId)
+      queryUserById(userId)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.editUserForm = res.data.data
+          this.editUserForm = res.data
           this.editUserDialogVisible = true
         })
     },
@@ -776,10 +782,10 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.put('/system/user/' + this.editUserForm.id, this.editUserForm)
+        editUser(this.editUserForm.id, this.editUserForm)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
             this.$message.success('修改成功!')
             this.editUserDialogVisible = false
@@ -806,10 +812,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/system/user/' + userId)
+        deleteUserById(userId)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
 
             this.getUserList()
@@ -852,21 +858,13 @@ export default {
     },
     // 自定义上传方法
     uploadAvatarRequest (file) {
-      uploadFile(file, '/coding-strength', false)
-      const requestParams = new FormData()
-      const headers = {
-        'Content-Type': 'multipart/form-data'
-      }
-      requestParams.append('file', file.file)
-      requestParams.append('path', '/coding-strength')
-      requestParams.append('uniqueName', false)
-      this.$http.post('https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload', requestParams, headers)
+      uploadFile(file.file, '/coding-strength', false)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
 
-          this.addUserForm.avatar = res.data.data.uri
+          this.addUserForm.avatar = res.data.uri
           // 关闭，并清空列表
           this.confirmProfile = false
           this.uploadProfile = false
@@ -876,7 +874,6 @@ export default {
         }).catch(error => {
           console.error(error)
         })
-      return false
     },
     onChangeUpload (file) {
       // 预保存上传的图片
