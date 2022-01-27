@@ -9,7 +9,16 @@ import Validator from './utils/validator.js'
 import axios from 'axios'
 import { Loading } from 'element-ui'
 import * as echarts from 'echarts'
+import moment from 'moment'
 
+// 全局日期格式化
+Vue.prototype.moment = moment
+Vue.filter('dateFormat', (dateStr, pattern = 'YYYY-MM-DD hh:mm:ss') => {
+  if (dateStr) {
+    return moment(dateStr).format(pattern)
+  }
+  return dateStr
+})
 // 配置echarts
 Vue.prototype.$echarts = echarts
 // 配置http请求

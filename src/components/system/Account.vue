@@ -11,7 +11,7 @@
         <el-col :span="3">
           <el-input
             placeholder="请输入账号"
-            v-model="pageInfo.name"
+            v-model="pageInfo.username"
             @input="onInput"
             @clear="getAccountList"
             clearable
@@ -20,18 +20,8 @@
         </el-col>
         <el-col :span="3">
           <el-input
-            placeholder="请输入手机"
-            v-model="pageInfo.mobile"
-            @input="onInput"
-            @clear="getAccountList"
-            clearable
-          >
-          </el-input>
-        </el-col>
-        <el-col :span="3">
-          <el-input
-            placeholder="请输入邮箱"
-            v-model="pageInfo.email"
+            placeholder="请输入钉钉ID"
+            v-model="pageInfo.dingtalkId"
             @input="onInput"
             @clear="getAccountList"
             clearable
@@ -40,50 +30,50 @@
         </el-col>
         <el-col :span="3">
           <el-select
-            v-model="pageInfo.active"
+            v-model="pageInfo.type"
             clearable
-            placeholder="请选择性别"
+            placeholder="请选择内外网"
             @clear="getAccountList"
             @change="getAccountList"
           >
             <el-option
               key="1"
-              label="启用"
+              label="内网"
               value="1"
             >
             </el-option>
             <el-option
-              key="0"
-              label="禁用"
-              value="0"
+              key="2"
+              label="外网"
+              value="2"
+            >
+            </el-option>
+            <el-option
+              key="3"
+              label="第三方"
+              value="3"
             >
             </el-option>
           </el-select>
         </el-col>
         <el-col :span="3">
           <el-select
-            v-model="pageInfo.sex"
+            v-model="pageInfo.lock"
             clearable
-            placeholder="请选择性别"
+            placeholder="请选择状态"
             @clear="getAccountList"
             @change="getAccountList"
           >
             <el-option
               key="0"
-              label="未知"
+              label="正常"
               value="0"
             >
             </el-option>
             <el-option
               key="1"
-              label="男"
+              label="锁定"
               value="1"
-            >
-            </el-option>
-            <el-option
-              key="2"
-              label="女"
-              value="2"
             >
             </el-option>
           </el-select>
@@ -99,13 +89,13 @@
           <el-button
             type="primary"
             icon="el-icon-edit"
-            @click="addUserDialogVisible = true"
+            @click="addAccountDialogVisible = true"
           >添加</el-button>
         </el-col>
       </el-row>
-      <!-- 用户列表 -->
+      <!-- 账号列表 -->
       <el-table
-        :data="userList"
+        :data="accountList"
         :border="true"
         stripe
         :header-cell-style="{'text-align':'center'}"
@@ -121,32 +111,41 @@
           align="center"
         />
         <el-table-column
-          prop="name"
+          prop="username"
           label="账号"
           align="center"
         />
         <el-table-column
-          prop="sex"
-          label="性别"
+          prop="dingtalkId"
+          label="钉钉ID"
+          align="center"
+        />
+        <el-table-column
+          prop="type"
+          label="类型"
           align="center"
         >
           <template slot-scope="scope">
-            <span v-if="scope.row.sex == '0'">未知</span>
-            <span v-if="scope.row.sex == '1'">男</span>
-            <span v-if="scope.row.sex == '2'">女</span>
+            <span v-if="scope.row.type == '1'">内网</span>
+            <span v-if="scope.row.type == '2'">外网</span>
+            <span v-if="scope.row.type == '3'">第三方</span>
           </template>
         </el-table-column>
         <el-table-column
-          prop="mobile"
-          label="手机"
-          width="185px"
+          prop="password"
+          label="密码"
           align="center"
         />
         <el-table-column
-          prop="email"
-          label="邮箱"
+          prop="passwordUpd"
+          label="修改密码时间"
           align="center"
-        />
+          width="185px"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.passwordUpd | dateFormat }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="active"
           label="状态"
@@ -158,7 +157,7 @@
               :active-value="1"
               :inactive-value="0"
               active-color="#13ce66"
-              @change="updateUserStatus(scope.row.id, scope.row.active)"
+              @change="updateAccountStatus(scope.row.id, scope.row.active)"
             />
           </template>
         </el-table-column>
@@ -209,21 +208,21 @@
       </el-pagination>
     </el-card>
 
-    <!-- 添加用户对话框 -->
+    <!-- 添加账号对话框 -->
     <el-dialog
-      title="新增用户"
-      :visible.sync="addUserDialogVisible"
+      title="新增账号"
+      :visible.sync="addAccountDialogVisible"
       width="50%"
       :before-close="handleClose"
     >
       <!-- 表单项 -->
       <el-form
-        ref="addUserFormRef"
-        :model="addUserForm"
-        :rules="addUserFormRules"
+        ref="addAccountFormRef"
+        :model="addAccountForm"
+        :rules="addAccountFormRules"
         label-width="120px"
       >
-        <!-- 用户头像 -->
+        <!-- 账号头像 -->
         <el-form-item
           label="头像"
           prop="avatar"
@@ -232,12 +231,12 @@
           <el-upload
             class="avatar-uploader"
             action="no_use"
-            :http-request="uploadAvatarRequest"
+            :http-request="addUploadAvatarRequest"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
             :on-change="onChangeUpload"
-            ref="uploadRef"
+            ref="addAvatarRef"
             :drag="false"
             accept="image/png, image/jpeg"
             list-type="picture"
@@ -246,8 +245,8 @@
           >
             <div class="avatar">
               <img
-                v-if="addUserForm.avatar"
-                :src="addUserForm.avatar"
+                v-if="addAccountForm.avatarUrl"
+                :src="addAccountForm.avatarUrl"
                 class="avatar"
               >
               <i
@@ -260,31 +259,41 @@
         <!-- 个人信息 -->
         <el-form-item
           label="账号"
-          prop="name"
+          prop="username"
         >
-          <el-input v-model="addUserForm.name"></el-input>
+          <el-input
+            v-model="addAccountForm.username"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item
-          label="性别"
-          prop="sex"
+          label="钉钉ID"
+          prop="dingtalkId"
         >
-          <el-radio-group v-model="addUserForm.sex">
-            <el-radio label="0">未知</el-radio>
-            <el-radio label="1">男</el-radio>
-            <el-radio label="2">女</el-radio>
+          <el-input
+            v-model="addAccountForm.dingtalkId"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="账号类型"
+          prop="type"
+        >
+          <el-radio-group v-model="addAccountForm.type">
+            <el-radio :label="1">内网</el-radio>
+            <el-radio :label="2">外网</el-radio>
+            <el-radio :label="3">第三方</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          label="手机号"
-          prop="mobile"
+          label="密码"
+          prop="password"
         >
-          <el-input v-model="addUserForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item
-          label="邮箱"
-          prop="email"
-        >
-          <el-input v-model="addUserForm.email"></el-input>
+          <el-input
+            v-model="addAccountForm.password"
+            type="password"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
@@ -294,19 +303,19 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="addUserForm.active"
+            v-model="addAccountForm.active"
           ></el-switch>
         </el-form-item>
         <el-form-item
-          label="个人简介"
-          prop="introduction"
+          label="备注"
+          prop="remark"
         >
           <el-input
             type="textarea"
-            placeholder="请输入个人简介, 不超过1000字"
-            v-model="addUserForm.introduction"
+            placeholder="请输入备注, 不超过300字"
+            v-model="addAccountForm.introduction"
             :autosize="{ minRow: 5, maxRow: 10 }"
-            maxlength="1000"
+            maxlength="300"
             show-word-limit
           >
           </el-input>
@@ -319,37 +328,35 @@
       >
         <el-button
           type="primary"
-          @click="submitAddUserRequest"
+          @click="submitAddAccountRequest"
         >确定</el-button>
         <el-button
           type="danger"
           :before-close="handleClose"
-          @click="addUserDialogVisible = false"
+          @click="addAccountDialogVisible = false"
         >取消</el-button>
         <el-button
           type="info"
-          @click="resetAddUserForm"
+          @click="resetAddAccountForm"
         >重置</el-button>
       </span>
     </el-dialog>
 
-    <!-- 编辑用户对话框 -->
+    <!-- 编辑账号对话框 -->
     <el-dialog
-      ref="editUserDialogRef"
-      title="编辑用户"
-      :visible.sync="editUserDialogVisible"
+      title="编辑账号"
+      :visible.sync="editAccountDialogVisible"
       width="50%"
       :before-close="handleClose"
-      @close="editDialogClosed"
     >
       <!-- 表单项 -->
       <el-form
-        ref="editUserFormRef"
-        :model="editUserForm"
-        :rules="editUserFormRules"
+        ref="editAccountFormRef"
+        :model="editAccountForm"
+        :rules="editAccountFormRules"
         label-width="120px"
       >
-        <!-- 用户头像 -->
+        <!-- 账号头像 -->
         <el-form-item
           label="头像"
           prop="avatar"
@@ -358,7 +365,7 @@
           <el-upload
             class="avatar-uploader"
             action="no_use"
-            :http-request="uploadAvatarRequest"
+            :http-request="editUploadAvatarRequest"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -372,8 +379,8 @@
           >
             <div class="avatar">
               <img
-                v-if="editUserForm.avatar"
-                :src="editUserForm.avatar"
+                v-if="editAccountForm.avatarUrl"
+                :src="editAccountForm.avatarUrl"
                 class="avatar"
               >
               <i
@@ -386,31 +393,42 @@
         <!-- 个人信息 -->
         <el-form-item
           label="账号"
-          prop="name"
+          prop="username"
         >
-          <el-input v-model="editUserForm.name"></el-input>
+          <el-input
+            v-model="editAccountForm.username"
+            clearable
+            disabled
+          ></el-input>
         </el-form-item>
         <el-form-item
-          label="性别"
-          prop="sex"
+          label="钉钉ID"
+          prop="dingtalkId"
         >
-          <el-radio-group v-model="editUserForm.sex">
-            <el-radio :label="0">未知</el-radio>
-            <el-radio :label="1">男</el-radio>
-            <el-radio :label="2">女</el-radio>
+          <el-input
+            v-model="editAccountForm.dingtalkId"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="账号类型"
+          prop="type"
+        >
+          <el-radio-group v-model="editAccountForm.type">
+            <el-radio :label="1">内网</el-radio>
+            <el-radio :label="2">外网</el-radio>
+            <el-radio :label="3">第三方</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          label="手机号"
-          prop="mobile"
+          label="密码"
+          prop="password"
         >
-          <el-input v-model="editUserForm.mobile"></el-input>
-        </el-form-item>
-        <el-form-item
-          label="邮箱"
-          prop="email"
-        >
-          <el-input v-model="editUserForm.email"></el-input>
+          <el-input
+            v-model="editAccountForm.password"
+            type="password"
+            clearable
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
@@ -420,19 +438,19 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="editUserForm.active"
+            v-model="editAccountForm.active"
           ></el-switch>
         </el-form-item>
         <el-form-item
-          label="个人简介"
-          prop="introduction"
+          label="备注"
+          prop="remark"
         >
           <el-input
             type="textarea"
-            placeholder="请输入个人简介, 不超过1000字"
-            v-model="editUserForm.introduction"
-            :autosize="{ minRow: 10, maxRow: 10 }"
-            maxlength="1000"
+            placeholder="请输入备注, 不超过300字"
+            v-model="editAccountForm.remark"
+            :autosize="{ minRow: 5, maxRow: 10 }"
+            maxlength="300"
             show-word-limit
           >
           </el-input>
@@ -445,25 +463,25 @@
       >
         <el-button
           type="primary"
-          @click="submitEditUserRequest"
+          @click="submitEditAccountRequest"
         >确定</el-button>
         <el-button
           type="danger"
           :before-close="handleClose"
-          @click="editUserDialogVisible = false"
+          @click="editAccountDialogVisible = false"
         >取消</el-button>
       </span>
     </el-dialog>
 
-    <!-- 用户详情 -->
+    <!-- 账号详情 -->
     <el-dialog
-      ref="userDetailDialogRef"
-      :visible.sync="userDetailDialogVisible"
+      ref="accountDetailDialogRef"
+      :visible.sync="accountDetailDialogVisible"
       width="50%"
     >
       <el-descriptions
         class="margin-top"
-        title="用户详情"
+        title="账号详情"
         :column="4"
         direction="horizontals"
         border
@@ -472,59 +490,62 @@
         :contentStyle="detailContentStyle"
       >
         <el-descriptions-item
-          label="用户ID"
+          label="账号ID"
           :span="2"
-        >{{detailUserForm.id}}</el-descriptions-item>
+        >{{detailAccountForm.id}}</el-descriptions-item>
         <el-descriptions-item
           label="头像"
           :span="2"
         >
           <div class="avatar">
             <img
-              v-if="detailUserForm.avatar"
-              :src="detailUserForm.avatar"
+              v-if="detailAccountForm.avatarUrl"
+              :src="detailAccountForm.avatarUrl"
               class="avatar"
             >
             <i
               v-else
-              class="el-icon-user avatar-uploader-icon"
+              class="el-icon-account avatar-uploader-icon"
             ></i>
           </div>
         </el-descriptions-item>
         <el-descriptions-item
           label="账号"
           :span="2"
-        >{{detailUserForm.name}}</el-descriptions-item>
+        >{{detailAccountForm.username}}</el-descriptions-item>
         <el-descriptions-item
-          label="性别"
+          label="类型"
           :span="2"
         >
-          <el-radio-group v-model="detailUserForm.sex">
-            <el-radio :label="0">未知</el-radio>
-            <el-radio :label="1">男</el-radio>
-            <el-radio :label="2">女</el-radio>
+          <el-radio-group v-model="detailAccountForm.type">
+            <el-radio :label="1">内网</el-radio>
+            <el-radio :label="2">外网</el-radio>
+            <el-radio :label="3">第三方</el-radio>
           </el-radio-group>
         </el-descriptions-item>
         <el-descriptions-item
-          label="手机号"
+          label="钉钉ID"
           :span="2"
-        >{{detailUserForm.mobile}}</el-descriptions-item>
+        >{{detailAccountForm.dingtalkId}}</el-descriptions-item>
         <el-descriptions-item
-          label="邮箱"
+          label="密码"
           :span="2"
-        >{{detailUserForm.email}}</el-descriptions-item>
+        >{{detailAccountForm.password}}</el-descriptions-item>
         <el-descriptions-item
           label="更新时间"
           :span="4"
         >
-          <el-date-picker
-            v-model="detailUserForm.updatedTime"
-            type="datetime"
-            placeholder="Select date and time"
-            default-time="12:00:00"
-            disabled
-          >
-          </el-date-picker>
+          <template>
+            {{detailAccountForm.updatedTime | dateFormat}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="密码更新"
+          :span="4"
+        >
+          <template>
+            {{detailAccountForm.passwordUpd | dateFormat}}
+          </template>
         </el-descriptions-item>
         <el-descriptions-item
           label="状态"
@@ -534,14 +555,14 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="detailUserForm.active"
+            v-model="detailAccountForm.active"
             disabled
           ></el-switch>
         </el-descriptions-item>
         <el-descriptions-item
-          label="个人简介"
+          label="备注"
           :span="4"
-        >{{detailUserForm.introduction}}</el-descriptions-item>
+        >{{detailAccountForm.remark}}</el-descriptions-item>
       </el-descriptions>
       <!-- 按钮 -->
       <span
@@ -550,7 +571,7 @@
       >
         <el-button
           type="danger"
-          @click="userDetailDialogVisible = false"
+          @click="accountDetailDialogVisible = false"
         >返回</el-button>
       </span>
     </el-dialog>
@@ -559,7 +580,13 @@
 
 <script>
 import { uploadFile } from '../../utils/upload.js'
-import { queryUserById, queryByConditions } from '../../api/system/account'
+import {
+  queryAccountById,
+  deleteAccountById,
+  addAccount,
+  editAccount,
+  queryByConditions
+} from '../../api/system/account'
 export default {
   created () {
     this.getAccountList()
@@ -574,33 +601,17 @@ export default {
       }
       callback()
     }
-    // 手机号码校验
-    const mobileValidator = (rule, value, callback) => {
-      const result = this.Validator.isPhone(value)
-      if (!result) {
-        return callback(new Error('请输入合法的手机号码'))
-      }
-      callback()
-    }
-    // 邮箱校验
-    const emailValidator = (rule, value, callback) => {
-      const result = this.Validator.isEmail(value)
-      if (!result) {
-        return callback(new Error('请输入合法的邮箱'))
-      }
-      callback()
-    }
     return {
-      userList: [],
+      accountList: [],
       pageInfo: {
         pageNum: 1,
         pageSize: 10,
         total: 0,
         query: ''
       },
-      addUserDialogVisible: false,
-      editUserDialogVisible: false,
-      userDetailDialogVisible: false,
+      addAccountDialogVisible: false,
+      editAccountDialogVisible: false,
+      accountDetailDialogVisible: false,
       avatarUrl: '',
       avatarPreviewUrl: '',
       // 上传头像对话框显示与否
@@ -613,49 +624,26 @@ export default {
       detailContentStyle: {
         'font-size': '12px'
       },
-      addUserForm: {
-        name: '',
-        sex: '',
-        mobile: '',
-        email: '',
-        active: 0,
-        introduction: '',
-        avatar: ''
-      },
-      editUserForm: {
-        name: '',
-        sex: '',
-        mobile: '',
-        email: '',
-        active: 0,
-        introduction: '',
-        avatar: ''
-      },
-      detailUserForm: {
-        name: '',
-        sex: '',
-        mobile: '',
-        email: '',
-        active: 0,
-        introduction: '',
-        avatar: ''
-      },
-      addUserFormRules: {
-        name: [
+      addAccountForm: {},
+      editAccountForm: {},
+      detailAccountForm: {},
+      addAccountFormRules: {
+        username: [
           { required: true, message: '请输入账号', trigger: 'blur' },
           { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
           { validator: specialCharValidator, trigger: 'blur' }
         ],
-        sex: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+        dingtalkId: [
+          { required: false },
+          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
         ],
-        mobile: [
-          { required: true, message: '请输入手机', trigger: 'blur' },
-          { validator: mobileValidator, trigger: 'blur' }
+        type: [
+          { required: true, message: '账号类型', trigger: 'change' }
         ],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: emailValidator, trigger: 'blur' }
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 30, message: '请输入6~30个字符', trigger: 'blur' }
         ],
         active: [
           { required: true, message: '是否启用', trigger: 'blur' }
@@ -667,22 +655,23 @@ export default {
           { required: false }
         ]
       },
-      editUserFormRules: {
-        name: [
+      editAccountFormRules: {
+        username: [
           { required: true, message: '请输入账号', trigger: 'blur' },
           { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
           { validator: specialCharValidator, trigger: 'blur' }
         ],
-        sex: [
-          { required: true, message: '请选择性别', trigger: 'change' }
+        dingtalkId: [
+          { required: false },
+          { min: 2, max: 30, message: '请输入2~30个字符', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
         ],
-        mobile: [
-          { required: true, message: '请输入手机', trigger: 'blur' },
-          { validator: mobileValidator, trigger: 'blur' }
+        type: [
+          { required: true, message: '账号类型', trigger: 'change' }
         ],
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: emailValidator, trigger: 'blur' }
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 30, message: '请输入6~30个字符', trigger: 'blur' }
         ],
         active: [
           { required: true, message: '是否启用', trigger: 'blur' }
@@ -697,15 +686,14 @@ export default {
     }
   },
   methods: {
-    // 获取用户列表
+    // 获取账号列表
     getAccountList () {
       queryByConditions(this.pageInfo)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          this.userList = res.data.list
-          console.log(res.list)
+          this.accountList = res.data.list
           this.pageInfo.total = res.data.total
         })
     },
@@ -719,16 +707,16 @@ export default {
       this.pageInfo.pageNum = newPage
       this.getAccountList()
     },
-    // 更新用户状态
-    updateUserStatus (userId, newStatus) {
+    // 更新账号状态
+    updateAccountStatus (accountId, newStatus) {
       const params = {
-        id: userId,
+        id: accountId,
         active: newStatus
       }
-      this.$http.put('/system/user/' + userId, params)
+      editAccount(accountId, params)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
           this.$message.success('更新成功!')
         })
@@ -738,55 +726,59 @@ export default {
       this.$forceUpdate()
     },
     // 重置新增表单
-    resetAddUserForm () {
-      this.$refs.addUserFormRef.resetFields()
+    resetAddAccountForm () {
+      this.$refs.addAccountFormRef.resetFields()
     },
     // 新增请求
-    submitAddUserRequest () {
-      this.$refs.addUserFormRef.validate(valid => {
+    submitAddAccountRequest () {
+      this.$refs.addAccountFormRef.validate(valid => {
         if (!valid) {
           return
         }
-        this.$http.post('/system/user', this.addUserForm)
+        addAccount(this.addAccountForm)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
             this.getAccountList()
             this.$message.success('添加成功')
             // 成功之后,关闭对话框
-            this.addUserDialogVisible = false
-            this.$refs.addUserFormRef.resetFields()
+            this.addAccountDialogVisible = false
+            this.$refs.addAccountFormRef.resetFields()
           })
       })
     },
     // 显示编辑对话框
-    showEditDialog (userId) {
-      this.$http.get('/system/user/' + userId)
+    showEditDialog (accountId) {
+      queryAccountById(accountId)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.editUserForm = res.data.data
-          this.editUserDialogVisible = true
+          this.editAccountForm = res.data
+          this.editAccountDialogVisible = true
         })
     },
     // 编辑提交
-    submitEditUserRequest () {
-      this.$refs.editUserFormRef.validate((valid) => {
+    submitEditAccountRequest () {
+      this.$refs.editAccountFormRef.validate((valid) => {
         if (!valid) {
           return
         }
-        this.$http.put('/system/user/' + this.editUserForm.id, this.editUserForm)
+        editAccount(this.editAccountForm.id, this.editAccountForm)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
             this.$message.success('修改成功!')
-            this.editUserDialogVisible = false
+            this.editAccountDialogVisible = false
             this.getAccountList()
           })
       })
+    },
+    // 日期格式化
+    dateFormat (dateTime) {
+      console.log(dateTime)
     },
     // 对话框关闭提示
     handleClose (done) {
@@ -798,19 +790,19 @@ export default {
     },
     // 对话框关闭, 清空数据
     editDialogClosed () {
-      this.$refs.editUserFormRef.resetFields()
+      this.$refs.editAccountFormRef.resetFields()
     },
     // 显示删除确认框
-    showDeleteConfirm (userId) {
+    showDeleteConfirm (accountId) {
       this.$confirm('确定要删除当前记录?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/system/user/' + userId)
+        deleteAccountById(accountId)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
 
             this.getAccountList()
@@ -826,16 +818,16 @@ export default {
         })
       })
     },
-    // 用户详情
-    showDetailDialog (userId) {
+    // 账号详情
+    showDetailDialog (accountId) {
       // 查询详情
-      queryUserById(userId).then(res => {
+      queryAccountById(accountId).then(res => {
         if (res.code !== 200) {
-          return new Error('查询用户详情失败')
+          return new Error('查询账号详情失败')
         }
-        this.detailUserForm = res.data
+        this.detailAccountForm = res.data
         // 显示详情对话框
-        this.userDetailDialogVisible = true
+        this.accountDetailDialogVisible = true
       })
     },
     // 头像上传
@@ -852,38 +844,47 @@ export default {
       return isLt2M
     },
     // 自定义上传方法
-    uploadAvatarRequest (file) {
+    addUploadAvatarRequest (file) {
       uploadFile(file.file, '/coding-strength', false)
-      const requestParams = new FormData()
-      const headers = {
-        'Content-Type': 'multipart/form-data'
-      }
-      requestParams.append('file', file.file)
-      requestParams.append('path', '/coding-strength')
-      requestParams.append('uniqueName', false)
-      this.$http.post('https://gateway-test-a.vevor.net/bmp-pus-service/controller-uploadService/front/single/upload', requestParams, headers)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
 
-          this.addUserForm.avatar = res.data.data.uri
+          this.addAccountForm.avatarUrl = res.data.uri
+          console.log(this.addAccountForm)
+          console.log(res.data)
           // 关闭，并清空列表
           this.confirmProfile = false
           this.uploadProfile = false
-          this.$refs.uploadRef.clearFiles()
-          // this.reload()
+          this.$refs.addAvatarRef.clearFiles()
           return this.$message.success('上传成功')
         }).catch(error => {
           console.error(error)
         })
-      return false
+    },
+    editUploadAvatarRequest (file) {
+      uploadFile(file.file, '/coding-strength', false)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.editAccountForm.avatarUrl = res.data.uri
+          // 关闭，并清空列表
+          this.confirmProfile = false
+          this.uploadProfile = false
+          this.$refs.editAvatarRef.clearFiles()
+          return this.$message.success('上传成功')
+        }).catch(error => {
+          console.error(error)
+        })
     },
     onChangeUpload (file) {
       // 预保存上传的图片
       this.previewImgURL = URL.createObjectURL(file.raw)
-      this.confirmProfile = true // 预览图片
-      console.log(this.previewImgURL)
+      // 预览图片
+      this.confirmProfile = true
     }
   }
 }

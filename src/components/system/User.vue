@@ -42,7 +42,7 @@
           <el-select
             v-model="pageInfo.active"
             clearable
-            placeholder="请选择性别"
+            placeholder="请选择状态"
             @clear="getUserList"
             @change="getUserList"
           >
@@ -232,12 +232,12 @@
           <el-upload
             class="avatar-uploader"
             action="no_use"
-            :http-request="uploadAvatarRequest"
+            :http-request="addUploadAvatarRequest"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
             :on-change="onChangeUpload"
-            ref="uploadRef"
+            ref="addAvatarRef"
             :drag="false"
             accept="image/png, image/jpeg"
             list-type="picture"
@@ -358,7 +358,7 @@
           <el-upload
             class="avatar-uploader"
             action="no_use"
-            :http-request="uploadAvatarRequest"
+            :http-request="editUploadAvatarRequest"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -857,7 +857,7 @@ export default {
       return isLt2M
     },
     // 自定义上传方法
-    uploadAvatarRequest (file) {
+    addUploadAvatarRequest (file) {
       uploadFile(file.file, '/coding-strength', false)
         .then(res => {
           if (res.code !== 200) {
@@ -868,7 +868,26 @@ export default {
           // 关闭，并清空列表
           this.confirmProfile = false
           this.uploadProfile = false
-          this.$refs.uploadRef.clearFiles()
+          this.$refs.addAvatarRef.clearFiles()
+          // this.reload()
+          return this.$message.success('上传成功')
+        }).catch(error => {
+          console.error(error)
+        })
+    },
+    // 自定义上传方法
+    editUploadAvatarRequest (file) {
+      uploadFile(file.file, '/coding-strength', false)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.editUserForm.avatar = res.data.uri
+          // 关闭，并清空列表
+          this.confirmProfile = false
+          this.uploadProfile = false
+          this.$refs.editAvatarRef.clearFiles()
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
