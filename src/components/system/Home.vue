@@ -46,33 +46,15 @@
           :router="true"
           :collapse="isColloaspMenu"
           :collapse-transition="false"
-          :default-active="defaultActive"
-          class="el-menu-vertical-demo"
+          class="el-menu-vertical"
           background-color="#333744"
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-submenu
-            :index="menu.id + ''"
-            v-for="menu in menuTree "
-            :key="menu.id"
-          >
-            <template slot="title">
-              <i :class="menu.icon"></i>
-              <span>{{menu.name}}</span>
-            </template>
-
-            <el-menu-item
-              @click="clickMenuItem(item.routePath)"
-              :index="item.routePath"
-              v-for="item in menu.children"
-              :key="item.id"
-            >
-              <i :class="item.icon"></i>
-              <span>{{item.name}}</span>
-            </el-menu-item>
-
-          </el-submenu>
+          <SubMenu
+            :subMenus="menuTree"
+            mode="vertical"
+          />
         </el-menu>
       </el-aside>
       <el-main>
@@ -83,7 +65,11 @@
 </template>
 
 <script>
+import SubMenu from './SubMenu'
 export default {
+  components: {
+    SubMenu
+  },
   created () {
     this.loadMenuTree()
     this.globalUsername = window.sessionStorage.getItem('username')
@@ -94,7 +80,7 @@ export default {
     return {
       menuTree: [],
       isColloaspMenu: false,
-      colloaspFlag: '#icon-Right-1',
+      colloaspFlag: '#icon-Left-1',
       defaultActive: '/home11',
       isDisplayLogout: 'none',
       globalUsername: '',
@@ -175,9 +161,6 @@ export default {
   padding-right: 0;
   padding-bottom: 0;
 }
-.icon-font {
-  margin-right: 10px;
-}
 .icon {
   width: 0.8em;
   height: 0.8em;
@@ -200,5 +183,43 @@ export default {
 .logoutBtn {
   position: fixed;
   top: 60px;
+}
+.el-icon-arrow-down:before {
+  content: '';
+}
+.el-submenu__icon-arrow {
+  color: black;
+}
+.el-submenu {
+  .el-submenu-title {
+    display: flex;
+    align-items: center;
+    color: black !important;
+    span {
+      padding: 0 10px;
+    }
+    .el-icon-location {
+      position: static;
+      margin: 0px;
+      color: #013c807e;
+    }
+    span {
+      font-size: 18px;
+    }
+    i {
+      font-size: 18px;
+    }
+    .el-icon-arrow-down {
+      position: static;
+      margin: 0px;
+      font-size: 18px;
+      span {
+        font-size: 18px;
+      }
+      i {
+        font-size: 18px;
+      }
+    }
+  }
 }
 </style>
