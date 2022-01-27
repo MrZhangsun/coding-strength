@@ -8,26 +8,99 @@
 
     <el-card>
       <el-row :gutter="20">
-        <el-col :span="8">
+        <el-col :span="3">
           <el-input
-            placeholder="search by username"
-            v-model="pageInfo.query"
+            placeholder="请输入姓名"
+            v-model="pageInfo.name"
             @input="onInput"
             @clear="getUserList"
             clearable
           >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="getUserList"
-            ></el-button>
           </el-input>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="3">
+          <el-input
+            placeholder="请输入手机"
+            v-model="pageInfo.mobile"
+            @input="onInput"
+            @clear="getUserList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="3">
+          <el-input
+            placeholder="请输入邮箱"
+            v-model="pageInfo.email"
+            @input="onInput"
+            @clear="getUserList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="3">
+          <el-select
+            v-model="pageInfo.active"
+            clearable
+            placeholder="请选择性别"
+            @clear="getUserList"
+            @change="getUserList"
+          >
+            <el-option
+              key="1"
+              label="启用"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="0"
+              label="禁用"
+              value="0"
+            >
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="3">
+          <el-select
+            v-model="pageInfo.sex"
+            clearable
+            placeholder="请选择性别"
+            @clear="getUserList"
+            @change="getUserList"
+          >
+            <el-option
+              key="0"
+              label="未知"
+              value="0"
+            >
+            </el-option>
+            <el-option
+              key="1"
+              label="男"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="2"
+              label="女"
+              value="2"
+            >
+            </el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="3">
           <el-button
             type="primary"
+            icon="el-icon-search"
+            @click="getUserList"
+          >搜索</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
             @click="addUserDialogVisible = true"
-          >添加用户</el-button>
+          >添加</el-button>
         </el-col>
       </el-row>
       <!-- 用户列表 -->
@@ -109,14 +182,15 @@
             />
             <el-tooltip
               effect="dark"
-              content="设置"
+              content="详情"
               :enterable="false"
               placement="top"
             >
               <el-button
                 type="warning"
-                icon="el-icon-setting"
+                icon="el-icon-info"
                 size="mini"
+                @click="showDetailDialog(scope.row.id)"
               />
             </el-tooltip>
           </template>
@@ -380,12 +454,112 @@
         >取消</el-button>
       </span>
     </el-dialog>
+
+    <!-- 用户详情 -->
+    <el-dialog
+      ref="userDetailDialogRef"
+      :visible.sync="userDetailDialogVisible"
+      width="50%"
+    >
+      <el-descriptions
+        class="margin-top"
+        title="用户详情"
+        :column="4"
+        direction="horizontals"
+        border
+        colon
+        :labelStyle="detailLabelStyle"
+        :contentStyle="detailContentStyle"
+      >
+        <el-descriptions-item
+          label="用户ID"
+          :span="2"
+        >{{detailUserForm.id}}</el-descriptions-item>
+        <el-descriptions-item
+          label="头像"
+          :span="2"
+        >
+          <div class="avatar">
+            <img
+              v-if="detailUserForm.avatar"
+              :src="detailUserForm.avatar"
+              class="avatar"
+            >
+            <i
+              v-else
+              class="el-icon-user avatar-uploader-icon"
+            ></i>
+          </div>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="姓名"
+          :span="2"
+        >{{detailUserForm.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="性别"
+          :span="2"
+        >
+          <el-radio-group v-model="detailUserForm.sex">
+            <el-radio :label="0">未知</el-radio>
+            <el-radio :label="1">男</el-radio>
+            <el-radio :label="2">女</el-radio>
+          </el-radio-group>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="手机号"
+          :span="2"
+        >{{detailUserForm.mobile}}</el-descriptions-item>
+        <el-descriptions-item
+          label="邮箱"
+          :span="2"
+        >{{detailUserForm.email}}</el-descriptions-item>
+        <el-descriptions-item
+          label="更新时间"
+          :span="4"
+        >
+          <el-date-picker
+            v-model="detailUserForm.updatedTime"
+            type="datetime"
+            placeholder="Select date and time"
+            default-time="12:00:00"
+            disabled
+          >
+          </el-date-picker>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="状态"
+          :span="4"
+        >
+          <el-switch
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            v-model="detailUserForm.active"
+            disabled
+          ></el-switch>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="个人简介"
+          :span="4"
+        >{{detailUserForm.introduction}}</el-descriptions-item>
+      </el-descriptions>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="danger"
+          @click="userDetailDialogVisible = false"
+        >返回</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { uploadFile } from '../../utils/upload.js'
-
+import { queryUserById } from '../../api/system'
 export default {
   created () {
     this.getUserList()
@@ -426,11 +600,19 @@ export default {
       },
       addUserDialogVisible: false,
       editUserDialogVisible: false,
+      userDetailDialogVisible: false,
       avatarUrl: '',
       avatarPreviewUrl: '',
       // 上传头像对话框显示与否
       uploadProfile: false,
       confirmProfile: false,
+      detailLabelStyle: {
+        width: '100px',
+        'text-align': 'left'
+      },
+      detailContentStyle: {
+        'font-size': '12px'
+      },
       addUserForm: {
         name: '',
         sex: '',
@@ -441,6 +623,15 @@ export default {
         avatar: ''
       },
       editUserForm: {
+        name: '',
+        sex: '',
+        mobile: '',
+        email: '',
+        active: 0,
+        introduction: '',
+        avatar: ''
+      },
+      detailUserForm: {
         name: '',
         sex: '',
         mobile: '',
@@ -632,6 +823,18 @@ export default {
           type: 'info',
           message: '已取消'
         })
+      })
+    },
+    // 用户详情
+    showDetailDialog (userId) {
+      // 查询详情
+      queryUserById(userId).then(res => {
+        if (res.code !== 200) {
+          return new Error('查询用户详情失败')
+        }
+        this.detailUserForm = res.data
+        // 显示详情对话框
+        this.userDetailDialogVisible = true
       })
     },
     // 头像上传

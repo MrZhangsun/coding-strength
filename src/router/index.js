@@ -29,7 +29,7 @@ const routes = [
     component: Login
   },
   {
-    name: '代码动态',
+    name: '首页',
     path: '/home',
     component: Home,
     redirect: '/activity',
