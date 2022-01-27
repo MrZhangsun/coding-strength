@@ -6,6 +6,9 @@ import Activity from '../components/system/Activity.vue'
 import Repository from '../components/coding/Repository.vue'
 import Reporter from '../components/coding/Reporter.vue'
 import Analysis from '../components/coding/Analysis.vue'
+import AnalysisRepository from '../components/coding/analysis/AnalysisRepository.vue'
+import AnalysisBranch from '../components/coding/analysis/AnalysisBranch.vue'
+import AnalysisCommit from '../components/coding/analysis/AnalysisCommit.vue'
 import Logger from '../components/coding/Logger.vue'
 import Menu from '../components/system/Menu.vue'
 import Account from '../components/system/Account.vue'
@@ -26,13 +29,13 @@ const routes = [
     component: Login
   },
   {
-    name: '主页',
+    name: '代码动态',
     path: '/home',
     component: Home,
     redirect: '/activity',
     children: [
       {
-        name: '首页',
+        name: '代码动态',
         path: '/activity',
         component: Activity
       }
@@ -56,7 +59,24 @@ const routes = [
       {
         name: '统计分析',
         path: 'analysis',
-        component: Analysis
+        component: Analysis,
+        children: [
+          {
+            name: '仓库统计',
+            path: 'repository',
+            component: AnalysisRepository
+          },
+          {
+            name: '分支统计',
+            path: 'branch',
+            component: AnalysisBranch
+          },
+          {
+            name: '提交统计',
+            path: 'commit',
+            component: AnalysisCommit
+          }
+        ]
       },
       {
         name: '统计日志',
