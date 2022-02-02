@@ -40,7 +40,6 @@ export function addMenu (addMenuForm) {
  */
 export function editMenu (editMenuForm) {
   return new Promise((resolve, reject) => {
-    console.log(editMenuForm)
     axios.put('/system/menu/' + editMenuForm.id, editMenuForm)
       .then(res => {
         resolve(res.data)

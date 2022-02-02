@@ -395,8 +395,6 @@ export default {
       editMenuForm: {
         parent: {}
       },
-      editNode: {},
-      addNode: {},
       menuFilterText: '',
       expandSwitcher: true,
       expandText: '收起菜单',
@@ -411,8 +409,6 @@ export default {
      */
     append (parent) {
       this.addMenuDialogVisible = true
-      // 传递node
-      this.addNode = parent
       this.addMenuForm.parentId = parent.id
     },
     /**
@@ -461,8 +457,13 @@ export default {
      */
     edit (node) {
       // 回显
-      this.editMenuForm = node
-      this.editNode = node
+      this.editMenuForm.id = node.id
+      this.editMenuForm.label = node.label
+      this.editMenuForm.name = node.name
+      this.editMenuForm.type = node.type
+      this.editMenuForm.icon = node.icon
+      this.editMenuForm.routePath = node.routePath
+      this.editMenuForm.parentId = node.parentId
       // 传递node
       this.editMenuDialogVisible = true
     },
@@ -475,20 +476,14 @@ export default {
           return
         }
         // 后台新增
-        const parent = this.addNode
-        this.addMenuForm.id = null
+        this.addMenuForm.label = this.addMenuForm.name
         addMenu(this.addMenuForm).then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
 
           this.addMenuForm.id = res.data
-          // 更新菜单树
-          if (!parent.children) {
-            this.$set(parent, 'children', [])
-          }
-
-          this.addMenuForm.label = this.addMenuForm.name
+          // 新添加的节点
           const node = {}
           node.id = this.addMenuForm.id
           node.label = this.addMenuForm.label
@@ -497,19 +492,25 @@ export default {
           node.icon = this.addMenuForm.icon
           node.routePath = this.addMenuForm.routePath
           node.parentId = this.addMenuForm.parentId
-
-          // 递归寻找parent节点
-          if (parent.id === 0) {
+          const parentId = this.addMenuForm.parentId
+          if (parentId === 0) {
             this.menuTree.push(node)
           } else {
-            parent.children.push(node)
+            // 更新菜单树
+            const menuTree = this.$refs.MenuTreeRef.store.root.data
+            this.foreachTreeNode(parentId, menuTree, (parent) => {
+              if (!parent.children) {
+                this.$set(parent, 'children', [])
+              }
+              parent.children.push(node)
+            })
           }
+
           // 关闭窗口,重置表单
           this.addMenuDialogVisible = false
           // 重置中间变量
           this.$refs.addMenuFormRef.resetFields()
           this.addMenuForm = {}
-          this.addNode = {}
           // 成功提示
           this.$message.success('添加成功')
         })
@@ -524,19 +525,56 @@ export default {
           return
         }
         // 后台新增
+        this.editMenuForm.label = this.editMenuForm.name
         editMenu(this.editMenuForm).then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
 
           // 更新菜单树
-          this.editMenuForm.label = this.editMenuForm.name
-          this.editNode = this.editMenuForm
+          const menuId = this.editMenuForm.id
+          const menuTree = this.$refs.MenuTreeRef.store.root.data
+          this.foreachTreeNode(menuId, menuTree, (element) => {
+            element.id = this.editMenuForm.id
+            element.label = this.editMenuForm.label
+            element.name = this.editMenuForm.name
+            element.type = this.editMenuForm.type
+            element.icon = this.editMenuForm.icon
+            element.routePath = this.editMenuForm.routePath
+            element.parentId = this.editMenuForm.parentId
+          })
           this.editMenuDialogVisible = false
           this.$refs.editMenuFormRef.resetFields()
           this.$message.success('编辑成功!')
         })
       })
+    },
+    /**
+     * 递归菜单树,编辑树
+     * @param {Integer} menuId 查找的菜单ID
+     * @param {Array} nodes 菜单树
+     * @param {Function} editHandle 回调函数
+     */
+    foreachTreeNode (menuId, node, editHandle) {
+      const nodes = Array.from(node)
+      for (let index = 0; index < nodes.length; index++) {
+        const element = nodes[index]
+        console.log(JSON.stringify(element.label))
+        if (menuId === element.id) {
+          editHandle(element)
+          console.log('found')
+          return
+        }
+
+        const children = element.children
+        console.log(children)
+        if (children.length === 0) {
+          console.log('no child')
+          continue
+        }
+        console.log('looking for child')
+        this.foreachTreeNode(menuId, children, editHandle)
+      }
     },
     /**
      * 过滤菜单
