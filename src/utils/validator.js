@@ -298,5 +298,19 @@ export default {
     } else {
       return false
     }
+  },
+
+  /**
+   * 检查字符串是否包含特殊字符
+   * @param {String} value 被检测字符串
+   * @returns true:包含,false:不包含
+   */
+  isContainsSpecialChar (value) {
+    const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
+    const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
+    if (regEn.test(value) || regCn.test(value)) {
+      return true
+    }
+    return false
   }
 }

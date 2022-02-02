@@ -5,6 +5,583 @@
       <el-breadcrumb-item>系统管理</el-breadcrumb-item>
       <el-breadcrumb-item>菜单管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <h3>菜单组建</h3>
+    <el-card>
+      <el-row
+        :gutter="20"
+        style="margin-bottom: 16px"
+      >
+        <el-col :span="12">
+          <el-input
+            placeholder="查找菜单"
+            v-model="menuFilterText"
+            @input="onInput"
+            clearable
+          >
+            <el-button
+              slot="append"
+              :icon="expandIcon"
+              @click="expandMenu"
+            >{{this.expandText}}</el-button>
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
+            @click="addRootMenu"
+          >添加根节点</el-button>
+        </el-col>
+
+      </el-row>
+
+      <!-- 菜单树 -->
+      <el-tree
+        :data="menuTree"
+        node-key="id"
+        default-expand-all
+        :filter-node-method="filterNode"
+        :expand-on-click-node="false"
+        ref="MenuTreeRef"
+      >
+        <span
+          class="custom-tree-node"
+          slot-scope="{ node, data }"
+        >
+          <span>{{ node.label }}</span>
+          <span>
+            <el-button
+              type="text"
+              size="mini"
+              @click="() => append(data)"
+            >
+              Append
+            </el-button>
+            <el-button
+              type="text"
+              size="mini"
+              @click="() => edit(data)"
+            >
+              Edit
+            </el-button>
+            <el-button
+              type="text"
+              size="mini"
+              @click="() => remove(node, data)"
+            >
+              Delete
+            </el-button>
+          </span>
+        </span>
+      </el-tree>
+    </el-card>
+
+    <!-- 添加菜单对话框 -->
+    <el-dialog
+      title="新增菜单"
+      :visible.sync="addMenuDialogVisible"
+      width="50%"
+      :before-close="handleClose"
+    >
+      <!-- 表单项 -->
+      <el-form
+        ref="addMenuFormRef"
+        :model="addMenuForm"
+        :rules="addMenuRule"
+        label-width="120px"
+      >
+        <el-form-item
+          label="上级菜单"
+          prop="parentId"
+        >
+          <el-input
+            clearable
+            placeholder="请输入上级菜单ID"
+            v-model="addMenuForm.parentId"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="菜单名称"
+          prop="name"
+        >
+          <el-input
+            clearable
+            placeholder="请输入菜单名称"
+            v-model="addMenuForm.name"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="菜单路径"
+          prop="routePath"
+        >
+          <el-input
+            clearable
+            placeholder="请输入菜单路由"
+            v-model="addMenuForm.routePath"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="图标类型"
+          prop="icon"
+        >
+          <el-input
+            clearable
+            placeholder="eg: icon-font el-icon-data-line"
+            v-model="addMenuForm.icon"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="排序值"
+          prop="sortNum"
+        >
+          <el-input-number
+            v-model="addMenuForm.sortNum"
+            :min="1"
+            :max="1000"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item
+          label="类型"
+          prop="type"
+        >
+          <el-select
+            v-model="addMenuForm.type"
+            clearable
+            placeholder="请选择类型"
+          >
+            <el-option
+              key="1"
+              label="菜单"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="2"
+              label="按钮"
+              value="2"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitAddMenuRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="addMenuDialogVisible = false"
+        >取消</el-button>
+        <el-button
+          type="info"
+          @click="resetAddMenuForm"
+        >重置</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑菜单对话框 -->
+    <el-dialog
+      title="新增菜单"
+      :visible.sync="editMenuDialogVisible"
+      width="50%"
+      :before-close="handleClose"
+    >
+      <!-- 表单项 -->
+      <el-form
+        ref="editMenuFormRef"
+        :model="editMenuForm"
+        :rules="editMenuRule"
+        label-width="120px"
+      >
+        <el-form-item
+          label="上级菜单"
+          prop="parentId"
+        >
+          <el-input
+            clearable
+            placeholder="请输入上级菜单ID"
+            v-model="editMenuForm.parentId"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="菜单ID"
+          prop="id"
+        >
+          <el-input
+            clearable
+            placeholder="请输入菜单ID"
+            v-model="editMenuForm.id"
+            disabled
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="菜单名称"
+          prop="name"
+        >
+          <el-input
+            clearable
+            placeholder="请输入菜单名称"
+            v-model="editMenuForm.name"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="菜单路径"
+          prop="routePath"
+        >
+          <el-input
+            clearable
+            placeholder="请输入菜单路由"
+            v-model="editMenuForm.routePath"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="图标类型"
+          prop="icon"
+        >
+          <el-input
+            clearable
+            placeholder="eg: icon-font el-icon-data-line"
+            v-model="editMenuForm.icon"
+            @input="onInput"
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="排序值"
+          prop="sortNum"
+        >
+          <el-input-number
+            v-model="editMenuForm.sortNum"
+            :min="1"
+            :max="1000"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item
+          label="类型"
+          prop="type"
+        >
+          <el-select
+            v-model="editMenuForm.type"
+            clearable
+            placeholder="请选择类型"
+          >
+            <el-option
+              key="1"
+              label="菜单"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="2"
+              label="按钮"
+              value="2"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitEditMenuRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="editMenuDialogVisible = false"
+        >取消</el-button>
+        <el-button
+          type="info"
+          @click="resetEditMenuForm"
+        >重置</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
+<script>
+import {
+  queryMenuTree,
+  addMenu,
+  editMenu,
+  deleteMenuById
+} from '../../api/system/menu'
+
+// let id = 1000
+export default {
+  watch: {
+    menuFilterText (filterText) {
+      this.$refs.MenuTreeRef.filter(filterText)
+    }
+  },
+  created () {
+    queryMenuTree().then(res => {
+      if (res.code !== 200) {
+        return this.$message.error(res.message)
+      }
+      this.menuTree = res.data
+    })
+  },
+  data () {
+    const specialCharValidator = (rule, value, callback) => {
+      if (this.Validator.isContainsSpecialChar(value)) {
+        return callback(new Error('名称中不能包含特殊字符'))
+      }
+      callback()
+    }
+    const menuTree = []
+    return {
+      menuTree: JSON.parse(JSON.stringify(menuTree)),
+      addMenuDialogVisible: false,
+      addMenuForm: {
+        parent: {}
+      },
+      addMenuRule: {
+        parentId: [
+          { required: true, message: '请携带上级菜单ID', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入菜单名称', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
+        ],
+        routePath: [
+          { required: true, message: '请输入菜单路由地址', trigger: 'blur' }
+        ],
+        icon: [
+          { required: true, message: '请输入菜单图标样式', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: '请选择菜单类型', trigger: 'blur' }
+        ]
+      },
+      editMenuRule: {
+        parentId: [
+          { required: true, message: '请携带上级菜单ID', trigger: 'blur' }
+        ],
+        id: [
+          { required: true, message: '请携带菜单ID', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '请输入菜单名称', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
+        ],
+        routePath: [
+          { required: true, message: '请输入菜单路由地址', trigger: 'blur' }
+        ],
+        icon: [
+          { required: true, message: '请输入菜单图标样式', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: '请选择菜单类型', trigger: 'blur' }
+        ]
+      },
+      editMenuDialogVisible: false,
+      editMenuForm: {
+        parent: {}
+      },
+      editNode: {},
+      addNode: {},
+      menuFilterText: '',
+      expandSwitcher: true,
+      expandText: '收起菜单',
+      expandIcon: 'el-icon-arrow-up'
+    }
+  },
+
+  methods: {
+    /**
+     * 添加节点
+     * @param 要添加节点的父级节点
+     */
+    append (parent) {
+      this.addMenuDialogVisible = true
+      // 传递node
+      this.addNode = parent
+      this.addMenuForm.parentId = parent.id
+    },
+    /**
+     * 添加根菜单
+     */
+    addRootMenu () {
+      const root = this.$refs.MenuTreeRef.store.root
+      console.log(root)
+      this.append(root)
+    },
+    /**
+     * 删除节点
+     * @param node 菜单树
+     * @param data 当前删除节点
+     */
+    remove (node, data) {
+      this.$confirm('确定要删除当前记录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(res => {
+        deleteMenuById(data.id).then(result => {
+          console.log(result)
+        })
+        // 前台删除
+        const parent = node.parent
+        const children = parent.data.children || parent.data
+        const index = children.findIndex(d => d.id === data.id)
+        children.splice(index, 1)
+        this.$message({
+          type: 'success',
+          message: '删除成功'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
+    },
+
+    /**
+     * 所编辑的节点
+     * @param node 被编辑的节点
+     */
+    edit (node) {
+      // 回显
+      this.editMenuForm = node
+      this.editNode = node
+      // 传递node
+      this.editMenuDialogVisible = true
+    },
+    /**
+     * 新增
+     */
+    submitAddMenuRequest () {
+      this.$refs.addMenuFormRef.validate(valid => {
+        if (!valid) {
+          return
+        }
+        // 后台新增
+        const parent = this.addNode
+        addMenu(this.addMenuForm).then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.addMenuForm.id = res.data.id
+          // 更新菜单树
+          if (!parent.children) {
+            this.$set(parent, 'children', [])
+          }
+
+          this.addMenuForm.label = this.addMenuForm.name
+          parent.children.push(this.addMenuForm)
+          this.addMenuDialogVisible = false
+          this.$refs.addMenuFormRef.resetFields()
+          this.$message.success('添加成功')
+        })
+      })
+    },
+    /**
+     * 编辑
+     */
+    submitEditMenuRequest () {
+      this.$refs.editMenuFormRef.validate(valid => {
+        if (!valid) {
+          return
+        }
+        // 后台新增
+        editMenu(this.editMenuForm).then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          // 更新菜单树
+          this.editMenuForm.label = this.editMenuForm.name
+          this.editNode = this.editMenuForm
+          this.editMenuDialogVisible = false
+          this.$refs.editMenuFormRef.resetFields()
+          this.$message.success('编辑成功!')
+        })
+      })
+    },
+    /**
+     * 过滤菜单
+     */
+    filterNode (value, data) {
+      if (!value) return true
+      return data.label.indexOf(value) !== -1
+    },
+    /**
+     * 重置添加表单
+     */
+    resetAddMenuForm () {
+      this.$refs.addMenuFormRef.resetFields()
+    },
+    /**
+     * 重置新增表单
+     */
+    resetEditMenuForm () {
+      this.$refs.editMenuFormRef.resetFields()
+    },
+    /**
+     * 对话框关闭提示
+     */
+    handleClose (done) {
+      this.$confirm('确定要关闭对话框?')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => { })
+    },
+    /**
+     * 刷新输入框
+     */
+    onInput () {
+      this.$forceUpdate()
+    },
+    /**
+     * 展开或折叠菜单
+     */
+    expandMenu () {
+      this.expandSwitcher = !this.expandSwitcher
+      this.expandSwitcher === true ? this.expandText = '收起菜单' : this.expandText = '打开菜单'
+      this.expandText = this.expandSwitcher ? '收起菜单' : '打开菜单'
+      this.expandIcon = this.expandSwitcher ? 'el-icon-arrow-up' : 'el-icon-arrow-down'
+      this.expandNodes(this.$refs.MenuTreeRef.store.root)
+    },
+    /**
+     * 遍历树形数据，设置每一项的expanded属性，实现展开收起
+     */
+    expandNodes (node) {
+      node.expanded = this.expandSwitcher
+      for (let i = 0; i < node.childNodes.length; i++) {
+        node.childNodes[i].expanded = this.expandSwitcher
+        if (node.childNodes[i].childNodes.length > 0) {
+          this.expandNodes(node.childNodes[i])
+        }
+      }
+    }
+  }
+}
+</script>
+<style lang="less" scoped>
+.custom-tree-node {
+  line-height: 55px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 0px 30px 0 0;
+}
+</style>
