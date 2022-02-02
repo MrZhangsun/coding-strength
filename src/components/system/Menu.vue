@@ -39,9 +39,12 @@
         :data="menuTree"
         node-key="id"
         default-expand-all
+        draggable
+        highlight-curren
         :filter-node-method="filterNode"
-        :expand-on-click-node="false"
+        :expand-on-click-node="true"
         ref="MenuTreeRef"
+        @node-drop="handleDrop"
       >
         <span
           class="custom-tree-node"
@@ -416,8 +419,7 @@ export default {
      * 添加根菜单
      */
     addRootMenu () {
-      const root = this.$refs.MenuTreeRef.store.root
-      console.log(root)
+      const root = { id: 0, label: 'root', children: [] }
       this.append(root)
     },
     /**
@@ -432,16 +434,18 @@ export default {
         type: 'warning'
       }).then(res => {
         deleteMenuById(data.id).then(result => {
-          console.log(result)
-        })
-        // 前台删除
-        const parent = node.parent
-        const children = parent.data.children || parent.data
-        const index = children.findIndex(d => d.id === data.id)
-        children.splice(index, 1)
-        this.$message({
-          type: 'success',
-          message: '删除成功'
+          if (result.code !== 200) {
+            return this.$message.error(result.message)
+          }
+          // 前台删除
+          const parent = node.parent
+          const children = parent.data.children || parent.data
+          const index = children.findIndex(d => d.id === data.id)
+          children.splice(index, 1)
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
         })
       }).catch(() => {
         this.$message({
@@ -472,21 +476,41 @@ export default {
         }
         // 后台新增
         const parent = this.addNode
+        this.addMenuForm.id = null
         addMenu(this.addMenuForm).then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
 
-          this.addMenuForm.id = res.data.id
+          this.addMenuForm.id = res.data
           // 更新菜单树
           if (!parent.children) {
             this.$set(parent, 'children', [])
           }
 
           this.addMenuForm.label = this.addMenuForm.name
-          parent.children.push(this.addMenuForm)
+          const node = {}
+          node.id = this.addMenuForm.id
+          node.label = this.addMenuForm.label
+          node.name = this.addMenuForm.name
+          node.type = this.addMenuForm.type
+          node.icon = this.addMenuForm.icon
+          node.routePath = this.addMenuForm.routePath
+          node.parentId = this.addMenuForm.parentId
+
+          // 递归寻找parent节点
+          if (parent.id === 0) {
+            this.menuTree.push(node)
+          } else {
+            parent.children.push(node)
+          }
+          // 关闭窗口,重置表单
           this.addMenuDialogVisible = false
+          // 重置中间变量
           this.$refs.addMenuFormRef.resetFields()
+          this.addMenuForm = {}
+          this.addNode = {}
+          // 成功提示
           this.$message.success('添加成功')
         })
       })
@@ -570,6 +594,31 @@ export default {
           this.expandNodes(node.childNodes[i])
         }
       }
+    },
+    /**
+     * 拖动处理
+     * @param {Object} dragNode 拖动的节点
+     * @param {Object} dragEndNode 拖动结束的节点
+     * @param {Object} dragType 拖动的类型
+     * @param {Object} dragEvent 拖动事件
+     */
+    handleDrop (dragNode, dragEndNode, dragType, dragEvent) {
+      console.log('tree drag end dragNode: ', dragNode)
+      console.log('tree drag end dragEndNode: ', dragEndNode)
+      console.log('tree drag end dragType: ', dragType)
+      console.log('tree drag end dragEvent: ', dragEvent)
+    },
+    /**
+     * 是否允许删除
+     */
+    allowDrop (draggingNode, dropNode, type) {
+      return false
+    },
+    /**
+     * 是否允许拖动
+     */
+    allowDrag (draggingNode) {
+      return true
     }
   }
 }
