@@ -50,6 +50,23 @@ export function editMenu (editMenuForm) {
 }
 
 /**
+ * 拖动菜单
+ * @param {Object} editMenuForm 菜单项
+ * @param {Integer} menuId 菜单ID
+ * @returns Promise
+ */
+export function dragMenu (editMenuForm) {
+  return new Promise((resolve, reject) => {
+    axios.put('/system/menu/' + editMenuForm.id, editMenuForm)
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}
+
+/**
  * 删除菜单
  * @param {Integer} menuId 菜单ID
  * @returns Promise

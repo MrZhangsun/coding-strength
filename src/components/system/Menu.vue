@@ -331,12 +331,7 @@ export default {
     }
   },
   created () {
-    queryMenuTree().then(res => {
-      if (res.code !== 200) {
-        return this.$message.error(res.message)
-      }
-      this.menuTree = res.data
-    })
+    this.loadingMenuTree()
   },
   data () {
     const specialCharValidator = (rule, value, callback) => {
@@ -404,8 +399,19 @@ export default {
 
   methods: {
     /**
+     * 加载菜单树
+     */
+    loadingMenuTree () {
+      queryMenuTree().then(res => {
+        if (res.code !== 200) {
+          return this.$message.error(res.message)
+        }
+        this.menuTree = res.data
+      })
+    },
+    /**
      * 添加节点
-     * @param 要添加节点的父级节点
+     * @param parent 要添加节点的父级节点
      */
     append (parent) {
       this.addMenuDialogVisible = true
@@ -464,6 +470,7 @@ export default {
       this.editMenuForm.icon = node.icon
       this.editMenuForm.routePath = node.routePath
       this.editMenuForm.parentId = node.parentId
+      this.editMenuForm.sortNum = node.sortNum
       // 传递node
       this.editMenuDialogVisible = true
     },
@@ -542,9 +549,14 @@ export default {
             element.icon = this.editMenuForm.icon
             element.routePath = this.editMenuForm.routePath
             element.parentId = this.editMenuForm.parentId
+            element.sortNum = this.editMenuForm.sortNum
           })
+          // 关闭对话框
           this.editMenuDialogVisible = false
           this.$refs.editMenuFormRef.resetFields()
+
+          // 重新加载菜单树
+          this.loadingMenuTree()
           this.$message.success('编辑成功!')
         })
       })
@@ -559,7 +571,6 @@ export default {
       const nodes = Array.from(node)
       for (let index = 0; index < nodes.length; index++) {
         const element = nodes[index]
-        console.log(JSON.stringify(element.label))
         if (menuId === element.id) {
           editHandle(element)
           console.log('found')
@@ -567,12 +578,10 @@ export default {
         }
 
         const children = element.children
-        console.log(children)
         if (children.length === 0) {
           console.log('no child')
           continue
         }
-        console.log('looking for child')
         this.foreachTreeNode(menuId, children, editHandle)
       }
     },
@@ -645,6 +654,7 @@ export default {
       console.log('tree drag end dragEndNode: ', dragEndNode)
       console.log('tree drag end dragType: ', dragType)
       console.log('tree drag end dragEvent: ', dragEvent)
+      editMenu()
     },
     /**
      * 是否允许删除
