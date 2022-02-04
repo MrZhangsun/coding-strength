@@ -44,7 +44,7 @@
         :filter-node-method="filterNode"
         :expand-on-click-node="true"
         ref="MenuTreeRef"
-        @node-drop="handleDrop"
+        @node-drop="handleDrag"
       >
         <span
           class="custom-tree-node"
@@ -573,13 +573,11 @@ export default {
         const element = nodes[index]
         if (menuId === element.id) {
           editHandle(element)
-          console.log('found')
           return
         }
 
         const children = element.children
         if (children.length === 0) {
-          console.log('no child')
           continue
         }
         this.foreachTreeNode(menuId, children, editHandle)
@@ -649,12 +647,20 @@ export default {
      * @param {Object} dragType 拖动的类型
      * @param {Object} dragEvent 拖动事件
      */
-    handleDrop (dragNode, dragEndNode, dragType, dragEvent) {
+    handleDrag (dragNode, dragEndNode, dragType, dragEvent) {
       console.log('tree drag end dragNode: ', dragNode)
       console.log('tree drag end dragEndNode: ', dragEndNode)
       console.log('tree drag end dragType: ', dragType)
       console.log('tree drag end dragEvent: ', dragEvent)
-      editMenu()
+      const dragForm = {}
+      dragForm.id = dragNode.data.id
+      if (dragType === 'inner') {
+        dragForm.parentId = dragEndNode.data.id
+      } else {
+        dragForm.parentId = dragEndNode.data.parentId
+      }
+
+      editMenu(dragForm)
     },
     /**
      * 是否允许删除
