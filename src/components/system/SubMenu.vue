@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="box fx_1"
-    :class="mode==='vertical' ? 'fx_col' :'fx'"
-  >
+  <div>
     <template v-for="menu in subMenus">
       <el-submenu
         v-if="menu.children && menu.children.length > 0"

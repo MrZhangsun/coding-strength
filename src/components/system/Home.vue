@@ -52,6 +52,7 @@
           active-text-color="#ffd04b"
         >
           <SubMenu
+            class="sub-menu"
             :subMenus="menuTree"
             mode="vertical"
           />
@@ -195,6 +196,7 @@ export default {
     display: flex;
     align-items: center;
     color: black !important;
+    padding-left: 25px;
     span {
       padding: 0 10px;
     }
