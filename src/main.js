@@ -11,7 +11,9 @@ import { Loading } from 'element-ui'
 import * as echarts from 'echarts'
 import moment from 'moment'
 
-// 全局日期格式化
+/**
+ * 全局日期格式化
+ */
 Vue.prototype.moment = moment
 Vue.filter('dateFormat', (dateStr, pattern = 'YYYY-MM-DD hh:mm:ss') => {
   if (dateStr) {
@@ -19,9 +21,30 @@ Vue.filter('dateFormat', (dateStr, pattern = 'YYYY-MM-DD hh:mm:ss') => {
   }
   return dateStr
 })
-// 配置echarts
+
+/**
+ * 内容宽度过滤器,超过款对, 显示省略号
+ * @param value 需要处理的文本
+ * @param limit 需要限制的字符长度
+ */
+Vue.filter('contentLimit', function (value, limit) {
+  if (!value) {
+    return ''
+  }
+  if (value.length <= limit - 3) {
+    return value
+  }
+  return value.slice(0, limit) + '...'
+})
+
+/**
+ * 配置echarts
+ */
 Vue.prototype.$echarts = echarts
-// 配置http请求
+
+/**
+ * 配置http请求
+ */
 axios.defaults.baseURL = 'http://localhost:10110/api/'
 let loading = null
 const loadingSwitch = false
