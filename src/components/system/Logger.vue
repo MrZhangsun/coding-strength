@@ -214,12 +214,100 @@
         :total="pageInfo.total"
       >
       </el-pagination>
+      <!-- 日志详情 -->
+      <el-dialog
+        :visible.sync="loggerDetailDialogVisible"
+        width="50%"
+      >
+        <el-descriptions
+          class="margin-top"
+          title="日志详情"
+          :column="4"
+          direction="horizontals"
+          border
+          colon
+          :labelStyle="detailLabelStyle"
+          :contentStyle="detailContentStyle"
+          ref="loggerDetailDialogRef"
+        >
+          <el-descriptions-item
+            label="日志ID"
+            :span="2"
+          >{{detailLoggerForm.id}}</el-descriptions-item>
+          <el-descriptions-item
+            label="请求方式"
+            :span="2"
+          >{{detailLoggerForm.method}}</el-descriptions-item>
+          <el-descriptions-item
+            label="IP地址"
+            :span="2"
+          >{{detailLoggerForm.address}}</el-descriptions-item>
+          <el-descriptions-item
+            label="接口路径"
+            :span="2"
+          >{{detailLoggerForm.path}}</el-descriptions-item>
+          <el-descriptions-item
+            label="操作人"
+            :span="2"
+          >{{detailLoggerForm.createdBy}}</el-descriptions-item>
+          <el-descriptions-item
+            label="创建时间"
+            :span="2"
+          >
+            <template>
+              {{detailLoggerForm.createdTime | dateFormat}}
+            </template>
+          </el-descriptions-item>
+          <el-descriptions-item
+            label="处理器"
+            :span="4"
+          >{{detailLoggerForm.methodRef}}</el-descriptions-item>
+          <el-descriptions-item
+            label="请求体"
+            :span="4"
+          >
+            {{detailLoggerForm.requestBody}}
+          </el-descriptions-item>
+          <el-descriptions-item
+            label="请求头"
+            :span="4"
+          >
+            {{detailLoggerForm.requestHeader}}
+          </el-descriptions-item>
+          <el-descriptions-item
+            label="响应体"
+            :span="4"
+          >
+            {{detailLoggerForm.responseBody}}
+          </el-descriptions-item>
+          <el-descriptions-item
+            label="响应头"
+            :span="4"
+          >
+            {{detailLoggerForm.responseHeader}}
+          </el-descriptions-item>
+          <el-descriptions-item
+            label="描述"
+            :span="4"
+          >{{detailLoggerForm.description}}</el-descriptions-item>
+        </el-descriptions>
+        <!-- 按钮 -->
+        <span
+          slot="footer"
+          class="dialog-footer"
+        >
+          <el-button
+            type="danger"
+            @click="backToList"
+          >返回</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
 
 <script>
-import { queryByConditions } from '../../api/system/logger'
+import { queryByConditions, queryById } from '../../api/system/logger'
 export default {
   created () {
     this.getLoggerList()
@@ -229,6 +317,15 @@ export default {
     return {
       loggerList: [],
       dateTimePicker: [],
+      loggerDetailDialogVisible: false,
+      detailLoggerForm: {},
+      detailLabelStyle: {
+        width: '100px',
+        'text-align': 'left'
+      },
+      detailContentStyle: {
+        'font-size': '12px'
+      },
       pageInfo: {
         pageNum: 1,
         pageSize: 10,
@@ -255,6 +352,19 @@ export default {
           this.loggerList = res.data.list
           this.pageInfo.total = res.data.total
         })
+    },
+    showDetailDialog (rowId) {
+      this.loggerDetailDialogVisible = true
+      queryById(rowId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.detailLoggerForm = res.data
+        })
+    },
+    backToList () {
+      this.loggerDetailDialogVisible = false
     },
     // 分页单位调整,重新刷新列表
     handleSizeChange (newSize) {
