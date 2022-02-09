@@ -6,6 +6,7 @@
       <el-breadcrumb-item>统计分析</el-breadcrumb-item>
       <el-breadcrumb-item>提交统计</el-breadcrumb-item>
     </el-breadcrumb>
+    <!-- 列表区 -->
     <el-card>
       <!-- 检索区 -->
       <el-row
@@ -213,6 +214,127 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 对话框 -->
+    <!-- Commit详情 -->
+    <el-dialog
+      ref="commitDetailDialogRef"
+      :visible.sync="commitDetailDialogVisible"
+      width="50%"
+    >
+      <el-descriptions
+        class="margin-top"
+        title="Commit详情"
+        :column="4"
+        direction="horizontals"
+        border
+        colon
+        :labelStyle="detailLabelStyle"
+        :contentStyle="detailContentStyle"
+      >
+        <el-descriptions-item
+          label="ID"
+          :span="2"
+        >{{detailCommitForm.id}}</el-descriptions-item>
+        <el-descriptions-item
+          label="Commit ID"
+          :span="2"
+        >{{detailCommitForm.commitId}}</el-descriptions-item>
+        <el-descriptions-item
+          label="所属仓库"
+          :span="2"
+        >{{detailCommitForm.repositoryName}}</el-descriptions-item>
+        <el-descriptions-item
+          label="所属分支"
+          :span="2"
+        >{{detailCommitForm.branchName}}</el-descriptions-item>
+        <el-descriptions-item
+          label="添加行"
+          :span="2"
+        >{{detailCommitForm.addLines}}</el-descriptions-item>
+        <el-descriptions-item
+          label="删除行"
+          :span="2"
+        >{{detailCommitForm.removeLines}}</el-descriptions-item>
+        <el-descriptions-item
+          label="有效行"
+          :span="2"
+        >{{detailCommitForm.addLines - detailCommitForm.removeLines}}</el-descriptions-item>
+        <el-descriptions-item
+          label="提交文件"
+          :span="4"
+        >{{detailCommitForm.commitFiles}}</el-descriptions-item>
+        <el-descriptions-item
+          label="作者"
+          :span="2"
+        >{{detailCommitForm.author}}</el-descriptions-item>
+        <el-descriptions-item
+          label="提交时间"
+          :span="2"
+        >
+          <template>
+            {{detailCommitForm.commitTime | dateFormat}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="创建人"
+          :span="2"
+        >{{detailCommitForm.createBy}}</el-descriptions-item>
+        <el-descriptions-item
+          label="创建时间"
+          :span="2"
+        >
+          <template>
+            {{detailCommitForm.createTime | dateFormat}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="更新人"
+          :span="2"
+        >{{detailCommitForm.updateBy}}</el-descriptions-item>
+        <el-descriptions-item
+          label="更新时间"
+          :span="4"
+        >
+          <template>
+            {{detailCommitForm.updateTime | dateFormat}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="删除状态"
+          :span="4"
+        >
+          <el-switch
+            :active-value="0"
+            :inactive-value="1"
+            active-color="#13ce66"
+            v-model="detailCommitForm.delete"
+            disabled
+          ></el-switch>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="禁用状态"
+          :span="4"
+        >
+          <el-switch
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            v-model="detailCommitForm.active"
+            disabled
+          ></el-switch>
+        </el-descriptions-item>
+      </el-descriptions>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="danger"
+          @click="commitDetailDialogVisible = false"
+        >返回</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -231,7 +353,16 @@ export default {
         total: 0,
         startTime: '',
         endTime: ''
-      }
+      },
+      detailLabelStyle: {
+        width: '100px',
+        'text-align': 'left'
+      },
+      detailContentStyle: {
+        'font-size': '12px'
+      },
+      detailCommitForm: {},
+      commitDetailDialogVisible: false
     }
   },
   methods: {
@@ -260,7 +391,14 @@ export default {
      * @param rowId commit主键ID
      */
     showDetailDialog (rowId) {
+      this.commitDetailDialogVisible = true
       queryCommitById(rowId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.detailCommitForm = res.data
+        })
     },
     /**
      * 分页单位调整,重新刷新列表
