@@ -8,9 +8,9 @@
           style="margin-right:10px; height: 55px;"
         >
         <span>
-          <b style="color: yellow; font-size:20px;">C</b>oding
-          <b style="color: red; font-size:20px;">S</b>trength
-          <b style="color: blue; font-size:20px;">T</b>OP
+          <b style="color: blue; font-size:20px;">C</b>oding
+          <b style="color: yellow; font-size:20px;">S</b>trength
+          <b style="color: red; font-size:20px;">T</b>OP
         </span>
       </div>
       <div class="logout-div">

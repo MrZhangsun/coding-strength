@@ -354,7 +354,7 @@
           label="统计时间"
           :span="4"
         >
-          {{detialRepositoryForm.updatedTime}}
+          {{detialRepositoryForm.updatedTime | dateFormat}}
         </el-descriptions-item>
         <el-descriptions-item
           label="解析状态"
