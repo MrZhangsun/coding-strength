@@ -5,8 +5,13 @@
         <img
           src="../../assets/logo.png"
           alt=""
+          style="margin-right:10px; height: 55px;"
         >
-        <span>Coding Strength Top</span>
+        <span>
+          <b style="color: yellow; font-size:20px;">C</b>oding
+          <b style="color: red; font-size:20px;">S</b>trength
+          <b style="color: blue; font-size:20px;">T</b>OP
+        </span>
       </div>
       <div class="logout-div">
         <div
@@ -20,7 +25,7 @@
           >
           </el-avatar>
         </div>
-        <span class="username">{{this.globalUsername}}</span>
+        <span class="username">{{this.globalUsername | contentLimit(10)}}</span>
         <el-button
           class="logoutBtn"
           :style="{'display': isDisplayLogout}"
@@ -136,15 +141,17 @@ export default {
   justify-content: space-between;
   padding-left: 20px;
   height: 100%;
-  width: 230px;
+  width: 250px;
   font-size: 18px;
-  color: rgb(252, 235, 5);
+  line-height: 60px;
+  color: rgb(255, 255, 255);
 }
 .logout-div {
   display: flex;
   justify-content: space-between;
   height: 100%;
   width: 150px;
+  color: rgb(245, 221, 8);
 }
 .avatar-div {
   padding: 10px;
