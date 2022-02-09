@@ -84,25 +84,25 @@
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >分析</el-button>
+          >时间分析</el-button>
         </el-col>
         <el-col :span="3">
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >分析</el-button>
+          >人效分析</el-button>
         </el-col>
         <el-col :span="3">
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >分析</el-button>
+          >仓库分析</el-button>
         </el-col>
         <el-col :span="3">
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >分析</el-button>
+          >分支分析</el-button>
         </el-col>
         <el-col :span="3">
           <el-button

@@ -10,6 +10,7 @@ import AnalysisRepository from '../components/coding/analysis/AnalysisRepository
 import AnalysisBranch from '../components/coding/analysis/AnalysisBranch.vue'
 import AnalysisCommit from '../components/coding/analysis/AnalysisCommit.vue'
 import Logger from '../components/coding/Logger.vue'
+import Author from '../components/coding/Author.vue'
 import Menu from '../components/system/Menu.vue'
 import Account from '../components/system/Account.vue'
 import User from '../components/system/User.vue'
@@ -77,6 +78,11 @@ const routes = [
             component: AnalysisCommit
           }
         ]
+      },
+      {
+        name: '作者关联',
+        path: 'author',
+        component: Author
       },
       {
         name: '统计日志',
