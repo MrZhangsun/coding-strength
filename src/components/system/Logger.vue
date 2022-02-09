@@ -329,7 +329,9 @@ export default {
       pageInfo: {
         pageNum: 1,
         pageSize: 10,
-        total: 0
+        total: 0,
+        startTime: '',
+        endTime: ''
       }
     }
   },
@@ -342,6 +344,9 @@ export default {
       if (this.dateTimePicker && this.dateTimePicker[0] && this.dateTimePicker[1]) {
         this.pageInfo.startTime = this.dateTimePicker[0]
         this.pageInfo.endTime = this.dateTimePicker[1]
+      } else {
+        this.pageInfo.startTime = ''
+        this.pageInfo.endTime = ''
       }
 
       queryByConditions(this.pageInfo)
