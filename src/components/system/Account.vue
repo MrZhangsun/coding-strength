@@ -10,7 +10,7 @@
       <el-row :gutter="20">
         <el-col :span="3">
           <el-input
-            placeholder="请输入账号"
+            placeholder="账号"
             v-model="pageInfo.username"
             @input="onInput"
             @clear="getAccountList"
@@ -20,7 +20,7 @@
         </el-col>
         <el-col :span="3">
           <el-input
-            placeholder="请输入钉钉ID"
+            placeholder="钉钉ID"
             v-model="pageInfo.dingtalkId"
             @input="onInput"
             @clear="getAccountList"
@@ -32,7 +32,7 @@
           <el-select
             v-model="pageInfo.type"
             clearable
-            placeholder="请选择内外网"
+            placeholder="内外网"
             @clear="getAccountList"
             @change="getAccountList"
           >
@@ -60,7 +60,7 @@
           <el-select
             v-model="pageInfo.lock"
             clearable
-            placeholder="请选择状态"
+            placeholder="状态"
             @clear="getAccountList"
             @change="getAccountList"
           >
