@@ -174,13 +174,20 @@
           label="项目名称"
           prop="name"
         >
-          <el-input v-model="addRepositoryForm.name"></el-input>
+          <el-input
+            v-model="addRepositoryForm.name"
+            disabled
+            placeholder="自动填充"
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="仓库地址"
           prop="url"
         >
-          <el-input v-model="addRepositoryForm.url"></el-input>
+          <el-input
+            v-model="addRepositoryForm.url"
+            @blur="autoWriteRepositoryName(addRepositoryForm.url)"
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="状态"
@@ -250,7 +257,10 @@
           label="项目名称"
           prop="name"
         >
-          <el-input v-model="editRepositoryForm.name"></el-input>
+          <el-input
+            v-model="editRepositoryForm.name"
+            disabled
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="仓库地址"
@@ -663,6 +673,21 @@ export default {
           console.error(error)
         })
       return false
+    },
+    /**
+     * 自动补充仓库名称
+     * @param repositoryUrl 仓库地址
+     */
+    autoWriteRepositoryName (repositoryUrl) {
+      const isUrl = this.Validator.isGitRepositoryUrl(repositoryUrl)
+      if (!isUrl) {
+        return null
+      }
+
+      const parts = repositoryUrl.split('/')
+      let repositoryName = parts[parts.length - 1]
+      repositoryName = repositoryName.slice(0, -4)
+      this.addRepositoryForm.name = repositoryName
     }
   }
 }
