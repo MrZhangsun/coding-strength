@@ -293,15 +293,23 @@
         >{{detailCommitForm.updateBy}}</el-descriptions-item>
         <el-descriptions-item
           label="更新时间"
-          :span="4"
+          :span="2"
         >
           <template>
             {{detailCommitForm.updateTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
-          label="删除状态"
+          label="提交注释"
           :span="4"
+        >
+          <template>
+            {{detailCommitForm.comment}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="删除状态"
+          :span="2"
         >
           <el-switch
             :active-value="0"
@@ -313,7 +321,7 @@
         </el-descriptions-item>
         <el-descriptions-item
           label="禁用状态"
-          :span="4"
+          :span="2"
         >
           <el-switch
             :active-value="1"
@@ -406,7 +414,7 @@ export default {
      */
     handleSizeChange (newSize) {
       this.pageInfo.pageSize = newSize
-      this.getAccountList()
+      this.getCommitList()
     },
     /**
      * 下一页
@@ -414,7 +422,7 @@ export default {
      */
     handleCurrentChange (newPage) {
       this.pageInfo.pageNum = newPage
-      this.getAccountList()
+      this.getCommitList()
     },
     /**
      * 强制刷新输入框,解决无法输入问题
