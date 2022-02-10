@@ -304,7 +304,7 @@
           :span="4"
         >
           <template>
-            {{detailCommitForm.comment}}
+            {{detailCommitForm.comment | contentLimit(100)}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
