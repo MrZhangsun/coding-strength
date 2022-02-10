@@ -15,9 +15,9 @@
       >
         <el-col :span="3">
           <el-select
-            v-model="pageInfo.repositoryName"
+            v-model="pageInfo.repositoryId"
             placeholder="仓库名称"
-            @clear="getBranchList"
+            @clear="clearRepositorySelect"
             @change="getBranchList"
             filterable
             clearable
@@ -27,7 +27,7 @@
               v-for="item in repositories"
               :key="item.id"
               :label="item.name"
-              :value="item.name"
+              :value="item.id"
             />
           </el-select>
         </el-col>
@@ -367,7 +367,6 @@ export default {
         this.pageInfo.endTime = ''
       }
 
-      this.repositories = this.repositoryCopy
       queryByConditions(this.pageInfo)
         .then(res => {
           if (res.code !== 200) {
@@ -436,9 +435,17 @@ export default {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
+
+          if (!res.data.list || res.data.list.length <= 0) {
+            return this.$message.info('暂无数据')
+          }
           this.repositories = res.data.list
           this.repositoryCopy = res.data.list
         })
+    },
+    clearRepositorySelect () {
+      // 下拉框重新赋值操作
+      this.repositories = this.repositoryCopy
     }
   }
 }
