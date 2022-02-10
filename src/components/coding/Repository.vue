@@ -398,8 +398,14 @@
 </template>
 
 <script>
-import { uploadFile } from '../../utils/upload.js'
-
+import { uploadFile } from '../../utils/upload'
+import {
+  queryRepositoryById,
+  deleteRepositoryById,
+  addRepository,
+  editRepository,
+  queryByConditions
+} from '../../api/coding/repository'
 export default {
   created () {
     this.getRepositoryList()
@@ -496,13 +502,13 @@ export default {
   methods: {
     // 获取代码仓库列表
     getRepositoryList () {
-      this.$http.get('/coding/repositories', { params: this.pageInfo })
+      queryByConditions(this.pageInfo)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.repositoryList = res.data.data.list
-          this.pageInfo.total = res.data.data.total
+          this.repositoryList = res.data.list
+          this.pageInfo.total = res.data.total
         })
     },
     // 分页单位调整,重新刷新列表
@@ -521,10 +527,10 @@ export default {
         id: repositoryId,
         status: newStatus
       }
-      this.$http.put('/coding/repository/' + repositoryId, params)
+      editRepository(repositoryId, params)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
           this.$message.success('更新成功!')
         })
@@ -543,10 +549,10 @@ export default {
         if (!valid) {
           return
         }
-        this.$http.post('/coding/repository', this.addRepositoryForm)
+        addRepository(this.addRepositoryForm)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
             this.getRepositoryList()
             this.$message.success('添加成功')
@@ -558,23 +564,23 @@ export default {
     },
     // 显示编辑对话框
     showEditDialog (repositoryId) {
-      this.$http.get('/coding/repository/' + repositoryId)
+      queryRepositoryById(repositoryId)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.editRepositoryForm = res.data.data
+          this.editRepositoryForm = res.data
           this.editRepositoryDialogVisible = true
         })
     },
     // 详情对话框
     showDetailDialog (repositoryId) {
-      this.$http.get('/coding/repository/' + repositoryId)
+      queryRepositoryById(repositoryId)
         .then(res => {
-          if (res.data.code !== 200) {
-            return this.$message.error(res.data.message)
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
-          this.detialRepositoryForm = res.data.data
+          this.detialRepositoryForm = res.data
           this.detailRepositoryDialogVisible = true
         })
     },
@@ -614,10 +620,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http.delete('/coding/repository/' + repositoryId)
+        deleteRepositoryById(repositoryId)
           .then(res => {
-            if (res.data.code !== 200) {
-              return this.$message.error(res.data.message)
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
             }
 
             this.getRepositoryList()

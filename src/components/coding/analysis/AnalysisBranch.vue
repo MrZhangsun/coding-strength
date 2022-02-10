@@ -14,14 +14,22 @@
         class="row-search"
       >
         <el-col :span="3">
-          <el-input
-            placeholder="仓库名称"
+          <el-select
             v-model="pageInfo.repositoryName"
-            @input="onInput"
+            placeholder="仓库名称"
             @clear="getBranchList"
+            @change="getBranchList"
+            filterable
             clearable
+            :filter-method="filterRepository"
           >
-          </el-input>
+            <el-option
+              v-for="item in repositories"
+              :key="item.id"
+              :label="item.name"
+              :value="item.name"
+            />
+          </el-select>
         </el-col>
         <el-col :span="3">
           <el-input
@@ -316,8 +324,10 @@
 </template>
 <script>
 import { queryByConditions, queryById as queryBranchById } from '../../../api/coding/branch'
+import { queryAll } from '../../../api/coding/repository'
 export default {
   created () {
+    this.getRepositoryList()
     this.getBranchList()
   },
   data () {
@@ -339,7 +349,9 @@ export default {
         'font-size': '12px'
       },
       detailBranchForm: {},
-      branchDetailDialogVisible: false
+      branchDetailDialogVisible: false,
+      repositories: [],
+      repositoryCopy: []
     }
   },
   methods: {
@@ -354,6 +366,8 @@ export default {
         this.pageInfo.startTime = ''
         this.pageInfo.endTime = ''
       }
+
+      this.repositories = this.repositoryCopy
       queryByConditions(this.pageInfo)
         .then(res => {
           if (res.code !== 200) {
@@ -398,6 +412,33 @@ export default {
      */
     onInput () {
       this.$forceUpdate()
+    },
+    /**
+     * 根据仓库名称过滤仓库
+     */
+    filterRepository (value) {
+      if (value) {
+        this.repositories = this.repositoryCopy.filter((item) => {
+          if (!!~item.name.indexOf(value) || !!~item.name.toUpperCase().indexOf(value.toUpperCase())) {
+            return true
+          }
+        })
+      } else {
+        this.repositories = this.repositoryCopy
+      }
+    },
+    /**
+     * 查询仓库列表
+     */
+    getRepositoryList () {
+      queryAll()
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.repositories = res.data.list
+          this.repositoryCopy = res.data.list
+        })
     }
   }
 }
