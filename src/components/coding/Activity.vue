@@ -20,15 +20,21 @@
       id="active-author"
       class="row-chart"
     ></div>
+    <h3>仓库增长趋势</h3>
+    <div
+      id="active-author"
+      class="row-chart"
+    ></div>
   </div>
 </template>
 <script>
+import { repositoryTop, branchTop, authorTop } from '../../api/coding/activity'
 let repositoryStatisticChart
 let activeRepositoryChart
 // let chart2
 export default {
   created () {
-    // this.getData()
+    this.getData()
   },
   destroyed () {
     // 销毁组建,防止内存泄漏
@@ -125,10 +131,26 @@ export default {
   methods: {
     // https://echarts.apache.org/examples/data/asset/data/flare.json
     getData () {
-      this.$http.get('https://echarts.apache.org/examples/data/asset/data/flare.json')
+      repositoryTop(5)
         .then(res => {
-          console.log(res)
-          this.data = res.data
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          console.log('respository', res.data)
+        })
+      authorTop(5)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          console.log('respository', res.data)
+        })
+      branchTop(5)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          console.log('respository', res.data)
         })
     }
   }
