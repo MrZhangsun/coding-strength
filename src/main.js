@@ -10,6 +10,7 @@ import axios from 'axios'
 import { Loading } from 'element-ui'
 import * as echarts from 'echarts'
 import moment from 'moment'
+import baseURL from './config/baseUrl'
 
 /**
  * 全局日期格式化
@@ -45,7 +46,7 @@ Vue.prototype.$echarts = echarts
 /**
  * 配置http请求
  */
-axios.defaults.baseURL = 'http://localhost:10110/api/'
+axios.defaults.baseURL = baseURL
 let loading = null
 const loadingSwitch = false
 const loadOption = {
