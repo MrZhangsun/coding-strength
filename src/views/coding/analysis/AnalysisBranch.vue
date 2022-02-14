@@ -437,6 +437,9 @@ export default {
           this.repositoryCopy = res.data.list
         })
     },
+    /**
+     * 重新给仓库列表赋值
+     */
     clearRepositorySelect () {
       // 下拉框重新赋值操作
       this.repositories = this.repositoryCopy

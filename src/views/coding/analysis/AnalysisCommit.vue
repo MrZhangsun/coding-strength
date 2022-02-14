@@ -14,24 +14,40 @@
         class="row-search"
       >
         <el-col :span="3">
-          <el-input
+          <el-select
+            v-model="pageInfo.repositoryId"
             placeholder="仓库名称"
-            v-model="pageInfo.repositoryName"
-            @input="onInput"
-            @clear="getCommitList"
+            @clear="clearRepositorySelect"
+            @change="onSelectRepository"
+            filterable
             clearable
+            :filter-method="filterRepository"
           >
-          </el-input>
+            <el-option
+              v-for="item in repositories"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
         </el-col>
         <el-col :span="3">
-          <el-input
+          <el-select
+            v-model="pageInfo.branchId"
             placeholder="分支名称"
-            v-model="pageInfo.branchName"
-            @input="onInput"
-            @clear="getCommitList"
+            @clear="clearRepositorySelect"
+            @change="getCommitList"
+            filterable
             clearable
+            :filter-method="filterRepository"
           >
-          </el-input>
+            <el-option
+              v-for="item in branches"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
         </el-col>
         <el-col :span="3">
           <el-input
@@ -53,7 +69,7 @@
           >
           </el-input>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="6">
           <el-date-picker
             v-model="dateTimePicker"
             type="datetimerange"
@@ -340,9 +356,15 @@
   </div>
 </template>
 <script>
-import { queryByConditions, queryById as queryCommitById } from '../../../api/coding/commit'
+import {
+  queryByConditions,
+  queryById as queryCommitById
+} from '../../../api/coding/commit'
+import { queryAll } from '../../../api/coding/repository'
+import { queryByRepositoryId } from '../../../api/coding/branch'
 export default {
   created () {
+    this.getRepositoryList()
     this.getCommitList()
   },
   data () {
@@ -364,7 +386,11 @@ export default {
         'font-size': '12px'
       },
       detailCommitForm: {},
-      commitDetailDialogVisible: false
+      commitDetailDialogVisible: false,
+      repositories: [],
+      repositoryCopy: [],
+      branches: [],
+      brancheCopy: []
     }
   },
   methods: {
@@ -423,6 +449,91 @@ export default {
      */
     onInput () {
       this.$forceUpdate()
+    },
+    /**
+     * 根据仓库名称过滤仓库
+     */
+    filterRepository (value) {
+      if (value) {
+        this.repositories = this.repositoryCopy.filter((item) => {
+          if (!!~item.name.indexOf(value) || !!~item.name.toUpperCase().indexOf(value.toUpperCase())) {
+            return true
+          }
+        })
+      } else {
+        this.repositories = this.repositoryCopy
+      }
+    },
+    /**
+     * 查询仓库列表
+     */
+    getRepositoryList () {
+      queryAll()
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          if (!res.data.list || res.data.list.length <= 0) {
+            return this.$message.info('暂无数据')
+          }
+          this.repositories = res.data.list
+          this.repositoryCopy = res.data.list
+        })
+    },
+    /**
+     * 重新给仓库列表赋值
+     */
+    clearRepositorySelect () {
+      // 下拉框重新赋值操作
+      this.repositories = this.repositoryCopy
+    },
+    /**
+     * 当选择了仓库之后
+     * @param repositoryId 选中的仓库ID
+     */
+    onSelectRepository (repositoryId) {
+      if (repositoryId) {
+        this.getBranchListByRepositoryId(repositoryId)
+      }
+    },
+    /**
+     * 根据仓库名称过滤仓库
+     */
+    filterBranch (value) {
+      if (value) {
+        this.branches = this.brancheCopy.filter((item) => {
+          if (!!~item.name.indexOf(value) || !!~item.name.toUpperCase().indexOf(value.toUpperCase())) {
+            return true
+          }
+        })
+      } else {
+        this.branches = this.brancheCopy
+      }
+    },
+    /**
+     * 查询仓库列表
+     */
+    getBranchListByRepositoryId (repositoryId) {
+      queryByRepositoryId(repositoryId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          if (!res.data || res.data.length <= 0) {
+            return this.$message.info('暂无数据')
+          }
+          this.branches = res.data
+          this.brancheCopy = res.data
+        })
+    },
+    /**
+     * 重新给仓库列表赋值
+     */
+    clearBranchSelect () {
+      // 下拉框重新赋值操作
+      this.branches = this.brancheCopy
     }
   }
 }
