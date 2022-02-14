@@ -872,7 +872,7 @@ export default {
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     // 自定义上传方法
@@ -891,14 +891,13 @@ export default {
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     onChangeUpload (file) {
       // 预保存上传的图片
       this.previewImgURL = URL.createObjectURL(file.raw)
       this.confirmProfile = true // 预览图片
-      console.log(this.previewImgURL)
     }
   }
 }

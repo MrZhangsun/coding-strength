@@ -648,10 +648,6 @@ export default {
      * @param {Object} dragEvent 拖动事件
      */
     handleDrag (dragNode, dragEndNode, dragType, dragEvent) {
-      console.log('tree drag end dragNode: ', dragNode)
-      console.log('tree drag end dragEndNode: ', dragEndNode)
-      console.log('tree drag end dragType: ', dragType)
-      console.log('tree drag end dragEvent: ', dragEvent)
       const dragForm = {}
       dragForm.id = dragNode.data.id
       if (dragType === 'inner') {

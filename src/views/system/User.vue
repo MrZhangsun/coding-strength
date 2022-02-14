@@ -897,8 +897,8 @@ export default {
     onChangeUpload (file) {
       // 预保存上传的图片
       this.previewImgURL = URL.createObjectURL(file.raw)
-      this.confirmProfile = true // 预览图片
-      console.log(this.previewImgURL)
+      // 预览图片
+      this.confirmProfile = true
     }
   }
 }

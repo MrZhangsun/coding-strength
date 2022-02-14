@@ -38,8 +38,8 @@ export default {
   },
   destroyed () {
     // 销毁组建,防止内存泄漏
-    repositoryStatisticChart.dispose()
-    activeRepositoryChart.dispose()
+    // repositoryStatisticChart.dispose()
+    // activeRepositoryChart.dispose()
   },
   mounted () {
     repositoryStatisticChart = this.$echarts.init(document.getElementById('repository'), 'infographic')
@@ -50,7 +50,6 @@ export default {
     // 监听页面尺寸变化事件, 动态修改图表尺寸
     window.addEventListener('resize', () => {
       this.screenWidth = window.innerWidth
-      console.log(window.innerWidth)
       repositoryStatisticChart.resize()
       activeRepositoryChart.resize()
     })
@@ -105,17 +104,7 @@ export default {
           }
         },
         dataset: {
-          source: [
-            ['system', '分支数量', '开发者数量', '库龄', '活跃天数'],
-            ['业务系统', 43.3, 85.8, 93.7, 100],
-            ['中台', 83.1, 73.4, 55.1, 100],
-            ['接口中心', 86.4, 65.2, 82.5, 100],
-            ['接口中心2', 86.4, 65.2, 82.5, 100],
-            ['接口中心3', 86.4, 65.2, 82.5, 100],
-            ['接口中心10', 86.4, 65.2, 82.5, 100],
-            ['接口中心11', 86.4, 65.2, 82.5, 100],
-            ['工具', 72.4, 53.9, 39.1, 100]
-          ]
+          source: []
         },
         xAxis: { type: 'category' },
         yAxis: {},
@@ -129,28 +118,32 @@ export default {
     }
   },
   methods: {
-    // https://echarts.apache.org/examples/data/asset/data/flare.json
     getData () {
-      repositoryTop(5)
+      const params = {
+        top: 6,
+        startTime: '2021-01-01 00:00:00',
+        endTime: '2023-01-01 00:00:0'
+      }
+      repositoryTop(params)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          console.log('respository', res.data)
+          const title = ['system', '分支数量', '开发者数量', '库龄', '活跃天数']
+          this.repositoryOptions.dataset.source.push(title)
+          this.repositoryOptions.dataset.source.push(res.data)
         })
-      authorTop(5)
+      authorTop(params)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          console.log('respository', res.data)
         })
-      branchTop(5)
+      branchTop(params)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          console.log('respository', res.data)
         })
     }
   }

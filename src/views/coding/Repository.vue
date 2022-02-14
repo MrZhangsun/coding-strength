@@ -676,7 +676,7 @@ export default {
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
       return false
     },

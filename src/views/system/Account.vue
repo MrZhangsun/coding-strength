@@ -776,10 +776,7 @@ export default {
           })
       })
     },
-    // 日期格式化
-    dateFormat (dateTime) {
-      console.log(dateTime)
-    },
+
     // 对话框关闭提示
     handleClose (done) {
       this.$confirm('确定要关闭对话框?')
@@ -852,15 +849,13 @@ export default {
           }
 
           this.addAccountForm.avatarUrl = res.data.uri
-          console.log(this.addAccountForm)
-          console.log(res.data)
           // 关闭，并清空列表
           this.confirmProfile = false
           this.uploadProfile = false
           this.$refs.addAvatarRef.clearFiles()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     editUploadAvatarRequest (file) {
@@ -877,7 +872,7 @@ export default {
           this.$refs.editAvatarRef.clearFiles()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     onChangeUpload (file) {

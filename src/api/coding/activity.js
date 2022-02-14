@@ -2,11 +2,11 @@ import axios from 'axios'
 
 /**
  * 仓库排名
- * @param {Integer} top
+ * @param {Object} params
  */
-export function repositoryTop (top) {
+export function repositoryTop (params) {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/dynamic/getRepositoryTop/' + top)
+    axios.post('/coding/activity/top/repository', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -17,11 +17,11 @@ export function repositoryTop (top) {
 
 /**
  * 分支排名
- * @param {Integer} top
+ * @param {Object} params
  */
-export function branchTop (top) {
+export function branchTop (params) {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/dynamic/getBranchTop/' + top)
+    axios.post('/coding/activity/top/branch', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -32,11 +32,11 @@ export function branchTop (top) {
 
 /**
  * 作者排名
- * @param {Integer} top
+ * @param {Object} params
  */
-export function authorTop (top) {
+export function authorTop (params) {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/dynamic/getAuthorTop/' + top)
+    axios.post('/coding/activity/top/author', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
