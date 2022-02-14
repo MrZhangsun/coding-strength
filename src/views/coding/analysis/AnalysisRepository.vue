@@ -7,7 +7,10 @@
     </el-breadcrumb>
 
     <el-card>
-      <el-row :gutter="20">
+      <el-row
+        :gutter="20"
+        class="row-search"
+      >
         <el-col :span="5">
           <el-input
             placeholder="请输入项目名称"
@@ -56,6 +59,36 @@
             icon="el-icon-search"
             @click="getRepositoryList"
           >搜索</el-button>
+        </el-col>
+      </el-row>
+      <!-- 分析区 -->
+      <el-row
+        :gutter="20"
+        class="row-analysis"
+      >
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >时间分析</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >人效分析</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >仓库分析</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >分支分析</el-button>
         </el-col>
       </el-row>
       <!-- 代码仓库列表 -->
@@ -350,5 +383,11 @@ export default {
   background-color: #fff;
   border: 1px dashed #0f0d0d;
   border-radius: 6px;
+}
+.row-analysis {
+  padding-bottom: 5px;
+}
+.row-search {
+  padding-bottom: 12px;
 }
 </style>

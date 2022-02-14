@@ -53,7 +53,7 @@
           >
           </el-input>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <el-date-picker
             v-model="dateTimePicker"
             type="datetimerange"
@@ -103,12 +103,6 @@
             type="primary"
             icon="el-icon-analysis"
           >分支分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >分析</el-button>
         </el-col>
       </el-row>
       <!-- 列表区 -->
