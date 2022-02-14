@@ -414,9 +414,9 @@ export default {
     // git@code.aliyun.com:vevorcenter/vevor-center.git
     // https://code.aliyun.com/vevorcenter/vevor-center.git
     const urlValidator = (rule, value, callback) => {
-      const isUrl = this.Validator.isSshRepositoryURL(value)
+      const isUrl = this.Validator.isGitRepositoryUrl(value)
       if (!isUrl) {
-        return callback(new Error('请输入SSH协议的地址'))
+        return callback(new Error('请输入正确的Git仓库地址'))
       }
       callback()
     }
