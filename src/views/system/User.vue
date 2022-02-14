@@ -872,7 +872,7 @@ export default {
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     // 自定义上传方法
@@ -891,7 +891,7 @@ export default {
           // this.reload()
           return this.$message.success('上传成功')
         }).catch(error => {
-          console.error(error)
+          return this.$message.error(error)
         })
     },
     onChangeUpload (file) {
