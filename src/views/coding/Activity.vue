@@ -109,11 +109,8 @@ export default {
       },
       dateTimePicker: [],
       topOptions: [{
-        value: 3,
-        label: '前3名'
-      }, {
         value: 5,
-        label: '前5名'
+        label: '前5名(默认)'
       }, {
         value: 10,
         label: '前10名'
@@ -123,6 +120,9 @@ export default {
       }, {
         value: 20,
         label: '前20名'
+      }, {
+        value: 30,
+        label: '前30名'
       }],
       statisticTimeRange: {
         shortcuts: [{
@@ -242,6 +242,9 @@ export default {
       } else {
         this.conditions.startTime = '2021-01-01 00:00:00'
         this.conditions.endTime = '2023-01-01 00:00:00'
+      }
+      if (!this.conditions.top) {
+        this.conditions.top = 5
       }
       // 查询仓库信息
       repositoryTop(this.conditions)
