@@ -167,6 +167,26 @@
                 @click="showDetailDialog(scope.row.id)"
               />
             </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              content="点击同步"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                type="info"
+                size="mini"
+                :disabled="scope.row.collectStatus === 1 ? true : false"
+                @click="collectRepository(scope.row.id, scope.row)"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                >
+                  <use :xlink:href="scope.row.collectStatus === 1 ? '#icon-tongbu2' : '#icon-tongbu1'"></use>
+                </svg>
+              </el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -274,6 +294,7 @@ import {
   queryRepositoryById,
   queryByConditions
 } from '../../../api/coding/repository'
+import { collectRepositoryById } from '../../../api/coding/collect'
 export default {
   created () {
     this.getRepositoryList()
@@ -346,6 +367,19 @@ export default {
           }
           this.detialRepositoryForm = res.data
           this.detailRepositoryDialogVisible = true
+        })
+    },
+    /**
+     * 仓库同步
+     * @param {Integer} repositoryId 仓库ID
+     */
+    collectRepository (repositoryId, row) {
+      collectRepositoryById(repositoryId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          row.collectStatus = 1
         })
     }
   }

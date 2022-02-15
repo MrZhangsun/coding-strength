@@ -1,12 +1,11 @@
 import axios from 'axios'
 
 /**
- * 查询条件
- * @param {Object} conditions 查询条件
+ * 触发所有仓库统计
  */
-export function queryByConditions (conditions) {
+export function scheduledCollections () {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/branches', { params: conditions })
+    axios.get('/coding/collections')
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -16,12 +15,12 @@ export function queryByConditions (conditions) {
 }
 
 /**
- * 根据主键查询
- * @param {Object} conditions 查询条件
+ * 触发仓库统计
+ * @param {Integer} repositoryId 仓库ID
  */
-export function queryById (rowId) {
+export function collectRepositoryById (repositoryId) {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/branch/' + rowId)
+    axios.get('/coding/collect/repository/' + repositoryId)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -31,12 +30,12 @@ export function queryById (rowId) {
 }
 
 /**
- * 根据仓库ID查询
- * @param {Integer} repositoryId 查询条件
+ * 触发分支统计
+ * @param {Integer} branchId 分支ID
  */
-export function queryByRepositoryId (repositoryId) {
+export function collectBranchById (branchId) {
   return new Promise((resolve, reject) => {
-    axios.get('/coding/branch/repository/' + repositoryId)
+    axios.get('/coding/collect/branch/' + branchId)
       .then(res => {
         resolve(res.data)
       }).catch(err => {

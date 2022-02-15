@@ -339,10 +339,10 @@
 <script>
 import {
   queryByConditions,
-  queryById as queryBranchById,
-  collectBranchById
+  queryById as queryBranchById
 } from '../../../api/coding/branch'
 import { queryAll } from '../../../api/coding/repository'
+import { collectBranchById } from '../../../api/coding/collect'
 export default {
   created () {
     this.getRepositoryList()
