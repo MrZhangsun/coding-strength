@@ -496,6 +496,7 @@ export default {
       if (repositoryId) {
         this.getBranchListByRepositoryId(repositoryId)
       }
+      this.getCommitList()
     },
     /**
      * 根据仓库名称过滤仓库
