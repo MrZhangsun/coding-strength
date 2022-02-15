@@ -44,3 +44,18 @@ export function queryByRepositoryId (repositoryId) {
       })
   })
 }
+
+/**
+ * 触发分支统计
+ * @param {Integer} branchId 分支ID
+ */
+export function collectBranchById (branchId) {
+  return new Promise((resolve, reject) => {
+    axios.get('/coding/collect/branch/' + branchId)
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}

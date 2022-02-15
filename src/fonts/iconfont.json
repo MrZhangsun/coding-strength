@@ -6,6 +6,69 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1240756",
+      "name": "完成",
+      "font_class": "wancheng",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "4034109",
+      "name": "完成-列表",
+      "font_class": "xuanze",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "4867103",
+      "name": "完成",
+      "font_class": "wancheng1",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "7674533",
+      "name": "完成",
+      "font_class": "wancheng2",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "15644379",
+      "name": "同步",
+      "font_class": "tongbu1",
+      "unicode": "e6ca",
+      "unicode_decimal": 59082
+    },
+    {
+      "icon_id": "21828293",
+      "name": "同步",
+      "font_class": "tongbu2",
+      "unicode": "e69f",
+      "unicode_decimal": 59039
+    },
+    {
+      "icon_id": "23191216",
+      "name": "同步",
+      "font_class": "tongbu3",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "19267037",
+      "name": "同步",
+      "font_class": "tongbu",
+      "unicode": "e754",
+      "unicode_decimal": 59220
+    },
+    {
+      "icon_id": "15425161",
+      "name": "系统日志 base/system/logger",
+      "font_class": "basesystemlogger",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
       "icon_id": "6802197",
       "name": "Left-3",
       "font_class": "Left-1",

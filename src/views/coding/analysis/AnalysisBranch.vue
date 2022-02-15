@@ -178,6 +178,26 @@
                 @click="showDetailDialog(scope.row.id)"
               />
             </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              content="点击同步"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                type="info"
+                size="mini"
+                :disabled="scope.row.collectStatus === 1 ? true : false"
+                @click="collectBranch(scope.row.id, scope.row)"
+              >
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                >
+                  <use :xlink:href="scope.row.collectStatus === 1 ? '#icon-tongbu2' : '#icon-tongbu1'"></use>
+                </svg>
+              </el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -229,7 +249,7 @@
         <el-descriptions-item
           label="活跃天数"
           :span="2"
-        >{{detailBranchForm.age}} days, {{ detailBranchForm.activeAge / detailBranchForm.age }} %</el-descriptions-item>
+        >{{detailBranchForm.age}} days, active days {{detailBranchForm.activeAge}} ({{ Math.round(detailBranchForm.activeAge * 100 / detailBranchForm.age) }}%)</el-descriptions-item>
         <el-descriptions-item
           label="提交总数"
           :span="2"
@@ -317,7 +337,11 @@
   </div>
 </template>
 <script>
-import { queryByConditions, queryById as queryBranchById } from '../../../api/coding/branch'
+import {
+  queryByConditions,
+  queryById as queryBranchById,
+  collectBranchById
+} from '../../../api/coding/branch'
 import { queryAll } from '../../../api/coding/repository'
 export default {
   created () {
@@ -443,6 +467,19 @@ export default {
     clearRepositorySelect () {
       // 下拉框重新赋值操作
       this.repositories = this.repositoryCopy
+    },
+    /**
+     * 分支同步
+     * @param {Integer} branchId 分支ID
+     */
+    collectBranch (branchId, row) {
+      collectBranchById(branchId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          row.collectStatus = 1
+        })
     }
   }
 }
