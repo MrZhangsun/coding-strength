@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@gitgraph/js": "^1.4.0",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "default-passive-events": "^2.0.0",

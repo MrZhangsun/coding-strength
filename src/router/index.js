@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '../views/system/Login.vue'
 import Home from '../views/system/Home.vue'
 import Activity from '../views/coding/Activity.vue'
+import Graph from '../views/coding/Graph.vue'
 import Repository from '../views/coding/Repository.vue'
 import Reporter from '../views/coding/Reporter.vue'
 import Analysis from '../views/coding/Analysis.vue'
@@ -33,12 +34,17 @@ const routes = [
     name: '首页',
     path: '/home',
     component: Home,
-    redirect: '/activity',
+    redirect: '/home/top',
     children: [
       {
         name: '代码动态',
-        path: '/activity',
+        path: 'top',
         component: Activity
+      },
+      {
+        name: 'Git Graph',
+        path: 'graph',
+        component: Graph
       }
     ]
   },
