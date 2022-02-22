@@ -79,8 +79,8 @@ const routes = [
             component: AnalysisBranch
           },
           {
-            name: '提交统计',
-            path: 'commit',
+            name: '作者统计',
+            path: 'author',
             component: AnalysisCommit
           }
         ]

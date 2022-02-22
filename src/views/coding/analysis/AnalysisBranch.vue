@@ -136,7 +136,7 @@
           align="center"
         />
         <el-table-column
-          prop="totalContributors"
+          prop="totalAuthors"
           label="作者总数"
           align="center"
         />
@@ -187,14 +187,16 @@
               <el-button
                 type="info"
                 size="mini"
+                :icon="scope.row.collectStatus === 1 ? 'el-icon-loading' : ''"
                 :disabled="scope.row.collectStatus === 1 ? true : false"
                 @click="collectBranch(scope.row.id, scope.row)"
               >
                 <svg
                   class="icon"
                   aria-hidden="true"
+                  v-if="scope.row.collectStatus === 0"
                 >
-                  <use :xlink:href="scope.row.collectStatus === 1 ? '#icon-tongbu2' : '#icon-tongbu1'"></use>
+                  <use xlink:href="#icon-tongbu1"></use>
                 </svg>
               </el-button>
             </el-tooltip>
@@ -257,7 +259,7 @@
         <el-descriptions-item
           label="作者总数"
           :span="4"
-        >{{detailBranchForm.totalContributors}}</el-descriptions-item>
+        >{{detailBranchForm.totalAuthors}}</el-descriptions-item>
         <el-descriptions-item
           label="文件总数"
           :span="2"
@@ -473,12 +475,12 @@ export default {
      * @param {Integer} branchId 分支ID
      */
     collectBranch (branchId, row) {
+      row.collectStatus = 1
       collectBranchById(branchId)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          row.collectStatus = 1
         })
     }
   }

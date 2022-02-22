@@ -176,14 +176,16 @@
               <el-button
                 type="info"
                 size="mini"
+                :icon="scope.row.collectStatus === 1 ? 'el-icon-loading' : ''"
                 :disabled="scope.row.collectStatus === 1 ? true : false"
                 @click="collectRepository(scope.row.id, scope.row)"
               >
                 <svg
                   class="icon"
                   aria-hidden="true"
+                  v-if="scope.row.collectStatus === 0"
                 >
-                  <use :xlink:href="scope.row.collectStatus === 1 ? '#icon-tongbu2' : '#icon-tongbu1'"></use>
+                  <use xlink:href="#icon-tongbu1"></use>
                 </svg>
               </el-button>
             </el-tooltip>
@@ -374,12 +376,12 @@ export default {
      * @param {Integer} repositoryId 仓库ID
      */
     collectRepository (repositoryId, row) {
+      row.collectStatus = 1
       collectRepositoryById(repositoryId)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          row.collectStatus = 1
         })
     }
   }

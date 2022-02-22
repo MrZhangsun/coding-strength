@@ -4,7 +4,7 @@
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>代码统计</el-breadcrumb-item>
       <el-breadcrumb-item>统计分析</el-breadcrumb-item>
-      <el-breadcrumb-item>提交统计</el-breadcrumb-item>
+      <el-breadcrumb-item>作者统计</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 列表区 -->
     <el-card>
