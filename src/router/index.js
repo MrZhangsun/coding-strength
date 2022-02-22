@@ -9,7 +9,7 @@ import Reporter from '../views/coding/Reporter.vue'
 import Analysis from '../views/coding/Analysis.vue'
 import AnalysisRepository from '../views/coding/analysis/AnalysisRepository.vue'
 import AnalysisBranch from '../views/coding/analysis/AnalysisBranch.vue'
-import AnalysisCommit from '../views/coding/analysis/AnalysisCommit.vue'
+import AnalysisAuthor from '../views/coding/analysis/AnalysisAuthor.vue'
 import Logger from '../views/coding/Logger.vue'
 import Author from '../views/coding/Author.vue'
 import Menu from '../views/system/Menu.vue'
@@ -81,7 +81,7 @@ const routes = [
           {
             name: '作者统计',
             path: 'author',
-            component: AnalysisCommit
+            component: AnalysisAuthor
           }
         ]
       },

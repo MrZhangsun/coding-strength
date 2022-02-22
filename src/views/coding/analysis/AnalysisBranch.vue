@@ -62,6 +62,9 @@
             @click="getBranchList"
           >搜索</el-button>
         </el-col>
+        <el-col :span="3">
+          <el-button type="primary">分支排名</el-button>
+        </el-col>
       </el-row>
       <!-- 分析区 -->
       <el-row
@@ -72,25 +75,13 @@
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >时间分析</el-button>
+          >本库分析</el-button>
         </el-col>
         <el-col :span="3">
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >人效分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >仓库分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >分支分析</el-button>
+          >全库分析</el-button>
         </el-col>
       </el-row>
       <!-- 列表区 -->

@@ -59,16 +59,6 @@
           >
           </el-input>
         </el-col>
-        <el-col :span="3">
-          <el-input
-            placeholder="Commit ID"
-            v-model="pageInfo.commitId"
-            @input="onInput"
-            @clear="getCommitList"
-            clearable
-          >
-          </el-input>
-        </el-col>
         <el-col :span="6">
           <el-date-picker
             v-model="dateTimePicker"
@@ -90,6 +80,9 @@
             @click="getCommitList"
           >搜索</el-button>
         </el-col>
+        <el-col :span="3">
+          <el-button type="primary">作者排名</el-button>
+        </el-col>
       </el-row>
       <!-- 分析区 -->
       <el-row
@@ -100,25 +93,19 @@
           <el-button
             type="primary"
             icon="el-icon-analysis"
-          >时间分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >人效分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >仓库分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
           >分支分析</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >本库分析</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-analysis"
+          >全库分析</el-button>
         </el-col>
       </el-row>
       <!-- 列表区 -->

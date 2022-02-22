@@ -60,35 +60,8 @@
             @click="getRepositoryList"
           >搜索</el-button>
         </el-col>
-      </el-row>
-      <!-- 分析区 -->
-      <el-row
-        :gutter="20"
-        class="row-analysis"
-      >
         <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >时间分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >人效分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >仓库分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >分支分析</el-button>
+          <el-button type="primary">仓库排名</el-button>
         </el-col>
       </el-row>
       <!-- 代码仓库列表 -->
