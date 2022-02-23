@@ -475,7 +475,7 @@ export default {
           }
 
           if (!res.data.list || res.data.list.length <= 0) {
-            return this.$message.info('暂无数据')
+            return this.$message.info('暂无仓库数据')
           }
           this.repositories = res.data.list
           this.repositoryCopy = res.data.list
