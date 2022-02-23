@@ -36,7 +36,7 @@
             v-model="pageInfo.branchId"
             placeholder="分支名称"
             @clear="clearRepositorySelect"
-            @change="getCommitList"
+            @change="getAuthorList"
             filterable
             clearable
             :filter-method="filterRepository"
@@ -54,7 +54,7 @@
             placeholder="作者"
             v-model="pageInfo.author"
             @input="onInput"
-            @clear="getCommitList"
+            @clear="getAuthorList"
             clearable
           >
           </el-input>
@@ -68,8 +68,8 @@
             end-placeholder="End date"
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
-            @click="getCommitList"
-            @clear="getCommitList"
+            @click="getAuthorList"
+            @clear="getAuthorList"
           >
           </el-date-picker>
         </el-col>
@@ -77,11 +77,11 @@
           <el-button
             type="primary"
             icon="el-icon-search"
-            @click="getCommitList"
+            @click="getAuthorList"
           >搜索</el-button>
         </el-col>
         <el-col :span="3">
-          <el-button type="primary">作者排名</el-button>
+          <el-button type="primary">排名</el-button>
         </el-col>
       </el-row>
       <!-- 分析区 -->
@@ -110,24 +110,24 @@
       </el-row>
       <!-- 列表区 -->
       <el-table
-        :data="commitList"
+        :data="authorList"
         :border="true"
         stripe
         :header-cell-style="{'text-align':'center'}"
       >
-        <el-table-column
-          type="index"
-          label="#"
-          align="center"
-        />
         <el-table-column
           prop="id"
           label="ID"
           align="center"
         />
         <el-table-column
-          prop="commitId"
-          label="Commit ID"
+          prop="account"
+          label="用户名"
+          align="center"
+        />
+        <el-table-column
+          prop="email"
+          label="E-Mail"
           align="center"
         />
         <el-table-column
@@ -141,20 +141,19 @@
           align="center"
         />
         <el-table-column
-          prop="author"
-          label="作者"
+          prop="joinBranchTime"
+          label="首次提交时间"
           align="center"
-        />
-        <el-table-column
-          prop="commitTime"
-          label="提交时间"
-          align="center"
-          width="185px"
         >
           <template slot-scope="scope">
-            {{ scope.row.commitTime | dateFormat }}
+            {{ scope.row.joinBranchTime | dateFormat }}
           </template>
         </el-table-column>
+        <el-table-column
+          prop="totalCommits"
+          label="分支提交总数"
+          align="center"
+        />
         <el-table-column
           prop="addLines"
           label="添加行"
@@ -174,10 +173,20 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="commitFiles"
+          prop="changedFiles"
           label="影响文件"
           align="center"
         />
+        <el-table-column
+          prop="lastStatisticTime"
+          label="最新统计时间"
+          align="center"
+          width="185px"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.lastStatisticTime | dateFormat }}
+          </template>
+        </el-table-column>
         <el-table-column
           label="操作"
           align="center"
@@ -212,15 +221,15 @@
       </el-pagination>
     </el-card>
     <!-- 对话框 -->
-    <!-- Commit详情 -->
+    <!-- Author详情 -->
     <el-dialog
-      ref="commitDetailDialogRef"
-      :visible.sync="commitDetailDialogVisible"
+      ref="authorDetailDialogRef"
+      :visible.sync="authorDetailDialogVisible"
       width="50%"
     >
       <el-descriptions
         class="margin-top"
-        title="Commit详情"
+        title="Author详情"
         :column="4"
         direction="horizontals"
         border
@@ -231,69 +240,69 @@
         <el-descriptions-item
           label="ID"
           :span="2"
-        >{{detailCommitForm.id}}</el-descriptions-item>
+        >{{detailAuthorForm.id}}</el-descriptions-item>
         <el-descriptions-item
-          label="Commit ID"
+          label="Author ID"
           :span="2"
-        >{{detailCommitForm.commitId}}</el-descriptions-item>
+        >{{detailAuthorForm.authorId}}</el-descriptions-item>
         <el-descriptions-item
           label="所属仓库"
           :span="2"
-        >{{detailCommitForm.repositoryName}}</el-descriptions-item>
+        >{{detailAuthorForm.repositoryName}}</el-descriptions-item>
         <el-descriptions-item
           label="所属分支"
           :span="2"
-        >{{detailCommitForm.branchName}}</el-descriptions-item>
+        >{{detailAuthorForm.branchName}}</el-descriptions-item>
         <el-descriptions-item
           label="添加行"
           :span="2"
-        >{{detailCommitForm.addLines}}</el-descriptions-item>
+        >{{detailAuthorForm.addLines}}</el-descriptions-item>
         <el-descriptions-item
           label="删除行"
           :span="2"
-        >{{detailCommitForm.removeLines}}</el-descriptions-item>
+        >{{detailAuthorForm.removeLines}}</el-descriptions-item>
         <el-descriptions-item
           label="有效行"
           :span="2"
-        >{{detailCommitForm.addLines - detailCommitForm.removeLines}}</el-descriptions-item>
+        >{{detailAuthorForm.addLines - detailAuthorForm.removeLines}}</el-descriptions-item>
         <el-descriptions-item
           label="提交文件"
           :span="4"
-        >{{detailCommitForm.commitFiles}}</el-descriptions-item>
+        >{{detailAuthorForm.authorFiles}}</el-descriptions-item>
         <el-descriptions-item
           label="作者"
           :span="2"
-        >{{detailCommitForm.author}}</el-descriptions-item>
+        >{{detailAuthorForm.author}}</el-descriptions-item>
         <el-descriptions-item
           label="提交时间"
           :span="2"
         >
           <template>
-            {{detailCommitForm.commitTime | dateFormat}}
+            {{detailAuthorForm.authorTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
           label="创建人"
           :span="2"
-        >{{detailCommitForm.createBy}}</el-descriptions-item>
+        >{{detailAuthorForm.createBy}}</el-descriptions-item>
         <el-descriptions-item
           label="创建时间"
           :span="2"
         >
           <template>
-            {{detailCommitForm.createTime | dateFormat}}
+            {{detailAuthorForm.createTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
           label="更新人"
           :span="2"
-        >{{detailCommitForm.updateBy}}</el-descriptions-item>
+        >{{detailAuthorForm.updateBy}}</el-descriptions-item>
         <el-descriptions-item
           label="更新时间"
           :span="2"
         >
           <template>
-            {{detailCommitForm.updateTime | dateFormat}}
+            {{detailAuthorForm.updateTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
@@ -301,7 +310,7 @@
           :span="4"
         >
           <template>
-            {{detailCommitForm.comment | contentLimit(100)}}
+            {{detailAuthorForm.comment | contentLimit(100)}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
@@ -312,7 +321,7 @@
             :active-value="0"
             :inactive-value="1"
             active-color="#13ce66"
-            v-model="detailCommitForm.delete"
+            v-model="detailAuthorForm.delete"
             disabled
           ></el-switch>
         </el-descriptions-item>
@@ -324,7 +333,7 @@
             :active-value="1"
             :inactive-value="0"
             active-color="#13ce66"
-            v-model="detailCommitForm.active"
+            v-model="detailAuthorForm.active"
             disabled
           ></el-switch>
         </el-descriptions-item>
@@ -336,7 +345,7 @@
       >
         <el-button
           type="danger"
-          @click="commitDetailDialogVisible = false"
+          @click="authorDetailDialogVisible = false"
         >返回</el-button>
       </span>
     </el-dialog>
@@ -345,18 +354,18 @@
 <script>
 import {
   queryByConditions,
-  queryById as queryCommitById
-} from '../../../api/coding/commit'
+  queryById as queryAuthorById
+} from '../../../api/coding/author'
 import { queryAll } from '../../../api/coding/repository'
 import { queryByRepositoryId } from '../../../api/coding/branch'
 export default {
   created () {
     this.getRepositoryList()
-    this.getCommitList()
+    this.getAuthorList()
   },
   data () {
     return {
-      commitList: [],
+      authorList: [],
       dateTimePicker: [],
       pageInfo: {
         pageNum: 1,
@@ -372,8 +381,8 @@ export default {
       detailContentStyle: {
         'font-size': '12px'
       },
-      detailCommitForm: {},
-      commitDetailDialogVisible: false,
+      detailAuthorForm: {},
+      authorDetailDialogVisible: false,
       repositories: [],
       repositoryCopy: [],
       branches: [],
@@ -384,7 +393,7 @@ export default {
     /**
      * 查询提交列表
      */
-    getCommitList () {
+    getAuthorList () {
       if (this.dateTimePicker && this.dateTimePicker[0] && this.dateTimePicker[1]) {
         this.pageInfo.startTime = this.dateTimePicker[0]
         this.pageInfo.endTime = this.dateTimePicker[1]
@@ -397,22 +406,22 @@ export default {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          this.commitList = res.data.list
+          this.authorList = res.data.list
           this.pageInfo.total = res.data.total
         })
     },
     /**
      * 查询详情
-     * @param rowId commit主键ID
+     * @param rowId author主键ID
      */
     showDetailDialog (rowId) {
-      this.commitDetailDialogVisible = true
-      queryCommitById(rowId)
+      this.authorDetailDialogVisible = true
+      queryAuthorById(rowId)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          this.detailCommitForm = res.data
+          this.detailAuthorForm = res.data
         })
     },
     /**
@@ -421,7 +430,7 @@ export default {
      */
     handleSizeChange (newSize) {
       this.pageInfo.pageSize = newSize
-      this.getCommitList()
+      this.getAuthorList()
     },
     /**
      * 下一页
@@ -429,7 +438,7 @@ export default {
      */
     handleCurrentChange (newPage) {
       this.pageInfo.pageNum = newPage
-      this.getCommitList()
+      this.getAuthorList()
     },
     /**
      * 强制刷新输入框,解决无法输入问题
@@ -483,7 +492,7 @@ export default {
       if (repositoryId) {
         this.getBranchListByRepositoryId(repositoryId)
       }
-      this.getCommitList()
+      this.getAuthorList()
     },
     /**
      * 根据仓库名称过滤仓库
