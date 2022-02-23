@@ -6,7 +6,7 @@ import axios from 'axios'
  */
 export function repositoryTop (params) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/activity/top/repository', params)
+    axios.post('/coding/rank/repository', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -21,7 +21,7 @@ export function repositoryTop (params) {
  */
 export function branchTop (params) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/activity/top/branch', params)
+    axios.post('/coding/rank/branch', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -36,7 +36,7 @@ export function branchTop (params) {
  */
 export function authorTop (params) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/activity/top/author', params)
+    axios.post('/coding/rank/author', params)
       .then(res => {
         resolve(res.data)
       }).catch(err => {

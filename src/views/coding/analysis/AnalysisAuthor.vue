@@ -81,7 +81,10 @@
           >搜索</el-button>
         </el-col>
         <el-col :span="3">
-          <el-button type="primary">排名</el-button>
+          <el-button
+            type="primary"
+            @click="toRankPage"
+          >作者排名</el-button>
         </el-col>
       </el-row>
       <!-- 分析区 -->
@@ -555,6 +558,12 @@ export default {
     clearBranchSelect () {
       // 下拉框重新赋值操作
       this.branches = this.brancheCopy
+    },
+    /**
+     * 跳转到排名页面
+     */
+    toRankPage () {
+      this.$router.push('/home/rank')
     }
   }
 }

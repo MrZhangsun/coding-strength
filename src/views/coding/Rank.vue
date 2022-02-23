@@ -40,21 +40,21 @@
     </div>
     <div class="chart-container">
       <div class="chart-unit">
-        <h3 class="chart-title">今日活跃仓库 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">今日仓库排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-repository"
           class="row-chart"
         ></div>
       </div>
       <div class="chart-unit">
-        <h3 class="chart-title">今日活跃分支 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">今日分支排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-branch"
           class="row-chart"
         ></div>
       </div>
       <div class="chart-unit">
-        <h3 class="chart-title">今日活跃作者 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">今日作者排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-author"
           class="row-chart"
@@ -64,7 +64,7 @@
   </div>
 </template>
 <script>
-import { repositoryTop, branchTop, authorTop } from '../../api/coding/activity'
+import { repositoryTop, branchTop, authorTop } from '../../api/coding/rank'
 
 let activeRepositoryChart
 let activeBranchChart

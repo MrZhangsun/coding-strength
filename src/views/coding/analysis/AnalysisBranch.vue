@@ -63,7 +63,10 @@
           >搜索</el-button>
         </el-col>
         <el-col :span="3">
-          <el-button type="primary">分支排名</el-button>
+          <el-button
+            type="primary"
+            @click="toRankPage"
+          >分支排名</el-button>
         </el-col>
       </el-row>
       <!-- 分析区 -->
@@ -473,6 +476,12 @@ export default {
             return this.$message.error(res.message)
           }
         })
+    },
+    /**
+     * 跳转到排名页面
+     */
+    toRankPage () {
+      this.$router.push('/home/rank')
     }
   }
 }

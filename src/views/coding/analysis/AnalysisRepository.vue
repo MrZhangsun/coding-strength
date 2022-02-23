@@ -61,7 +61,10 @@
           >搜索</el-button>
         </el-col>
         <el-col :span="3">
-          <el-button type="primary">仓库排名</el-button>
+          <el-button
+            type="primary"
+            @click="toRankPage"
+          >仓库排名</el-button>
         </el-col>
       </el-row>
       <!-- 代码仓库列表 -->
@@ -356,6 +359,12 @@ export default {
             return this.$message.error(res.message)
           }
         })
+    },
+    /**
+     * 跳转到排名页面
+     */
+    toRankPage () {
+      this.$router.push('/home/rank')
     }
   }
 }
