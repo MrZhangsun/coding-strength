@@ -64,11 +64,11 @@
             v-model="dateTimePicker"
             type="datetimerange"
             range-separator="To"
-            start-placeholder="Start date"
-            end-placeholder="End date"
+            start-placeholder="统计开始"
+            end-placeholder="统计结束"
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
-            @click="getAuthorList"
+            @change="getAuthorList"
             @clear="getAuthorList"
           >
           </el-date-picker>
@@ -229,7 +229,7 @@
     >
       <el-descriptions
         class="margin-top"
-        title="Author详情"
+        title="作者详情"
         :column="4"
         direction="horizontals"
         border
@@ -242,17 +242,37 @@
           :span="2"
         >{{detailAuthorForm.id}}</el-descriptions-item>
         <el-descriptions-item
-          label="Author ID"
+          label="姓名"
           :span="2"
-        >{{detailAuthorForm.authorId}}</el-descriptions-item>
+        >{{detailAuthorForm.name}}</el-descriptions-item>
         <el-descriptions-item
-          label="所属仓库"
+          label="账号"
+          :span="2"
+        >{{detailAuthorForm.account}}</el-descriptions-item>
+        <el-descriptions-item
+          label="邮箱"
+          :span="2"
+        >{{detailAuthorForm.email}}</el-descriptions-item>
+        <el-descriptions-item
+          label="所在仓库"
           :span="2"
         >{{detailAuthorForm.repositoryName}}</el-descriptions-item>
         <el-descriptions-item
-          label="所属分支"
+          label="所在分支"
           :span="2"
         >{{detailAuthorForm.branchName}}</el-descriptions-item>
+        <el-descriptions-item
+          label="首次提交时间"
+          :span="2"
+        >
+          <template>
+            {{detailAuthorForm.joinBranchTime | dateFormat}}
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="总提交"
+          :span="2"
+        >{{detailAuthorForm.totalCommits}}</el-descriptions-item>
         <el-descriptions-item
           label="添加行"
           :span="2"
@@ -266,51 +286,55 @@
           :span="2"
         >{{detailAuthorForm.addLines - detailAuthorForm.removeLines}}</el-descriptions-item>
         <el-descriptions-item
-          label="提交文件"
-          :span="4"
-        >{{detailAuthorForm.authorFiles}}</el-descriptions-item>
-        <el-descriptions-item
-          label="作者"
+          label="影响文件"
           :span="2"
-        >{{detailAuthorForm.author}}</el-descriptions-item>
+        >{{detailAuthorForm.changedFiles}}</el-descriptions-item>
+
         <el-descriptions-item
-          label="提交时间"
+          label="统计ID"
+          :span="2"
+        >{{detailAuthorForm.collectId}}</el-descriptions-item>
+
+        <el-descriptions-item
+          label="统计状态"
+          :span="2"
+        >
+          {{detailAuthorForm.collectStatus === 0 ? '已完成' : '统计中'}}
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="触发方式"
+          :span="2"
+        >{{detailAuthorForm.collectorTriggerMethod}}</el-descriptions-item>
+        <el-descriptions-item
+          label="统计时间"
           :span="2"
         >
           <template>
-            {{detailAuthorForm.authorTime | dateFormat}}
+            {{detailAuthorForm.lastStatisticTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
           label="创建人"
           :span="2"
-        >{{detailAuthorForm.createBy}}</el-descriptions-item>
+        >{{detailAuthorForm.createdBy}}</el-descriptions-item>
         <el-descriptions-item
           label="创建时间"
           :span="2"
         >
           <template>
-            {{detailAuthorForm.createTime | dateFormat}}
+            {{detailAuthorForm.createdTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
           label="更新人"
           :span="2"
-        >{{detailAuthorForm.updateBy}}</el-descriptions-item>
+        >{{detailAuthorForm.updatedBy}}</el-descriptions-item>
         <el-descriptions-item
           label="更新时间"
           :span="2"
         >
           <template>
-            {{detailAuthorForm.updateTime | dateFormat}}
-          </template>
-        </el-descriptions-item>
-        <el-descriptions-item
-          label="提交注释"
-          :span="4"
-        >
-          <template>
-            {{detailAuthorForm.comment | contentLimit(100)}}
+            {{detailAuthorForm.updatedTime | dateFormat}}
           </template>
         </el-descriptions-item>
         <el-descriptions-item
@@ -391,7 +415,7 @@ export default {
   },
   methods: {
     /**
-     * 查询提交列表
+     * 查询作者列表
      */
     getAuthorList () {
       if (this.dateTimePicker && this.dateTimePicker[0] && this.dateTimePicker[1]) {
