@@ -197,12 +197,15 @@ export default {
         },
         dataset: {
           source: [
-            ['分支', 'Commit数量']
+            ['分支', '提交数量', '作者数量', '文件数量', '代码行数']
           ]
         },
         xAxis: {},
         yAxis: { type: 'category' },
         series: [
+          { type: 'bar' },
+          { type: 'bar' },
+          { type: 'bar' },
           { type: 'bar' }
         ]
       },
@@ -223,12 +226,15 @@ export default {
         },
         dataset: {
           source: [
-            ['作者', '代码行数']
+            ['作者', '添加行数', '移除行数', '代码行数', '影响文件']
           ]
         },
         xAxis: {},
         yAxis: { type: 'category' },
         series: [
+          { type: 'bar' },
+          { type: 'bar' },
+          { type: 'bar' },
           { type: 'bar' }
         ]
       }
@@ -240,7 +246,7 @@ export default {
         this.conditions.startTime = this.dateTimePicker[0]
         this.conditions.endTime = this.dateTimePicker[1]
       } else {
-        this.conditions.startTime = '2021-01-01 00:00:00'
+        this.conditions.startTime = '2000-01-01 00:00:00'
         this.conditions.endTime = '2023-01-01 00:00:00'
       }
       if (!this.conditions.top) {
@@ -273,7 +279,10 @@ export default {
             const branch = []
             branch[0] = element.name
             branch[1] = element.totalCommits
-            this.activeBranchOptions.dataset.source.push(branch)
+            branch[2] = element.totalAuthors
+            branch[3] = element.totalFiles
+            branch[4] = element.totalLineOfCode
+            this.activeBranchOptions.dataset.source.unshift(branch)
           })
           // 从新绘制图表
           activeBranchChart.setOption(this.activeBranchOptions)
@@ -286,8 +295,11 @@ export default {
           res.data.forEach(element => {
             const author = []
             author[0] = element.account
-            author[1] = element.totalLine
-            this.activeAuthorOptions.dataset.source.push(author)
+            author[1] = element.totalAddLines
+            author[2] = element.totalRemoveLines
+            author[3] = element.totalSaveLines
+            author[4] = element.totalChangeFiles
+            this.activeAuthorOptions.dataset.source.unshift(author)
           })
           // 从新绘制图表
           activeAuthorChart.setOption(this.activeAuthorOptions)

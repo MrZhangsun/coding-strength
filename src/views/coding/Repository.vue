@@ -73,11 +73,6 @@
         :header-cell-style="{'text-align':'center'}"
       >
         <el-table-column
-          type="index"
-          label="#"
-          align="center"
-        />
-        <el-table-column
           prop="id"
           label="ID"
           align="center"
@@ -92,6 +87,11 @@
           label="地址"
           width="330px"
           align="left"
+        />
+        <el-table-column
+          prop="totalBranches"
+          label="分支数量"
+          align="center"
         />
         <el-table-column
           prop="status"
@@ -339,35 +339,11 @@
           :span="4"
         >{{detialRepositoryForm.url}}</el-descriptions-item>
         <el-descriptions-item
-          label="仓库账号"
-          :span="2"
-        >{{detialRepositoryForm.username}}</el-descriptions-item>
-        <el-descriptions-item
-          label="账号密码"
-          :span="2"
-        >{{detialRepositoryForm.password}}</el-descriptions-item>
-        <el-descriptions-item
-          label="贡献者数量"
-          :span="2"
-        >{{detialRepositoryForm.totalAuthors}}</el-descriptions-item>
-        <el-descriptions-item
           label="分支数量"
           :span="2"
         >{{detialRepositoryForm.totalBranches}}</el-descriptions-item>
         <el-descriptions-item
-          label="项目周期"
-          :span="4"
-        >
-          {{detialRepositoryForm.totalAge}} days, {{detialRepositoryForm.activeAge}} active days ({{detialRepositoryForm.activeAge * 100 / detialRepositoryForm.totalAge}}%)
-        </el-descriptions-item>
-        <el-descriptions-item
-          label="统计时间"
-          :span="4"
-        >
-          {{detialRepositoryForm.updatedTime | dateFormat}}
-        </el-descriptions-item>
-        <el-descriptions-item
-          label="解析状态"
+          label="统计开关"
           :span="4"
         >
           <el-switch

@@ -2,11 +2,11 @@ import axios from 'axios'
 
 /**
  * 仓库排名
- * @param {Object} params
+ * @param {Object} conditions
  */
-export function repositoryTop (params) {
+export function repositoryTop (conditions) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/rank/repository', params)
+    axios.get('/coding/rank/repository/' + conditions.top, { params: conditions })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -17,11 +17,11 @@ export function repositoryTop (params) {
 
 /**
  * 分支排名
- * @param {Object} params
+ * @param {Object} conditions
  */
-export function branchTop (params) {
+export function branchTop (conditions) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/rank/branch', params)
+    axios.get('/coding/rank/branch/' + conditions.top, { params: conditions })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -32,11 +32,11 @@ export function branchTop (params) {
 
 /**
  * 作者排名
- * @param {Object} params
+ * @param {Object} conditions
  */
-export function authorTop (params) {
+export function authorTop (conditions) {
   return new Promise((resolve, reject) => {
-    axios.post('/coding/rank/author', params)
+    axios.get('/coding/rank/author/' + conditions.top, { params: conditions })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
