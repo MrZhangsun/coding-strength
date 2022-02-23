@@ -95,6 +95,16 @@
           align="center"
         />
         <el-table-column
+          prop="mergedBranches"
+          label="合并分支"
+          align="center"
+        />
+        <el-table-column
+          prop="noMergedBranches"
+          label="未合并"
+          align="center"
+        />
+        <el-table-column
           prop="totalAuthors"
           label="作者数量"
           align="center"
@@ -209,36 +219,26 @@
           :span="4"
         >{{detialRepositoryForm.url}}</el-descriptions-item>
         <el-descriptions-item
-          label="仓库账号"
-          :span="2"
-        >{{detialRepositoryForm.username}}</el-descriptions-item>
-        <el-descriptions-item
-          label="账号密码"
-          :span="2"
-        >{{detialRepositoryForm.password}}</el-descriptions-item>
-        <el-descriptions-item
           label="贡献者数量"
           :span="2"
         >{{detialRepositoryForm.totalAuthors}}</el-descriptions-item>
         <el-descriptions-item
           label="分支数量"
           :span="2"
-        >{{detialRepositoryForm.totalBranches}}</el-descriptions-item>
+        >
+          total: {{detialRepositoryForm.totalBranches}},
+          merged: {{detialRepositoryForm.mergedBranches}},
+          no-merged: {{detialRepositoryForm.noMergedBranches}}
+        </el-descriptions-item>
         <el-descriptions-item
           label="项目周期"
-          :span="4"
+          :span="2"
         >
           {{detialRepositoryForm.totalAge}} days, {{detialRepositoryForm.activeAge}} active days ({{detialRepositoryForm.activeAge * 100 / detialRepositoryForm.totalAge}}%)
         </el-descriptions-item>
         <el-descriptions-item
-          label="统计时间"
-          :span="4"
-        >
-          {{detialRepositoryForm.updatedTime | dateFormat}}
-        </el-descriptions-item>
-        <el-descriptions-item
-          label="解析状态"
-          :span="4"
+          label="解析开关"
+          :span="2"
         >
           <el-switch
             :active-value="1"
@@ -248,6 +248,27 @@
             disabled
           ></el-switch>
         </el-descriptions-item>
+        <el-descriptions-item
+          label="统计时间"
+          :span="2"
+        >
+          {{detialRepositoryForm.lastStatisticTime | dateFormat}}
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="解析编号"
+          :span="2"
+        >{{detialRepositoryForm.collectId}}</el-descriptions-item>
+        <el-descriptions-item
+          label="解析状态"
+          :span="2"
+        >
+          {{detialRepositoryForm.collectStatus === 1 ? '正在解析中...' : '解析完成'}}
+          {{detialRepositoryForm.collectExitCode === 0 ? '(成功)' : '(失败)'}}
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="触发方式"
+          :span="2"
+        >{{detialRepositoryForm.collectorTriggerMethod}}</el-descriptions-item>
         <el-descriptions-item
           label="项目简介"
           :span="4"

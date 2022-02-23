@@ -40,21 +40,21 @@
     </div>
     <div class="chart-container">
       <div class="chart-unit">
-        <h3 class="chart-title">今日仓库排名 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">仓库排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-repository"
           class="row-chart"
         ></div>
       </div>
       <div class="chart-unit">
-        <h3 class="chart-title">今日分支排名 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">分支排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-branch"
           class="row-chart"
         ></div>
       </div>
       <div class="chart-unit">
-        <h3 class="chart-title">今日作者排名 TOP{{this.conditions.top + ''}}</h3>
+        <h3 class="chart-title">作者排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-author"
           class="row-chart"

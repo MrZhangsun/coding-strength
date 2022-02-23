@@ -94,6 +94,16 @@
           align="center"
         />
         <el-table-column
+          prop="mergedBranches"
+          label="Merged"
+          align="center"
+        />
+        <el-table-column
+          prop="noMergedBranches"
+          label="No-Mereged"
+          align="center"
+        />
+        <el-table-column
           prop="status"
           label="状态"
           align="center"
@@ -341,7 +351,11 @@
         <el-descriptions-item
           label="分支数量"
           :span="2"
-        >{{detialRepositoryForm.totalBranches}}</el-descriptions-item>
+        >
+          total: {{detialRepositoryForm.totalBranches}}
+          merged: {{detialRepositoryForm.mergedBranches}}
+          no-merged: {{detialRepositoryForm.noMergedBranches}}
+        </el-descriptions-item>
         <el-descriptions-item
           label="统计开关"
           :span="4"

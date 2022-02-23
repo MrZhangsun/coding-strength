@@ -41,6 +41,26 @@
           >
           </el-input>
         </el-col>
+        <el-col :span="3">
+          <el-select
+            v-model="pageInfo.mergedStatus"
+            placeholder="合并状态"
+            @clear="clearRepositorySelect"
+            @change="getBranchList"
+            clearable
+          >
+            <el-option
+              :key="1"
+              label="Merged"
+              :value="1"
+            />
+            <el-option
+              :key="0"
+              label="No-Merged"
+              :value="0"
+            />
+          </el-select>
+        </el-col>
         <el-col :span="8">
           <el-date-picker
             v-model="dateTimePicker"
@@ -94,11 +114,6 @@
         stripe
         :header-cell-style="{'text-align':'center'}"
       >
-        <el-table-column
-          type="index"
-          label="#"
-          align="center"
-        />
         <el-table-column
           prop="id"
           label="ID"
@@ -155,6 +170,15 @@
           </template>
         </el-table-column>
         <el-table-column
+          prop="mergedStatus"
+          label="合并状态"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.mergedStatus === 1 ? 'Merged':'No-Merged'}}
+          </template>
+        </el-table-column>
+        <el-table-column
           label="操作"
           align="center"
         >
@@ -182,7 +206,7 @@
                 type="info"
                 size="mini"
                 :icon="scope.row.collectStatus === 1 ? 'el-icon-loading' : ''"
-                :disabled="scope.row.collectStatus === 1 ? true : false"
+                :disabled="(scope.row.collectStatus === 1 && scope.row.mergedStatus === 0 )? true : false"
                 @click="collectBranch(scope.row.id, scope.row)"
               >
                 <svg
