@@ -1,21 +1,23 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/system/Login.vue'
-import Home from '../views/system/Home.vue'
-import Rank from '../views/coding/Rank.vue'
-import Graph from '../views/coding/Graph.vue'
-import Repository from '../views/coding/Repository.vue'
-import Reporter from '../views/coding/Reporter.vue'
-import Analysis from '../views/coding/Analysis.vue'
-import AnalysisRepository from '../views/coding/analysis/AnalysisRepository.vue'
-import AnalysisBranch from '../views/coding/analysis/AnalysisBranch.vue'
-import AnalysisAuthor from '../views/coding/analysis/AnalysisAuthor.vue'
-import Logger from '../views/coding/Logger.vue'
-import Author from '../views/coding/Author.vue'
-import Menu from '../views/system/Menu.vue'
-import Account from '../views/system/Account.vue'
-import User from '../views/system/User.vue'
-import SystemLogger from '../views/system/Logger.vue'
+import Login from '../views/system/Login'
+import Home from '../views/system/Home'
+import Rank from '../views/coding/Rank'
+import Graph from '../views/coding/Graph'
+import Repository from '../views/coding/Repository'
+import Reporter from '../views/coding/Reporter'
+import Analysis from '../views/coding/Analysis'
+import Inspect from '../views/coding/Inspect'
+import AnalysisRepository from '../views/coding/analysis/AnalysisRepository'
+import AnalysisBranch from '../views/coding/analysis/AnalysisBranch'
+import AnalysisAuthor from '../views/coding/analysis/AnalysisAuthor'
+import Logger from '../views/coding/Logger'
+import Author from '../views/coding/Author'
+import Menu from '../views/system/Menu'
+import Account from '../views/system/Account'
+import User from '../views/system/User'
+import SystemLogger from '../views/system/Logger'
+import Feedback from '../views/release/Feedback'
 
 Vue.use(VueRouter)
 
@@ -86,6 +88,11 @@ const routes = [
         ]
       },
       {
+        name: '代码检视',
+        path: 'inspect',
+        component: Inspect
+      },
+      {
         name: '作者关联',
         path: 'author',
         component: Author
@@ -94,6 +101,18 @@ const routes = [
         name: '统计日志',
         path: 'logger',
         component: Logger
+      }
+    ]
+  },
+  {
+    name: '版本统计',
+    path: '/release',
+    component: Home,
+    children: [
+      {
+        name: '业务反馈',
+        path: 'feedback',
+        component: Feedback
       }
     ]
   },
