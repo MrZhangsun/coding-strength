@@ -5,7 +5,7 @@
       <el-breadcrumb-item>版本统计</el-breadcrumb-item>
       <el-breadcrumb-item>发布历史</el-breadcrumb-item>
     </el-breadcrumb>
-
+    <!-- 筛选条件 -->
     <el-card>
       <el-row :gutter="20">
         <el-col :span="3">
@@ -136,7 +136,7 @@
         </el-table-column>
         <el-table-column
           label="操作"
-          width="200px"
+          width="230px"
           align="center"
         >
           <template slot-scope="scope">
@@ -163,6 +163,19 @@
                 icon="el-icon-info"
                 size="mini"
                 @click="showDetailDialog(scope.row.id)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              content="生成反馈链接"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                style="background-color: #67C23A;"
+                icon="el-icon-link"
+                size="mini"
+                @click="generateFeedbackUrl(scope.row.id)"
               />
             </el-tooltip>
           </template>
@@ -648,7 +661,6 @@
 </template>
 
 <script>
-import { uploadFile } from '../../utils/upload'
 import {
   queryHistoryById,
   deleteHistoryById,
@@ -656,6 +668,9 @@ import {
   editHistory,
   queryByConditions
 } from '../../api/release/history'
+
+import { queryFeedbackUrl } from '../../api/release/feedback'
+
 export default {
   created () {
     this.getHistoryList()
@@ -809,20 +824,6 @@ export default {
       this.pageInfo.pageNum = newPage
       this.getHistoryList()
     },
-    // 更新发布历史状态
-    updateHistoryStatus (historyId, newStatus) {
-      const params = {
-        id: historyId,
-        active: newStatus
-      }
-      editHistory(historyId, params)
-        .then(res => {
-          if (res.code !== 200) {
-            return this.$message.error(res.message)
-          }
-          this.$message.success('更新成功!')
-        })
-    },
     // 强制刷新输入框,解决无法输入问题
     onInput () {
       this.$forceUpdate()
@@ -938,62 +939,23 @@ export default {
         this.historyDetailDialogVisible = true
       })
     },
-    // 头像上传
-    handleAvatarSuccess (res, file) {
-      this.avatarUrl = URL.createObjectURL(file.raw)
-    },
-    // 头像上传前校验
-    beforeAvatarUpload (file) {
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isLt2M) {
-        this.$message.error('Avatar picture size can not exceed 2MB!')
-      }
-      return isLt2M
-    },
-    // 自定义上传方法
-    addUploadAvatarRequest (file) {
-      uploadFile(file.file, '/coding-strength', false)
+    /**
+     * 生成反馈链接
+     */
+    generateFeedbackUrl (releaseId) {
+      queryFeedbackUrl(releaseId)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
 
-          this.addHistoryForm.avatar = res.data.uri
-          // 关闭，并清空列表
-          this.confirmProfile = false
-          this.uploadProfile = false
-          this.$refs.addAvatarRef.clearFiles()
-          // this.reload()
-          return this.$message.success('上传成功')
-        }).catch(error => {
-          return this.$message.error(error)
+          this.$copyText(res.data)
+            .then(res => {
+              this.$message.success('链接已经复制到剪切板!')
+            }).catch(error => {
+              return this.$message.error(error)
+            })
         })
-    },
-    // 自定义上传方法
-    editUploadAvatarRequest (file) {
-      uploadFile(file.file, '/coding-strength', false)
-        .then(res => {
-          if (res.code !== 200) {
-            return this.$message.error(res.message)
-          }
-
-          this.editHistoryForm.avatar = res.data.uri
-          // 关闭，并清空列表
-          this.confirmProfile = false
-          this.uploadProfile = false
-          this.$refs.editAvatarRef.clearFiles()
-          // this.reload()
-          return this.$message.success('上传成功')
-        }).catch(error => {
-          return this.$message.error(error)
-        })
-    },
-    onChangeUpload (file) {
-      // 预保存上传的图片
-      this.previewImgURL = URL.createObjectURL(file.raw)
-      // 预览图片
-      this.confirmProfile = true
     }
   }
 }

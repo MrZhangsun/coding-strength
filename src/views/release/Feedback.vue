@@ -7,6 +7,20 @@
     </el-breadcrumb>
 
     <el-card>
+      <ul class="file-list">
+        <li
+          v-for="(f, index) of files"
+          :key="index"
+        >
+          <span>[文件{{index + 1}}] {{f}}</span>
+          <span
+            class="copy-btn"
+            v-clipboard:copy="f"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
+          >复制</span>
+        </li>
+      </ul>
     </el-card>
   </div>
 </template>
@@ -24,12 +38,21 @@ export default {
         type: [],
         resource: '',
         desc: ''
-      }
+      },
+      files: ['fsfsdfsdfs', 'sdfffffffsd']
     }
   },
   methods: {
     onSubmit () {
       console.log('submit!')
+    },
+    // 复制成功时的回调函数
+    onCopy (e) {
+      this.$message.success('内容已复制到剪切板！')
+    },
+    // 复制失败时的回调函数
+    onError (e) {
+      this.$message.error('抱歉，复制失败！')
     }
   }
 }

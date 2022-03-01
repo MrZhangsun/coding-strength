@@ -157,7 +157,6 @@ const router = new VueRouter({
 
 // 路由访问拦截器
 router.beforeEach((to, from, next) => {
-  console.log(to.path)
   // to : 将要访问的路径
   // from: 从哪个页面来
   // next: 放行
@@ -165,7 +164,6 @@ router.beforeEach((to, from, next) => {
     return next()
   }
 
-  console.log(to.path)
   if (to.path.startsWith('/api')) {
     return next()
   }
