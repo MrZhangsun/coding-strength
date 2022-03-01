@@ -3,10 +3,11 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>版本统计</el-breadcrumb-item>
-      <el-breadcrumb-item>业务反馈</el-breadcrumb-item>
+      <el-breadcrumb-item>发布历史</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card>
+
     </el-card>
   </div>
 </template>

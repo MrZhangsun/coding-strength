@@ -18,6 +18,7 @@ import Account from '../views/system/Account'
 import User from '../views/system/User'
 import SystemLogger from '../views/system/Logger'
 import Feedback from '../views/release/Feedback'
+import History from '../views/release/History'
 
 Vue.use(VueRouter)
 
@@ -110,6 +111,11 @@ const routes = [
     component: Home,
     children: [
       {
+        name: '发布历史',
+        path: 'history',
+        component: History
+      },
+      {
         name: '业务反馈',
         path: 'feedback',
         component: Feedback
@@ -151,10 +157,16 @@ const router = new VueRouter({
 
 // 路由访问拦截器
 router.beforeEach((to, from, next) => {
+  console.log(to.path)
   // to : 将要访问的路径
   // from: 从哪个页面来
   // next: 放行
   if (to.path === '/login') {
+    return next()
+  }
+
+  console.log(to.path)
+  if (to.path.startsWith('/api')) {
     return next()
   }
 
