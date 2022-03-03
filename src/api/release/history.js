@@ -80,3 +80,18 @@ export function queryByConditions (conditions) {
       })
   })
 }
+
+/**
+ * 查询条件
+ * @param {Object} conditions 查询条件
+ */
+export function queryHistoryFeedback (conditions) {
+  return new Promise((resolve, reject) => {
+    axios.get('/release/history/feedback', { params: conditions })
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}

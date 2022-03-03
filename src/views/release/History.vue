@@ -669,7 +669,10 @@ import {
   queryByConditions
 } from '../../api/release/history'
 
-import { queryFeedbackUrl } from '../../api/release/feedback'
+import {
+  queryFeedbackUrl,
+  checkInvestBinding
+} from '../../api/release/feedback'
 
 export default {
   created () {
@@ -943,7 +946,40 @@ export default {
      * 生成反馈链接
      */
     generateFeedbackUrl (releaseId) {
-      queryFeedbackUrl(releaseId)
+      // 1. 检查报告是否绑定
+      checkInvestBinding(releaseId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          if (res.data) {
+            // 已经绑定
+            this.theQueryFeedbackUrl(releaseId, false)
+          } else {
+            // 未绑定报告
+            this.$confirm('当前版本还没有绑定调研问题, 是否采用默认问题? ', '友情提示', {
+              confirmButtonText: '默认',
+              cancelButtonText: '绑定',
+              type: 'warning'
+            }).then(() => {
+              this.theQueryFeedbackUrl(releaseId, true)
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '绑定功能敬请期待, 先从数据库配置'
+              })
+            })
+          }
+        })
+    },
+
+    /**
+     * 查询报告链接地址
+     */
+    theQueryFeedbackUrl (releaseId, defaultInvest) {
+      console.log(releaseId, defaultInvest)
+      // 2. 是否采用默认链接
+      queryFeedbackUrl(releaseId, defaultInvest)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
