@@ -52,7 +52,7 @@
         <el-col :span="3">
           <el-input
             placeholder="作者"
-            v-model="pageInfo.author"
+            v-model="pageInfo.account"
             @input="onInput"
             @clear="getAuthorList"
             clearable
