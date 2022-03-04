@@ -59,7 +59,7 @@
           >
           </el-input>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="8">
           <el-date-picker
             v-model="dateTimePicker"
             type="datetimerange"

@@ -163,7 +163,7 @@
           prop="lastStatisticTime"
           label="上次统计"
           align="center"
-          width="185px"
+          width="160px"
         >
           <template slot-scope="scope">
             {{ scope.row.lastStatisticTime | dateFormat }}
@@ -181,6 +181,7 @@
         <el-table-column
           label="操作"
           align="center"
+          width="140px"
         >
           <template slot-scope="scope">
             <el-tooltip
