@@ -46,7 +46,10 @@
           class="row-chart"
         ></div>
       </div>
-      <div class="chart-unit">
+      <div
+        class="chart-unit"
+        style="height: auto"
+      >
         <h3 class="chart-title">分支排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-branch"
@@ -226,7 +229,7 @@ export default {
         },
         dataset: {
           source: [
-            ['作者', '添加行数', '移除行数', '代码行数', '影响文件']
+            ['作者', '提交总数', '添加行数', '移除行数', '代码行数', '影响文件']
           ]
         },
         xAxis: {},
@@ -252,12 +255,20 @@ export default {
       if (!this.conditions.top) {
         this.conditions.top = 5
       }
+
       // 查询仓库信息
       repositoryTop(this.conditions)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
+
+          // 清空上次的结果
+          const length = this.activeRepositoryOptions.dataset.source.length
+          if (length > 1) {
+            this.activeRepositoryOptions.dataset.source.splice(1, length - 1)
+          }
+
           res.data.forEach(element => {
             const repository = []
             repository[0] = element.name
@@ -265,6 +276,7 @@ export default {
             repository[2] = element.totalAuthors
             repository[3] = element.totalAge
             repository[4] = element.activeAge
+
             this.activeRepositoryOptions.dataset.source.push(repository)
           })
           // 从新绘制图表
@@ -275,6 +287,13 @@ export default {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
+
+          // 清空上次的结果
+          const length = this.activeBranchOptions.dataset.source.length
+          if (length > 1) {
+            this.activeBranchOptions.dataset.source.splice(1, length - 1)
+          }
+
           res.data.forEach(element => {
             const branch = []
             branch[0] = element.name
@@ -292,13 +311,21 @@ export default {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
+
+          // 清空上次的结果
+          const length = this.activeAuthorOptions.dataset.source.length
+          if (length > 1) {
+            this.activeAuthorOptions.dataset.source.splice(1, length - 1)
+          }
+
           res.data.forEach(element => {
             const author = []
             author[0] = element.account
-            author[1] = element.totalAddLines
-            author[2] = element.totalRemoveLines
-            author[3] = element.totalSaveLines
-            author[4] = element.totalChangeFiles
+            author[1] = element.totalCommits
+            author[2] = element.totalAddLines
+            author[3] = element.totalRemoveLines
+            author[4] = element.totalSaveLines
+            author[5] = element.totalChangeFiles
             this.activeAuthorOptions.dataset.source.push(author)
           })
           // 从新绘制图表
