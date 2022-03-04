@@ -282,7 +282,7 @@ export default {
             branch[2] = element.totalAuthors
             branch[3] = element.totalFiles
             branch[4] = element.totalLineOfCode
-            this.activeBranchOptions.dataset.source.unshift(branch)
+            this.activeBranchOptions.dataset.source.push(branch)
           })
           // 从新绘制图表
           activeBranchChart.setOption(this.activeBranchOptions)
@@ -299,7 +299,7 @@ export default {
             author[2] = element.totalRemoveLines
             author[3] = element.totalSaveLines
             author[4] = element.totalChangeFiles
-            this.activeAuthorOptions.dataset.source.unshift(author)
+            this.activeAuthorOptions.dataset.source.push(author)
           })
           // 从新绘制图表
           activeAuthorChart.setOption(this.activeAuthorOptions)
