@@ -22,32 +22,68 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-input
-            placeholder=""
-            v-model="pageInfo.currentPosition"
-            @input="onInput"
-            @clear="getLoggerList"
+          <el-select
+            v-model="pageInfo.collectorTriggerMethod"
             clearable
+            placeholder="触发方式"
+            @clear="getLoggerList"
+            @change="getLoggerList"
           >
-          </el-input>
+            <el-option
+              key="0"
+              label="定时触发"
+              value="SCHEDULE"
+            >
+            </el-option>
+            <el-option
+              key="1"
+              label="页面触发"
+              value="WEB_API"
+            >
+            </el-option>
+            <el-option
+              key="2"
+              label="Webhook触发"
+              value="WEBHOOK"
+            >
+            </el-option>
+          </el-select>
         </el-col>
         <el-col :span="4">
-          <el-input
-            placeholder="仓库或分支名称"
-            v-model="pageInfo.currentPosition"
-            @input="onInput"
-            @clear="getLoggerList"
+          <el-select
+            v-model="pageInfo.collectStatus"
             clearable
+            placeholder="同步状态"
+            @clear="getLoggerList"
+            @change="getLoggerList"
           >
-          </el-input>
+            <el-option
+              key="0"
+              label="已完成"
+              value="0"
+            >
+            </el-option>
+            <el-option
+              key="1"
+              label="执行中"
+              value="1"
+            >
+            </el-option>
+            <el-option
+              key="2"
+              label="已失败"
+              value="2"
+            >
+            </el-option>
+          </el-select>
         </el-col>
         <el-col :span="8">
           <el-date-picker
             v-model="dateTimePicker"
             type="datetimerange"
             range-separator="To"
-            start-placeholder="统计开始"
-            end-placeholder="统计结束"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
             format="yyyy-MM-dd HH:mm:ss"
             value-format="yyyy-MM-dd HH:mm:ss"
             @change="getLoggerList"
