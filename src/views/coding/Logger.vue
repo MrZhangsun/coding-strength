@@ -5,35 +5,235 @@
       <el-breadcrumb-item>代码统计</el-breadcrumb-item>
       <el-breadcrumb-item>统计日志</el-breadcrumb-item>
     </el-breadcrumb>
-
-    <h3>代码统计日志组建</h3>
-    <div style="height: 300px;">
-      <el-steps direction="vertical">
-        <el-step
-          @click.native="handleClick"
-          title="Step 1"
-          description="descriptiondescriptiondescriptiondescription"
+    <el-card>
+      <!-- 检索区 -->
+      <el-row
+        :gutter="20"
+        class="row-search"
+      >
+        <el-col :span="4">
+          <el-input
+            placeholder="当前位置"
+            v-model="pageInfo.currentPosition"
+            @input="onInput"
+            @clear="getLoggerList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-input
+            placeholder=""
+            v-model="pageInfo.currentPosition"
+            @input="onInput"
+            @clear="getLoggerList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-input
+            placeholder="仓库或分支名称"
+            v-model="pageInfo.currentPosition"
+            @input="onInput"
+            @clear="getLoggerList"
+            clearable
+          >
+          </el-input>
+        </el-col>
+        <el-col :span="8">
+          <el-date-picker
+            v-model="dateTimePicker"
+            type="datetimerange"
+            range-separator="To"
+            start-placeholder="统计开始"
+            end-placeholder="统计结束"
+            format="yyyy-MM-dd HH:mm:ss"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            @change="getLoggerList"
+            @clear="getLoggerList"
+          >
+          </el-date-picker>
+        </el-col>
+        <el-col :span="3">
+          <el-button
+            type="primary"
+            icon="el-icon-search"
+            @click="getLoggerList"
+          >搜索</el-button>
+        </el-col>
+      </el-row>
+      <!-- 列表区 -->
+      <el-table
+        :data="loggerList"
+        :border="true"
+        stripe
+        :header-cell-style="{'text-align':'center'}"
+      >
+        <el-table-column
+          prop="id"
+          label="ID"
+          align="center"
         />
-      </el-steps>
-    </div>
-
-    <el-dialog>
-    </el-dialog>
+        <el-table-column
+          prop="collectType"
+          label="解析类型"
+          align="center"
+        />
+        <el-table-column
+          prop="collectorTriggerMethod"
+          label="触发方式"
+          align="center"
+        />
+        <el-table-column
+          prop="collectId"
+          label="批次编号"
+          align="center"
+        />
+        <el-table-column
+          prop="currentPosition"
+          label="当前位置"
+          align="center"
+        />
+        <el-table-column
+          prop="startTime"
+          label="开始时间"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.startTime | dateFormat }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="endTime"
+          label="结束时间"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.endTime | dateFormat }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="endTime"
+          label="更新时间"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.updatedTime | dateFormat }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="collectStatus"
+          label="运行状态"
+          align="center"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.collectStatus === 0 ? '已完成' : (scope.row.collectStatus === 1 ? '运行中': '解析失败')}}
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 分页组建 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="pageInfo.pageNum"
+        :page-sizes="[10, 50, 100, 200, 500, 1000]"
+        :page-size="pageInfo.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="pageInfo.total"
+      >
+      </el-pagination>
+    </el-card>
   </div>
 </template>
 <script>
+import {
+  queryByConditions,
+  queryById
+} from '../../api/coding/logger'
+
 export default {
   created () {
-
+    this.getLoggerList()
   },
   data () {
     return {
-      items: []
+      loggerList: [],
+      dateTimePicker: [],
+      pageInfo: {
+        pageNum: 1,
+        pageSize: 10,
+        total: 0,
+        startTime: '',
+        endTime: ''
+      },
+      detailLabelStyle: {
+        width: '100px',
+        'text-align': 'left'
+      },
+      detailContentStyle: {
+        'font-size': '12px'
+      },
+      detailLoggerForm: {},
+      loggerDetailDialogVisible: false
     }
   },
   methods: {
-    handleClick (value) {
-      console.log(value)
+    /**
+     * 查询作者列表
+     */
+    getLoggerList () {
+      if (this.dateTimePicker && this.dateTimePicker[0] && this.dateTimePicker[1]) {
+        this.pageInfo.startTime = this.dateTimePicker[0]
+        this.pageInfo.endTime = this.dateTimePicker[1]
+      } else {
+        this.pageInfo.startTime = ''
+        this.pageInfo.endTime = ''
+      }
+      queryByConditions(this.pageInfo)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.loggerList = res.data.list
+          this.pageInfo.total = res.data.total
+        })
+    },
+    /**
+     * 查询详情
+     * @param rowId author主键ID
+     */
+    showDetailDialog (rowId) {
+      this.loggerDetailDialogVisible = true
+      queryById(rowId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.detailLoggerForm = res.data
+        })
+    },
+    /**
+     * 分页单位调整,重新刷新列表
+     * @param newSize 分页单位调整
+     */
+    handleSizeChange (newSize) {
+      this.pageInfo.pageSize = newSize
+      this.getLoggerList()
+    },
+    /**
+     * 下一页
+     * @param newPage 下一页
+     */
+    handleCurrentChange (newPage) {
+      this.pageInfo.pageNum = newPage
+      this.getLoggerList()
+    },
+    /**
+     * 强制刷新输入框,解决无法输入问题
+     */
+    onInput () {
+      this.$forceUpdate()
     }
   }
 }
