@@ -337,6 +337,16 @@
             :value="0"
           ></el-input>
         </el-form-item>
+        <el-form-item
+          label="反馈报告"
+          prop="investigationId"
+        >
+          <el-input
+            placeholder="请选择要绑定的报告"
+            v-model="addHistoryForm.investigationId"
+            :value="0"
+          ></el-input>
+        </el-form-item>
       </el-form>
       <!-- 按钮 -->
       <span
@@ -719,11 +729,7 @@ export default {
       addHistoryDialogVisible: false,
       editHistoryDialogVisible: false,
       historyDetailDialogVisible: false,
-      avatarUrl: '',
-      avatarPreviewUrl: '',
-      // 上传头像对话框显示与否
-      uploadProfile: false,
-      confirmProfile: false,
+
       detailLabelStyle: {
         width: '100px',
         'text-align': 'left'
@@ -964,10 +970,7 @@ export default {
             }).then(() => {
               this.theQueryFeedbackUrl(releaseId, true)
             }).catch(() => {
-              this.$message({
-                type: 'info',
-                message: '绑定功能敬请期待, 先从数据库配置'
-              })
+              this.$router.push('/release/investigation')
             })
           }
         })

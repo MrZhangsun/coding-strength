@@ -19,6 +19,7 @@ import User from '../views/system/User'
 import SystemLogger from '../views/system/Logger'
 import Feedback from '../views/release/Feedback'
 import History from '../views/release/History'
+import Investigation from '../views/release/Investigation'
 
 Vue.use(VueRouter)
 
@@ -119,6 +120,11 @@ const routes = [
         name: '业务反馈',
         path: 'feedback',
         component: Feedback
+      },
+      {
+        name: '业务反馈',
+        path: 'investigation',
+        component: Investigation
       }
     ]
   },
