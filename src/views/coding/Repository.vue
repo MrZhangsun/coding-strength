@@ -539,8 +539,17 @@ export default {
         if (!valid) {
           return
         }
+        // loading
+        const loading = this.$loading({
+          lock: true,
+          text: '解析中',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+
         addRepository(this.addRepositoryForm)
           .then(res => {
+            loading.close()
             if (res.code !== 200) {
               return this.$message.error(res.message)
             }

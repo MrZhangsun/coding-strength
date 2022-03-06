@@ -240,6 +240,11 @@
         :labelStyle="detailLabelStyle"
         :contentStyle="detailContentStyle"
       >
+        <el-table-column
+          type="selection"
+          width="55"
+        >
+        </el-table-column>
         <el-descriptions-item
           label="ID"
           :span="2"
