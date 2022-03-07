@@ -122,7 +122,7 @@ const routes = [
         component: Feedback
       },
       {
-        name: '业务反馈',
+        name: '调研报告',
         path: 'investigation',
         component: Investigation
       }

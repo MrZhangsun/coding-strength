@@ -90,7 +90,7 @@
       </el-row>
       <!-- 调研报告列表 -->
       <el-table
-        :data="InvestigationList"
+        :data="investigationList"
         :border="true"
         stripe
         :header-cell-style="{'text-align':'center'}"
@@ -197,7 +197,7 @@
                 style="background-color: #67C23A;"
                 icon="el-icon-link"
                 size="mini"
-                @click="generateFeedbackUrl(scope.row.id)"
+                @click="investigationBind(scope.row.id)"
               />
             </el-tooltip>
           </template>
@@ -495,6 +495,42 @@
         >返回</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      ref="investigationDetailDialogRef"
+      :visible.sync="investigationBindDialogVisible"
+      width="60%"
+      title="关联问题"
+      id="transfer_dialog"
+    >
+      <el-transfer
+        :titles="['可选问题', '报告问题']"
+        :button-texts="['移除', '添加']"
+        filterable
+        :filter-method="filterMethod"
+        filter-placeholder="输入关键字过滤"
+        v-model="transferdIndicators"
+        :data="indicatorList"
+        style="text-align: left; display: inline-block; width: auto; height: 100%;"
+      >
+      </el-transfer>
+
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitInvestigationBindRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="investigationBindDialogVisible = false"
+        >取消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -507,10 +543,7 @@ import {
   queryByConditions
 } from '../../api/release/investigation'
 
-import {
-  queryFeedbackUrl,
-  checkInvestBinding
-} from '../../api/release/feedback'
+import { queryByConditions as queryIndicators, binding, findBindings } from '../../api/release/indicator'
 
 export default {
   created () {
@@ -527,7 +560,11 @@ export default {
       callback()
     }
     return {
-      InvestigationList: [],
+      activeNames: {},
+      indicatorList: [],
+      transferdIndicators: [],
+      selectedInvestigation: 0,
+      investigationList: [],
       dateTimePicker: [],
       pageInfo: {
         pageNum: 1,
@@ -537,6 +574,7 @@ export default {
       addInvestigationDialogVisible: false,
       editInvestigationDialogVisible: false,
       investigationDetailDialogVisible: false,
+      investigationBindDialogVisible: false,
 
       detailLabelStyle: {
         width: '100px',
@@ -575,7 +613,7 @@ export default {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          this.InvestigationList = res.data.list
+          this.investigationList = res.data.list
           this.pageInfo.total = res.data.total
         })
     },
@@ -700,50 +738,58 @@ export default {
     /**
      * 生成反馈链接
      */
-    generateFeedbackUrl (releaseId) {
-      // 1. 检查报告是否绑定
-      checkInvestBinding(releaseId)
+    investigationBind (investigationId) {
+      // 打开对话框
+      this.investigationBindDialogVisible = true
+      // 查询问题
+      queryIndicators()
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-          if (res.data) {
-            // 已经绑定
-            this.theQueryFeedbackUrl(releaseId, false)
-          } else {
-            // 未绑定报告
-            this.$confirm('当前版本还没有绑定调研问题, 是否采用默认问题? ', '友情提示', {
-              confirmButtonText: '默认',
-              cancelButtonText: '绑定',
-              type: 'warning'
-            }).then(() => {
-              this.theQueryFeedbackUrl(releaseId, true)
-            }).catch(() => {
-              this.$router.push('/release/investigation')
-            })
+
+          this.indicatorList = []
+          res.data.forEach(element => {
+            const e = {
+              label: element.label,
+              key: element.id,
+              initial: element.label
+            }
+            this.indicatorList.push(e)
+          })
+        })
+      // 查询绑定的问题
+      findBindings(investigationId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
           }
+          this.transferdIndicators = res.data
         })
     },
 
     /**
-     * 查询报告链接地址
+     * 保存绑定结果
      */
-    theQueryFeedbackUrl (releaseId, defaultInvest) {
-      console.log(releaseId, defaultInvest)
-      // 2. 是否采用默认链接
-      queryFeedbackUrl(releaseId, defaultInvest)
+    submitInvestigationBindRequest () {
+      console.log(this.transferdIndicators)
+      this.selectedInvestigation = 2
+      binding(this.selectedInvestigation, this.transferdIndicators)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)
           }
-
-          this.$copyText(res.data)
-            .then(res => {
-              this.$message.success('链接已经复制到剪切板!')
-            }).catch(error => {
-              return this.$message.error(error)
-            })
+          this.selectedInvestigation = res.data
+          this.investigationBindDialogVisible = false
         })
+    },
+    handleChange () { },
+
+    /**
+     * transfer过滤
+     */
+    filterMethod (keywords, item) {
+      return item.initial.toLowerCase().indexOf(keywords.toLowerCase()) > -1
     }
   }
 }
@@ -753,32 +799,7 @@ export default {
   width: 100%;
   height: 100%;
 }
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  width: 80px;
-  height: 80px;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 80px;
-  height: 80px;
-  line-height: 80px;
-  text-align: center;
-}
-.avatar {
-  width: 80px;
-  height: 80px;
-  display: block;
-  background-color: #fff;
-  border: 1px dashed #0f0d0d;
-  border-radius: 6px;
+#transfer_dialog /deep/ .el-transfer-panel {
+  width: 350px;
 }
 </style>

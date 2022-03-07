@@ -980,7 +980,6 @@ export default {
      * 查询报告链接地址
      */
     theQueryFeedbackUrl (releaseId, defaultInvest) {
-      console.log(releaseId, defaultInvest)
       // 2. 是否采用默认链接
       queryFeedbackUrl(releaseId, defaultInvest)
         .then(res => {

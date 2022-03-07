@@ -177,10 +177,22 @@ export default {
         xAxis: {},
         yAxis: { type: 'category' },
         series: [
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' }
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          }
         ]
       },
       activeBranchOptions: {
@@ -206,10 +218,22 @@ export default {
         xAxis: {},
         yAxis: { type: 'category' },
         series: [
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' }
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          }
         ]
       },
       activeAuthorOptions: {
@@ -235,10 +259,22 @@ export default {
         xAxis: {},
         yAxis: { type: 'category' },
         series: [
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' },
-          { type: 'bar' }
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          }
         ]
       }
     }
