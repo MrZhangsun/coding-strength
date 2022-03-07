@@ -77,7 +77,7 @@
           <el-button
             type="primary"
             icon="el-icon-edit"
-            @click="addHistoryDialogVisible = true"
+            @click="showAddHistoryDialog"
           >添加</el-button>
         </el-col>
       </el-row>
@@ -341,11 +341,20 @@
           label="反馈报告"
           prop="investigationId"
         >
-          <el-input
-            placeholder="请选择要绑定的报告"
+          <el-select
             v-model="addHistoryForm.investigationId"
-            :value="0"
-          ></el-input>
+            filterable
+            clearable
+            placeholder="请选择要绑定的报告"
+          >
+            <el-option
+              v-for="item in investigationOptions"
+              :key="item.id"
+              :label="item.description"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
@@ -513,6 +522,25 @@
             v-model="editHistoryForm.onlineDays"
             :value="0"
           ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="反馈报告"
+          prop="investigationId"
+        >
+          <el-select
+            v-model="editHistoryForm.investigationId"
+            filterable
+            clearable
+            placeholder="请选择要绑定的报告"
+          >
+            <el-option
+              v-for="item in investigationOptions"
+              :key="item.id"
+              :label="item.description"
+              :value="item.id"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <!-- 按钮 -->
@@ -684,6 +712,10 @@ import {
   checkInvestBinding
 } from '../../api/release/feedback'
 
+import {
+  queryByConditions as queryInvestigations
+} from '../../api/release/investigation'
+
 export default {
   created () {
     this.getHistoryList()
@@ -718,6 +750,7 @@ export default {
       }
     }
     return {
+      investigationOptions: [],
       historyList: [],
       dateTimePicker: [],
       pageInfo: {
@@ -880,6 +913,8 @@ export default {
           this.editHistoryForm = res.data
           this.editHistoryDialogVisible = true
         })
+
+      this.loadInvestigation()
     },
     // 编辑提交
     submitEditHistoryRequest () {
@@ -970,7 +1005,7 @@ export default {
             }).then(() => {
               this.theQueryFeedbackUrl(releaseId, true)
             }).catch(() => {
-              this.$router.push('/release/investigation')
+              this.showEditDialog(releaseId)
             })
           }
         })
@@ -993,6 +1028,32 @@ export default {
             }).catch(error => {
               return this.$message.error(error)
             })
+        })
+    },
+
+    /**
+     * 添加对话框展示
+     */
+    showAddHistoryDialog () {
+      this.addHistoryDialogVisible = true
+      this.loadInvestigation()
+    },
+
+    /**
+     * 加载报告下拉框
+     */
+    loadInvestigation () {
+      this.pageInfo.pageNum = 1
+      this.pageInfo.pageSize = 10000
+      queryInvestigations(this.pageInfo)
+        .then(res => {
+          this.loading = false
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.investigationOptions = res.data.list
+          console.log(this.investigationOptions)
         })
     }
   }
