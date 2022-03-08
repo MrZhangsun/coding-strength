@@ -636,6 +636,12 @@
           :span="4"
         >{{detailHistoryForm.optFunction}}</el-descriptions-item>
         <el-descriptions-item
+          label="反馈报告"
+          :span="4"
+        >
+          {{detailHistoryForm.description === null ? '未绑定' : '《' + detailHistoryForm.description +'》'}}
+        </el-descriptions-item>
+        <el-descriptions-item
           label="创建人"
           :span="2"
         >{{detailHistoryForm.createdBy}}</el-descriptions-item>
