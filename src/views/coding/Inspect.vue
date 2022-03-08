@@ -7,8 +7,7 @@
     </el-breadcrumb>
 
     <h3>
-      代码检视 - Coding Reveiew Auto
-      <el-button icon="el-icon-loading">规划中</el-button>
+      <el-button icon="el-icon-loading">代码检视规划中</el-button>
     </h3>
   </div>
 </template>

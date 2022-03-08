@@ -20,6 +20,9 @@ import SystemLogger from '../views/system/Logger'
 import Feedback from '../views/release/Feedback'
 import History from '../views/release/History'
 import Investigation from '../views/release/Investigation'
+import Statistic from '../views/performance/Statistic'
+import Indicator from '../views/performance/Indicator'
+import PerformanceReporter from '../views/performance/PerformanceReporter'
 
 Vue.use(VueRouter)
 
@@ -125,6 +128,28 @@ const routes = [
         name: '调研报告',
         path: 'investigation',
         component: Investigation
+      }
+    ]
+  },
+  {
+    name: '绩效管理',
+    path: '/performance',
+    component: Home,
+    children: [
+      {
+        name: '考核指标',
+        path: 'indicator',
+        component: Indicator
+      },
+      {
+        name: '绩效统计',
+        path: 'statistic',
+        component: Statistic
+      },
+      {
+        name: '绩效报告',
+        path: 'reporter',
+        component: PerformanceReporter
       }
     ]
   },
