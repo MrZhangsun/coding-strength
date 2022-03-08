@@ -84,7 +84,7 @@
           <el-button
             type="primary"
             icon="el-icon-edit"
-            @click="addInvestigationDialogVisible = true"
+            @click="addIndicatorDialogVisible = true"
           >添加问题</el-button>
         </el-col>
       </el-row>
@@ -496,6 +496,166 @@
       </span>
     </el-dialog>
 
+    <!-- 添加问题对话框 -->
+    <el-dialog
+      title="新增调研问题"
+      :visible.sync="addIndicatorDialogVisible"
+      width="50%"
+      :before-close="handleClose"
+    >
+      <!-- 表单项 -->
+      <el-form
+        ref="addIndicatorFormRef"
+        :model="addIndicatorForm"
+        :rules="addIndicatorFormRules"
+        label-width="120px"
+      >
+        <el-form-item
+          label="标题"
+          prop="name"
+        >
+          <el-input
+            placeholder="请给你的问题取个名字"
+            v-model="addIndicatorForm.name"
+            @input="onInput"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="摘要"
+          prop="label"
+        >
+          <el-input
+            placeholder="请简单描述一下问题(该值用于显示)"
+            v-model="addIndicatorForm.label"
+            @input="onInput"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="问题类型"
+          prop="objective"
+        >
+          <el-input
+            placeholder="请简单描述一下问题类型, 如: 基本信息|研发效率|业务价值|需求挖掘|需求沟通..."
+            v-model="addIndicatorForm.objective"
+            @input="onInput"
+            clearable
+          ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="预设权重"
+          prop="weight"
+        >
+          <el-input-number
+            placeholder="预设权重"
+            v-model="addIndicatorForm.weight"
+            @input="onInput"
+            clearable
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </el-form-item>
+        <el-form-item
+          label="类型"
+          prop="type"
+        >
+          <!-- 考核指标类型, 1：单选，2：多选，3：文本框，4：文本域 -->
+          <el-select
+            v-model="addIndicatorForm.type"
+            clearable
+            placeholder="请选择问题类型"
+            @change="choseIndicatorType"
+          >
+            <el-option
+              key="1"
+              label="单选"
+              :value="1"
+            />
+            <el-option
+              key="2"
+              label="多选"
+              :value="2"
+            />
+            <el-option
+              key="3"
+              label="文本框"
+              :value="3"
+            />
+            <el-option
+              key="4"
+              label="文本域"
+              :value="4"
+            />
+          </el-select>
+        </el-form-item>
+        <el-row
+          :gutter="20"
+          v-for="(item, index) in addIndicatorForm.items"
+          :key="index"
+        >
+          <el-col :span="12">
+            <el-form-item :label="'选项 ' + (index + 1) + ' :'">
+              <el-input v-model="item.label"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item label="分数 :">
+              <el-input-number
+                size="small"
+                v-model="item.value"
+                @input="onInput"
+                clearable
+                :min="0"
+                :max="10"
+              ></el-input-number>
+            </el-form-item>
+          </el-col>
+          <el-col :span="2">
+            <el-form-item>
+              <el-button
+                type="primary"
+                size="small"
+                icon="el-icon-plus"
+                plain
+                @click="addIndicatorItem(index)"
+              >添加</el-button>
+            </el-form-item>
+          </el-col>
+          <el-col :span="2">
+            <el-form-item>
+              <el-button
+                type="danger"
+                size="small"
+                icon="el-icon-minus"
+                @click="removeIndicatorItem(index)"
+              >删除</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitAddIndicatorRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="addIndicatorDialogVisible = false"
+        >取消</el-button>
+        <el-button
+          type="info"
+          @click="resetAddIndicatorForm"
+        >重置</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 关联报告问题 -->
     <el-dialog
       ref="investigationDetailDialogRef"
       :visible.sync="investigationBindDialogVisible"
@@ -543,7 +703,12 @@ import {
   queryByConditions
 } from '../../api/release/investigation'
 
-import { queryByConditions as queryIndicators, binding, findBindings } from '../../api/release/indicator'
+import {
+  queryByConditions as queryIndicators,
+  binding,
+  findBindings,
+  addIndicator
+} from '../../api/release/indicator'
 
 export default {
   created () {
@@ -572,6 +737,7 @@ export default {
         total: 0
       },
       addInvestigationDialogVisible: false,
+      addIndicatorDialogVisible: false,
       editInvestigationDialogVisible: false,
       investigationDetailDialogVisible: false,
       investigationBindDialogVisible: false,
@@ -601,6 +767,25 @@ export default {
           { required: true, message: '请输入调研报告名称', trigger: 'blur' },
           { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' },
           { validator: specialCharValidator, trigger: 'blur' }
+        ]
+      },
+      addIndicatorForm: {
+        items: [],
+        weight: 0
+      },
+      addIndicatorFormRules: {
+        name: [
+          { required: true, message: '请输入调研问题名称', trigger: 'blur' },
+          { min: 3, max: 20, message: '请输入3~20个字符', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
+        ],
+        label: [
+          { required: true, message: '请输入调研问题', trigger: 'blur' },
+          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' },
+          { validator: specialCharValidator, trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: '请选择问题类型', trigger: 'change' }
         ]
       }
     }
@@ -736,11 +921,12 @@ export default {
       })
     },
     /**
-     * 生成反馈链接
+     * 绑定问题
      */
     investigationBind (investigationId) {
       // 打开对话框
       this.investigationBindDialogVisible = true
+      this.selectedInvestigation = investigationId
       // 查询问题
       queryIndicators()
         .then(res => {
@@ -758,6 +944,7 @@ export default {
             this.indicatorList.push(e)
           })
         })
+
       // 查询绑定的问题
       findBindings(investigationId)
         .then(res => {
@@ -772,8 +959,6 @@ export default {
      * 保存绑定结果
      */
     submitInvestigationBindRequest () {
-      console.log(this.transferdIndicators)
-      this.selectedInvestigation = 2
       binding(this.selectedInvestigation, this.transferdIndicators)
         .then(res => {
           if (res.code !== 200) {
@@ -783,6 +968,7 @@ export default {
           this.investigationBindDialogVisible = false
         })
     },
+
     handleChange () { },
 
     /**
@@ -790,6 +976,53 @@ export default {
      */
     filterMethod (keywords, item) {
       return item.initial.toLowerCase().indexOf(keywords.toLowerCase()) > -1
+    },
+
+    /**
+     *  重置新增问题表单
+     */
+    resetAddIndicatorForm () {
+      this.addIndicatorForm.items = []
+      this.$refs.addIndicatorFormRef.resetFields()
+    },
+    /**
+     * 保存问题
+     */
+    submitAddIndicatorRequest () {
+      console.log(this.addIndicatorForm)
+      addIndicator(this.addIndicatorForm)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.addIndicatorDialogVisible = false
+        })
+    },
+    /**
+     * 问题类型选择
+     */
+    choseIndicatorType (type) {
+      // 新增问题
+      if (type === 1 || type === 2) {
+        this.addIndicatorForm.items = []
+        this.addIndicatorForm.items.push({})
+      } else {
+        this.addIndicatorForm.items = []
+      }
+    },
+    /**
+     * 添加问题
+     */
+    addIndicatorItem (index) {
+      this.addIndicatorForm.items.splice(index, 0, {})
+    },
+    /**
+     * 移除问题
+     */
+    removeIndicatorItem (index) {
+      if (index >= 0) {
+        this.addIndicatorForm.items.splice(index, 1)
+      }
     }
   }
 }
