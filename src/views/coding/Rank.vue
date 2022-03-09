@@ -46,10 +46,7 @@
           class="row-chart"
         ></div>
       </div>
-      <div
-        class="chart-unit"
-        style="height: auto"
-      >
+      <div class="chart-unit">
         <h3 class="chart-title">分支排名 TOP{{this.conditions.top + ''}}</h3>
         <div
           id="active-branch"
@@ -68,13 +65,26 @@
 </template>
 <script>
 import { repositoryTop, branchTop, authorTop } from '../../api/coding/rank'
-
+import moment from 'moment'
 let activeRepositoryChart
 let activeBranchChart
 let activeAuthorChart
 // let chart2
 export default {
   created () {
+    // 默认值
+    this.conditions.top = 10
+    // 上一个月
+    const lastMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
+    const current = new Date()
+    // 格式化
+    const lastMonthtStr = moment(lastMonth).format('YYYY-MM-DD hh:mm:ss')
+    const currentStr = moment(current).format('YYYY-MM-DD hh:mm:ss')
+
+    this.conditions.endTime = currentStr
+    this.conditions.startTime = lastMonthtStr
+    this.dateTimePicker[0] = this.conditions.startTime
+    this.dateTimePicker[1] = this.conditions.endTime
     this.getData()
   },
   destroyed () {
@@ -94,9 +104,14 @@ export default {
     // 监听页面尺寸变化事件, 动态修改图表尺寸
     window.addEventListener('resize', () => {
       this.screenWidth = window.innerWidth
-      activeRepositoryChart.resize()
-      activeBranchChart.resize()
-      activeAuthorChart.resize()
+      this.screenHeight = window.innerHeight
+      const resize = {
+        width: this.screenWidth,
+        height: this.screenHeight
+      }
+      activeRepositoryChart.resize(resize)
+      activeBranchChart.resize(resize)
+      activeAuthorChart.resize(resize)
     })
     // 点击事件
     activeRepositoryChart.on('click', (params) => {
@@ -106,26 +121,32 @@ export default {
   data () {
     return {
       conditions: {
-        top: 5,
+        top: 10,
         startTime: '2021-01-01 00:00:00',
         endTime: '2023-01-01 00:00:0'
       },
       dateTimePicker: [],
       topOptions: [{
-        value: 5,
-        label: '前5名(默认)'
-      }, {
         value: 10,
-        label: '前10名'
-      }, {
-        value: 15,
-        label: '前15名'
-      }, {
-        value: 20,
-        label: '前20名'
+        label: '前10名(默认)'
       }, {
         value: 30,
         label: '前30名'
+      }, {
+        value: 50,
+        label: '前50名'
+      }, {
+        value: 100,
+        label: '前100名'
+      }, {
+        value: 150,
+        label: '前150名'
+      }, {
+        value: 200,
+        label: '前200名'
+      }, {
+        value: 1000,
+        label: '前1000名'
       }],
       statisticTimeRange: {
         shortcuts: [{
@@ -154,6 +175,8 @@ export default {
           }
         }]
       },
+      screenWidth: 0,
+      screenHeight: 0,
       activeRepositoryOptions: {
         legend: {
           type: 'scroll',
@@ -174,8 +197,8 @@ export default {
             ['系统', '分支数量', '开发者数量', '库龄', '活跃天数']
           ]
         },
-        xAxis: {},
-        yAxis: { type: 'category' },
+        yAxis: {},
+        xAxis: { type: 'category' },
         series: [
           {
             type: 'bar',
@@ -192,6 +215,15 @@ export default {
           {
             type: 'bar',
             barWidth: 20
+          }
+        ],
+        dataZoom: [
+          {
+            type: 'slider',
+            realtime: true,
+            start: 30,
+            end: 70,
+            top: 20
           }
         ]
       },
@@ -215,8 +247,8 @@ export default {
             ['分支', '提交数量', '作者数量', '文件数量', '代码行数']
           ]
         },
-        xAxis: {},
-        yAxis: { type: 'category' },
+        yAxis: {},
+        xAxis: { type: 'category' },
         series: [
           {
             type: 'bar',
@@ -233,6 +265,15 @@ export default {
           {
             type: 'bar',
             barWidth: 20
+          }
+        ],
+        dataZoom: [
+          {
+            type: 'slider',
+            realtime: true,
+            start: 30,
+            end: 70,
+            top: 20
           }
         ]
       },
@@ -256,8 +297,8 @@ export default {
             ['作者', '提交总数', '添加行数', '移除行数', '代码行数', '影响文件']
           ]
         },
-        xAxis: {},
-        yAxis: { type: 'category' },
+        yAxis: {},
+        xAxis: { type: 'category' },
         series: [
           {
             type: 'bar',
@@ -275,6 +316,15 @@ export default {
             type: 'bar',
             barWidth: 20
           }
+        ],
+        dataZoom: [
+          {
+            type: 'slider',
+            realtime: true,
+            start: 30,
+            end: 70,
+            top: 20
+          }
         ]
       }
     }
@@ -289,7 +339,7 @@ export default {
         this.conditions.endTime = '2023-01-01 00:00:00'
       }
       if (!this.conditions.top) {
-        this.conditions.top = 5
+        this.conditions.top = 10
       }
 
       // 查询仓库信息
@@ -376,7 +426,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .row-chart {
-  widows: 100%;
-  height: 400px;
+  width: 100%;
+  height: 800px;
 }
 </style>
