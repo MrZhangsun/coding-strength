@@ -32,3 +32,4 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 Test1
 TEST2-1
+TEST2-2
