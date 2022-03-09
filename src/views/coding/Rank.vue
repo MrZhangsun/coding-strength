@@ -69,7 +69,7 @@ import moment from 'moment'
 let activeRepositoryChart
 let activeBranchChart
 let activeAuthorChart
-// let chart2
+
 export default {
   created () {
     // 默认值
