@@ -66,6 +66,7 @@
 <script>
 import { repositoryTop, branchTop, authorTop } from '../../api/coding/rank'
 import moment from 'moment'
+
 let activeRepositoryChart
 let activeBranchChart
 let activeAuthorChart
