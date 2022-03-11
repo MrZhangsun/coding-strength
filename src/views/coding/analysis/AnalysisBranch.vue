@@ -34,7 +34,7 @@
         <el-col :span="3">
           <el-input
             placeholder="分支名称"
-            v-model="pageInfo.branchName"
+            v-model="pageInfo.name"
             @input="onInput"
             @clear="getBranchList"
             clearable
