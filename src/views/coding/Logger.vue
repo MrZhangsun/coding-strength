@@ -164,7 +164,18 @@
           align="center"
         >
           <template slot-scope="scope">
-            {{ scope.row.collectStatus === 0 ? '已完成' : (scope.row.collectStatus === 1 ? '运行中': '解析失败')}}
+            <span
+              v-if="scope.row.collectStatus === 1"
+              style="color: blue"
+            >运行中</span>
+            <span
+              v-else-if="scope.row.collectStatus === 0"
+              style="color: green"
+            >已完成</span>
+            <span
+              v-else
+              style="color: red"
+            >解析失败</span>
           </template>
         </el-table-column>
       </el-table>
