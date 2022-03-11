@@ -98,7 +98,7 @@ const routes = [
         component: Inspect
       },
       {
-        name: '作者关联',
+        name: '作者管理',
         path: 'author',
         component: Author
       },

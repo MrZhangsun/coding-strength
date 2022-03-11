@@ -3,7 +3,7 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>代码统计</el-breadcrumb-item>
-      <el-breadcrumb-item>作者关联</el-breadcrumb-item>
+      <el-breadcrumb-item>作者管理</el-breadcrumb-item>
     </el-breadcrumb>
 
     <el-card>
@@ -110,11 +110,6 @@
         stripe
         :header-cell-style="{'text-align':'center'}"
       >
-        <el-table-column
-          type="index"
-          label="#"
-          align="center"
-        />
         <el-table-column
           prop="id"
           label="ID"

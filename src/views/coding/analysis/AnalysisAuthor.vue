@@ -51,7 +51,7 @@
         </el-col>
         <el-col :span="3">
           <el-input
-            placeholder="作者"
+            placeholder="用户名"
             v-model="pageInfo.account"
             @input="onInput"
             @clear="getAuthorList"
@@ -124,6 +124,22 @@
           align="center"
         />
         <el-table-column
+          prop="name"
+          label="姓名"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <span
+              v-if="scope.row.name === null"
+              style="color: red"
+            >未关联</span>
+            <span
+              v-else
+              style="color: green"
+            >{{scope.row.name}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
           prop="account"
           label="用户名"
           align="center"
@@ -144,6 +160,11 @@
           align="center"
         />
         <el-table-column
+          prop="totalCommits"
+          label="分支提交总数"
+          align="center"
+        />
+        <el-table-column
           prop="joinBranchTime"
           label="首次提交时间"
           align="center"
@@ -152,34 +173,6 @@
             {{ scope.row.joinBranchTime | dateFormat }}
           </template>
         </el-table-column>
-        <el-table-column
-          prop="totalCommits"
-          label="分支提交总数"
-          align="center"
-        />
-        <el-table-column
-          prop="addLines"
-          label="添加行"
-          align="center"
-        />
-        <el-table-column
-          prop="removeLines"
-          label="删除行"
-          align="center"
-        />
-        <el-table-column
-          label="有效行"
-          align="center"
-        >
-          <template slot-scope="scope">
-            {{ scope.row.addLines - scope.row.removeLines}}
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="changedFiles"
-          label="影响文件"
-          align="center"
-        />
         <el-table-column
           prop="lastStatisticTime"
           label="最新统计时间"
@@ -206,6 +199,19 @@
                 icon="el-icon-info"
                 size="mini"
                 @click="showDetailDialog(scope.row.id)"
+              />
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              content="关联作者"
+              :enterable="false"
+              placement="top"
+            >
+              <el-button
+                style="background-color: #67C23A;"
+                icon="el-icon-connection"
+                size="mini"
+                @click="showLinkAuthorDialog(scope.row)"
               />
             </el-tooltip>
           </template>
@@ -381,13 +387,77 @@
         >返回</el-button>
       </span>
     </el-dialog>
+
+    <!-- 作者关联 -->
+    <el-dialog
+      ref="linkUserDialogRef"
+      :visible.sync="linkUserDialogVisible"
+      width="40%"
+      title="作者关联"
+    >
+      <el-form
+        ref="linkUserFormRef"
+        :model="linkUserForm"
+        :rules="linkUserFormRules"
+        label-width="120px"
+      >
+        <el-form-item
+          label="关联方式"
+          prop="method"
+        >
+          <el-radio-group v-model="linkUserForm.method">
+            <el-radio :label="1">A: 为 {{linkUserForm.account}} 账号关联</el-radio>
+            <el-radio :label="2">B: 为 {{linkUserForm.email | contentLimit(10)}} 邮箱关联</el-radio>
+            <el-radio :label="3">A 且 B</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item
+          label="关联作者"
+          prop="userId"
+        >
+          <el-select
+            v-model="linkUserForm.userId"
+            filterable
+            clearable
+            placeholder="请选择作者"
+          >
+            <el-option
+              v-for="item in userForSelect"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+              :disabled="item.disabled"
+            >
+            </el-option>
+          </el-select>
+          找不到用户? <router-link to="/system/user">添加</router-link>
+        </el-form-item>
+      </el-form>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="primary"
+          @click="submitLinkUserRequest"
+        >确定</el-button>
+        <el-button
+          type="danger"
+          :before-close="handleClose"
+          @click="linkUserDialogVisible = false"
+        >取消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import {
   queryByConditions,
-  queryById as queryAuthorById
+  queryById as queryAuthorById,
+  linkUser
 } from '../../../api/coding/author'
+import { queryByConditions as queryUsers } from '../../../api/system/user'
 import { queryAll } from '../../../api/coding/repository'
 import { queryByRepositoryId } from '../../../api/coding/branch'
 export default {
@@ -414,7 +484,24 @@ export default {
         'font-size': '12px'
       },
       detailAuthorForm: {},
+      userForSelect: [],
+      linkUserForm: {
+        email: '',
+        account: '',
+        id: '',
+        userId: '',
+        method: ''
+      },
+      linkUserFormRules: {
+        method: [
+          { required: true, message: '请选择关联方式', trigger: 'change' }
+        ],
+        userId: [
+          { required: true, message: '请选择关联用户', trigger: 'change' }
+        ]
+      },
       authorDetailDialogVisible: false,
+      linkUserDialogVisible: false,
       repositories: [],
       repositoryCopy: [],
       branches: [],
@@ -569,6 +656,47 @@ export default {
      */
     toRankPage () {
       this.$router.push('/home/rank')
+    },
+    /**
+     * 打开对话框
+     */
+    showLinkAuthorDialog (row) {
+      this.linkUserDialogVisible = true
+      const query = {
+        pageNum: 1,
+        pageSize: 10000
+      }
+      this.linkUserForm.email = row.email
+      this.linkUserForm.account = row.account
+      this.linkUserForm.authorId = row.id
+      queryUsers(query)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.userForSelect = res.data.list
+        })
+    },
+    /**
+     * 关联作者
+     */
+    submitLinkUserRequest () {
+      this.$refs.linkUserFormRef.validate(valid => {
+        if (!valid) {
+          return
+        }
+        linkUser(this.linkUserForm)
+          .then(res => {
+            if (res.code !== 200) {
+              return this.$message.error(res.message)
+            }
+            this.$message.success('关联成功')
+            // 成功之后,关闭对话框
+            this.linkUserDialogVisible = false
+            this.getAuthorList()
+            this.$refs.linkUserFormRef.resetFields()
+          })
+      })
     }
   }
 }

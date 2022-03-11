@@ -29,3 +29,18 @@ export function queryById (rowId) {
       })
   })
 }
+
+/**
+ * 关联作者和用户
+ * @param {Object}} link 关联信息
+ */
+export function linkUser (link) {
+  return new Promise((resolve, reject) => {
+    axios.post('/coding/author/link/user', link)
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}
