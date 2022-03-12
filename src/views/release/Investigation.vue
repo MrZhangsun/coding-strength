@@ -758,15 +758,13 @@ export default {
       addInvestigationFormRules: {
         name: [
           { required: true, message: '请输入调研报告名称', trigger: 'blur' },
-          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' },
-          { validator: specialCharValidator, trigger: 'blur' }
+          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' }
         ]
       },
       editInvestigationFormRules: {
         name: [
           { required: true, message: '请输入调研报告名称', trigger: 'blur' },
-          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' },
-          { validator: specialCharValidator, trigger: 'blur' }
+          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' }
         ]
       },
       addIndicatorForm: {
