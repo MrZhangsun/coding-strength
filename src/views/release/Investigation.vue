@@ -716,14 +716,6 @@ export default {
   },
   data () {
     // 特殊字符校验
-    const specialCharValidator = (rule, value, callback) => {
-      const regEn = /[`~!@#$%^&*()_+<>?:"{},./;']/
-      const regCn = /[·！#￥（——）：；“”‘、，|《。》？、【】]/
-      if (regEn.test(value) || regCn.test(value)) {
-        return callback(new Error('名称中不能包含特殊字符'))
-      }
-      callback()
-    }
     return {
       activeNames: {},
       indicatorList: [],
