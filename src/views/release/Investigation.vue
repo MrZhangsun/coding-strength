@@ -461,25 +461,29 @@
                 <div
                   v-for="item in indicator.indicatorItems"
                   :key="item.id"
-                  style=" margin-top: 10px;"
+                  style="margin-top: 10px;"
                 >
                   <el-radio
                     :label="item.label"
                     :value="item.value"
-                  >
-                  </el-radio>
+                    disabled
+                  ></el-radio>
                 </div>
               </el-radio-group>
 
-              <el-checkbox-group v-else-if="indicator.type === 2">
+              <el-checkbox-group
+                v-else-if="indicator.type === 2"
+                v-model="detailCheckList"
+              >
                 <div
                   v-for="item in indicator.indicatorItems"
                   :key="item.id"
-                  style=" margin-top: 10px;"
+                  style="margin-top: 10px;"
                 >
                   <el-checkbox
                     :label="item.label"
                     :value="item.value"
+                    disabled
                   ></el-checkbox>
                 </div>
               </el-checkbox-group>
@@ -726,6 +730,7 @@ export default {
   data () {
     // 特殊字符校验
     return {
+      detailCheckList: [],
       activeNames: {},
       indicatorList: [],
       transferdIndicators: [],
@@ -755,6 +760,11 @@ export default {
       editInvestigationForm: {
       },
       detailInvestigationForm: {
+        indicators: [
+          {
+            indicatorItems: []
+          }
+        ]
       },
       addInvestigationFormRules: {
         name: [
