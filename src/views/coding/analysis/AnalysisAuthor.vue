@@ -96,6 +96,7 @@
           <el-button
             type="primary"
             icon="el-icon-analysis"
+            @click="analysisBranch"
           >分支分析</el-button>
         </el-col>
         <el-col :span="3">
@@ -115,10 +116,16 @@
       <el-table
         :data="authorList"
         :border="true"
+        ref="authorListRef"
         stripe
         :header-cell-style="{'text-align':'center'}"
+        @selection-change="handleSelectionChange"
+        @select="select"
+        @select-all="selectAll"
       >
+        >
         <el-table-column
+          type="selection"
           prop="id"
           label="ID"
           align="center"
@@ -505,7 +512,8 @@ export default {
       repositories: [],
       repositoryCopy: [],
       branches: [],
-      brancheCopy: []
+      brancheCopy: [],
+      selectRow: undefined
     }
   },
   methods: {
@@ -564,6 +572,13 @@ export default {
      */
     onInput () {
       this.$forceUpdate()
+    },
+    handleClose (done) {
+      this.$confirm('确定要关闭对话框?')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => { })
     },
     /**
      * 根据仓库名称过滤仓库
@@ -697,6 +712,36 @@ export default {
             this.$refs.linkUserFormRef.resetFields()
           })
       })
+    },
+    handleSelectionChange (select) {
+      // if (select.length === 1) {
+      //   this.selectRow = select[0]
+      // }
+      console.log(select)
+    },
+    select (selection, row) {
+      if (selection.length > 0) {
+        const delRow = selection.shift()
+        this.selectRow = delRow
+        console.log(delRow)
+        this.$refs.authorListRef.toggleRowSelection(delRow, false)
+      } else if (selection.length === 0) {
+        this.selectRow = undefined
+      }
+    },
+    selectAll (selection) {
+      if (selection.length > 0) {
+        selection.length = 1
+        this.selectRow = selection[0]
+      } else if (selection.length === 0) {
+        this.selectRow = undefined
+      }
+    },
+    analysisBranch () {
+      console.log(this.selectRow)
+      if (!this.selectRow || this.selectRow.length === 0) {
+        return this.$message.error('请选择一条记录进行分析')
+      }
     }
   }
 }
