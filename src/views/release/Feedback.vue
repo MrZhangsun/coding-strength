@@ -125,6 +125,7 @@
               v-model="selectedInvestId[scope.row.id]"
               placeholder="查看报告"
               @change="showDetailDialog(selectedInvestId[scope.row.id])"
+              clearable
             >
               <el-option
                 v-for="item in scope.row.investigationIds"
@@ -227,6 +228,9 @@ export default {
      * @param 调查报告
      */
     showDetailDialog (selectedInvestId) {
+      if (!selectedInvestId) {
+        return
+      }
       queryInvestigation(selectedInvestId)
         .then(res => {
           if (res.code !== 200) {
