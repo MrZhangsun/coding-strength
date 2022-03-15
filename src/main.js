@@ -14,6 +14,9 @@ import * as echarts from 'echarts'
 import moment from 'moment'
 import baseURL from './config/baseUrl'
 
+import infiniteScroll from 'vue-infinite-scroll'
+Vue.use(infiniteScroll)
+
 /**
  * 全局日期格式化
  */

@@ -121,7 +121,8 @@
         >
           <template slot-scope="scope">
             <span v-if="scope.row.type === 1">版本反馈</span>
-            <span v-if="scope.row.type !== 1">暂不支持</span>
+            <span v-else-if="scope.row.type === 2">问卷调查</span>
+            <span v-else>其他</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -263,6 +264,18 @@
               :value="1"
             >
             </el-option>
+            <el-option
+              key="2"
+              label="问卷调查"
+              :value="2"
+            >
+            </el-option>
+            <el-option
+              key="-1"
+              label="其他"
+              :value="-1"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -336,6 +349,18 @@
               :value="1"
             >
             </el-option>
+            <el-option
+              key="2"
+              label="问卷调查"
+              :value="2"
+            >
+            </el-option>
+            <el-option
+              key="-1"
+              label="其他"
+              :value="-1"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -385,7 +410,8 @@
             v-model="detailInvestigationForm.type"
           >
             <el-radio :label="1">版本反馈</el-radio>
-            <el-radio :label="2">其他</el-radio>
+            <el-radio :label="2">问卷调查</el-radio>
+            <el-radio :label="-1">其他</el-radio>
           </el-radio-group>
         </el-descriptions-item>
         <el-descriptions-item
@@ -451,6 +477,7 @@
           <el-collapse
             @change="handleChange"
             accordion
+            v-if="detailInvestigationForm.indicators.length > 0"
           >
             <el-collapse-item
               :title="'问题' + (index + 1) + '、' + indicator.label"
@@ -495,6 +522,12 @@
               </div>
             </el-collapse-item>
           </el-collapse>
+          <span
+            v-else
+            style="color: red;"
+          >
+            未绑定问题
+          </span>
         </el-descriptions-item>
       </el-descriptions>
       <!-- 按钮 -->

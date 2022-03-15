@@ -119,7 +119,6 @@
         ref="authorListRef"
         stripe
         :header-cell-style="{'text-align':'center'}"
-        @selection-change="handleSelectionChange"
         @select="select"
         @select-all="selectAll"
       >
@@ -456,6 +455,90 @@
         >取消</el-button>
       </span>
     </el-dialog>
+
+    <!-- 作者分析 -->
+    <el-dialog
+      ref="authorAnalysisDialogRef"
+      :visible.sync="authorAnalysisDialogVisible"
+      width="60%"
+      title="作者分析"
+      @open="open()"
+    >
+      <el-descriptions
+        class="margin-top"
+        :column="8"
+        direction="horizontals"
+        border
+        colon
+        :labelStyle="detailLabelStyle"
+        :contentStyle="detailContentStyle"
+      >
+        <el-descriptions-item
+          label="作者姓名"
+          :span="2"
+        >{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="作者账号"
+          :span="2"
+        >{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="作者邮箱"
+          :span="4"
+        >{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="参与仓库"
+          :span="2"
+        >6{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="参与分支"
+          :span="2"
+        >20{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="提交总数"
+          :span="2"
+        >总共多少次, 平均水平{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="总代码量"
+          :span="2"
+        >2000 rows add, 100 rows remove{{authorAnalysis.name}}</el-descriptions-item>
+        <el-descriptions-item
+          label="活动分布"
+          :span="8"
+        >
+          <div
+            id="author-activities"
+            style="height:200px"
+          ></div>
+        </el-descriptions-item>
+        <el-descriptions-item
+          label="排名统计"
+          :span="8"
+        >
+          <el-tabs
+            type="card"
+            style="height: 200px;"
+          >
+            <el-tab-pane label="今日榜">
+              <ul
+                class="infinite-list"
+                v-infinite-scroll="load"
+                style="overflow:auto"
+              >
+                <li
+                  v-for="i in count"
+                  :key="i"
+                  class="infinite-list-item"
+                >{{ i }}</li>
+              </ul>
+            </el-tab-pane>
+            <el-tab-pane label="本周榜">本周排行</el-tab-pane>
+            <el-tab-pane label="本月榜">本月排行</el-tab-pane>
+            <el-tab-pane label="本季榜">本季排行</el-tab-pane>
+            <el-tab-pane label="历史榜">本季排行</el-tab-pane>
+          </el-tabs>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -467,6 +550,7 @@ import {
 import { queryByConditions as queryUsers } from '../../../api/system/user'
 import { queryAll } from '../../../api/coding/repository'
 import { queryByRepositoryId } from '../../../api/coding/branch'
+
 export default {
   created () {
     this.getRepositoryList()
@@ -509,14 +593,88 @@ export default {
       },
       authorDetailDialogVisible: false,
       linkUserDialogVisible: false,
+      authorAnalysisDialogVisible: false,
       repositories: [],
       repositoryCopy: [],
       branches: [],
       brancheCopy: [],
-      selectRow: undefined
+      selectRow: undefined,
+      authorAnalysis: {
+        name: ''
+      },
+      authorActivityChart: {},
+      authorAnalysisOptions: {
+        legend: {
+          type: 'scroll',
+          orient: 'horizontal',
+          right: 'center',
+          bottom: 0,
+          top: 'bottom',
+          backgroundColor: '#ccc'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        dataset: {
+          source: [
+            ['作者', '提交总数', '添加行数', '移除行数', '代码行数', '影响文件'],
+            ['里斯', 1, 10, 20, 10, 10],
+            ['里斯', 1, 10, 20, 10, 10]
+          ]
+        },
+        yAxis: {},
+        xAxis: { type: 'category' },
+        series: [
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          },
+          {
+            type: 'bar',
+            barWidth: 20
+          }
+        ],
+        dataZoom: [
+          {
+            type: 'slider',
+            realtime: true,
+            start: 30,
+            end: 70,
+            top: 20
+          }
+        ]
+      },
+      count: 10,
+      loading: false
+    }
+  },
+  computed: {
+    noMore () {
+      return this.count >= 20
+    },
+    disabled () {
+      return this.loading || this.noMore
     }
   },
   methods: {
+    load () {
+      this.loading = true
+      setTimeout(() => {
+        this.count += 2
+        this.loading = false
+      }, 2000)
+    },
     /**
      * 查询作者列表
      */
@@ -713,35 +871,59 @@ export default {
           })
       })
     },
-    handleSelectionChange (select) {
-      // if (select.length === 1) {
-      //   this.selectRow = select[0]
-      // }
-      console.log(select)
-    },
+    /**
+     * 单选
+     */
     select (selection, row) {
-      if (selection.length > 0) {
+      if (selection.length === 1) {
+        this.selectRow = selection[0]
+      } else if (selection.length > 1) {
+        // 去除选中
         const delRow = selection.shift()
-        this.selectRow = delRow
-        console.log(delRow)
         this.$refs.authorListRef.toggleRowSelection(delRow, false)
-      } else if (selection.length === 0) {
+
+        // 选中赋值
+        this.selectRow = selection[selection.length - 1]
+      } else {
         this.selectRow = undefined
       }
     },
+    /**
+     * 全选/全不选
+     */
     selectAll (selection) {
-      if (selection.length > 0) {
-        selection.length = 1
+      if (selection.length > 1) {
         this.selectRow = selection[0]
-      } else if (selection.length === 0) {
+        selection.length = 1
+      } else {
         this.selectRow = undefined
       }
     },
     analysisBranch () {
-      console.log(this.selectRow)
-      if (!this.selectRow || this.selectRow.length === 0) {
+      if (!this.selectRow) {
         return this.$message.error('请选择一条记录进行分析')
       }
+      if (this.selectRow.length > 1) {
+        return this.$message.error('只能选择一条记录')
+      }
+      this.authorAnalysisDialogVisible = true
+    },
+    open () {
+      this.$nextTick(() => {
+        const dom = document.getElementById('author-activities')
+        this.authorActivityChart = this.$echarts.init(dom, 'infographic')
+        this.authorActivityChart.setOption(this.authorAnalysisOptions)
+        // 监听页面尺寸变化事件, 动态修改图表尺寸
+        window.addEventListener('resize', () => {
+          this.screenWidth = window.innerWidth
+          this.screenHeight = window.innerHeight
+          const resize = {
+            width: this.screenWidth,
+            height: this.screenHeight
+          }
+          this.authorActivityChart.resize(resize)
+        })
+      })
     }
   }
 }
