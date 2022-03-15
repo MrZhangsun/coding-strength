@@ -1,5 +1,5 @@
 {
-  "name": "coding-strength",
+  "name": "coding-strength-top",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,9 +12,8 @@
     "@gitgraph/js": "^1.4.0",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
-    "default-passive-events": "^2.0.0",
     "echarts": "^5.2.2",
-    "element-ui": "^2.4.5",
+    "element-ui": "^2.15.7",
     "three": "^0.137.5",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.3",

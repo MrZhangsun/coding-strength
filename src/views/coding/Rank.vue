@@ -54,11 +54,23 @@
         ></div>
       </div>
       <div class="chart-unit">
-        <h3 class="chart-title">作者排名 TOP{{this.conditions.top + ''}}</h3>
+        <el-tooltip
+          content="排名根据权重进行排名, 具体权重:
+          1. 提交次数: 功能迭代多, 业务价值大, 权重50%;
+          2. 添加行数: 功能复杂, 权重35%;
+          3. 删除行数: 代码质量低, 权重-5%;
+          4. 影响文件数: 功能关联性强, 权重25%"
+          placement="bottom"
+          effect="light"
+        >
+
+          <h3 class="chart-title">作者排名 TOP{{this.conditions.top + ''}}</h3>
+        </el-tooltip>
         <div
           id="active-author"
           class="row-chart"
         ></div>
+
       </div>
     </div>
   </div>
@@ -301,6 +313,10 @@ export default {
         yAxis: {},
         xAxis: { type: 'category' },
         series: [
+          {
+            type: 'bar',
+            barWidth: 20
+          },
           {
             type: 'bar',
             barWidth: 20

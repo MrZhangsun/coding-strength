@@ -476,31 +476,31 @@
         <el-descriptions-item
           label="作者姓名"
           :span="2"
-        >{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.name}}</el-descriptions-item>
         <el-descriptions-item
           label="作者账号"
           :span="2"
-        >{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.account}}</el-descriptions-item>
         <el-descriptions-item
           label="作者邮箱"
           :span="4"
-        >{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.email}}</el-descriptions-item>
         <el-descriptions-item
           label="参与仓库"
           :span="2"
-        >6{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.totalRepositories.length}}</el-descriptions-item>
         <el-descriptions-item
           label="参与分支"
           :span="2"
-        >20{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.totalBranches.length}}</el-descriptions-item>
         <el-descriptions-item
           label="提交总数"
           :span="2"
-        >总共多少次, 平均水平{{authorAnalysis.name}}</el-descriptions-item>
+        >总共{{authorAnalysisResult.totalCommits}}次, 公司平均提交次数{{authorAnalysisResult.averageCommits}}</el-descriptions-item>
         <el-descriptions-item
           label="总代码量"
           :span="2"
-        >2000 rows add, 100 rows remove{{authorAnalysis.name}}</el-descriptions-item>
+        >{{authorAnalysisResult.totalAddLines}} rows add, {{authorAnalysisResult.totalRemoveLines}} rows remove</el-descriptions-item>
         <el-descriptions-item
           label="活动分布"
           :span="8"
@@ -514,10 +514,7 @@
           label="排名统计"
           :span="8"
         >
-          <el-tabs
-            type="card"
-            style="height: 200px;"
-          >
+          <el-tabs type="card">
             <el-tab-pane label="今日榜">
               <ul
                 class="infinite-list"
@@ -525,10 +522,10 @@
                 style="overflow:auto"
               >
                 <li
-                  v-for="i in count"
-                  :key="i"
+                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
+                  :key="index"
                   class="infinite-list-item"
-                >{{ i }}</li>
+                >第{{index + 1}}名: {{ rank.account }}</li>
               </ul>
             </el-tab-pane>
             <el-tab-pane label="本周榜">本周排行</el-tab-pane>
@@ -545,16 +542,22 @@
 import {
   queryByConditions,
   queryById as queryAuthorById,
-  linkUser
+  linkUser,
+  authorAnalysis
 } from '../../../api/coding/author'
 import { queryByConditions as queryUsers } from '../../../api/system/user'
 import { queryAll } from '../../../api/coding/repository'
 import { queryByRepositoryId } from '../../../api/coding/branch'
-
+import moment from 'moment'
+let authorActivityChart
 export default {
   created () {
     this.getRepositoryList()
     this.getAuthorList()
+  },
+  destroyed () {
+    // 销毁组建,防止内存泄漏
+    authorActivityChart.dispose()
   },
   data () {
     return {
@@ -599,10 +602,12 @@ export default {
       branches: [],
       brancheCopy: [],
       selectRow: undefined,
-      authorAnalysis: {
-        name: ''
+      authorAnalysisResult: {
+        name: '',
+        totalBranches: [],
+        totalRepositories: []
+
       },
-      authorActivityChart: {},
       authorAnalysisOptions: {
         legend: {
           type: 'scroll',
@@ -620,18 +625,12 @@ export default {
         },
         dataset: {
           source: [
-            ['作者', '提交总数', '添加行数', '移除行数', '代码行数', '影响文件'],
-            ['里斯', 1, 10, 20, 10, 10],
-            ['里斯', 1, 10, 20, 10, 10]
+            ['提交时间', '添加行', '移除行', '影响文件']
           ]
         },
         yAxis: {},
         xAxis: { type: 'category' },
         series: [
-          {
-            type: 'bar',
-            barWidth: 20
-          },
           {
             type: 'bar',
             barWidth: 20
@@ -906,13 +905,46 @@ export default {
       if (this.selectRow.length > 1) {
         return this.$message.error('只能选择一条记录')
       }
-      this.authorAnalysisDialogVisible = true
+
+      const conditions = {
+        account: this.selectRow.account,
+        email: this.selectRow.email,
+        startTime: '2022-01-01 00:00:00',
+        endTime: '2022-03-15 00:00:00'
+      }
+      authorAnalysis(conditions)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.authorAnalysisResult = res.data
+          this.authorAnalysisDialogVisible = true
+          this.authorAnalysisResult.name = this.selectRow.name
+
+          // 清空上次的结果
+          const length = this.authorAnalysisOptions.dataset.source.length
+          if (length > 1) {
+            this.authorAnalysisOptions.dataset.source.splice(1, length - 1)
+          }
+
+          res.data.activities.forEach(element => {
+            const commit = []
+            const commitTimeStr = moment(element.commitTime).format('YYYY-MM-DD hh:mm:ss')
+            commit[0] = commitTimeStr
+            commit[1] = element.addLines
+            commit[2] = element.removeLines
+            commit[3] = element.commitFiles
+            this.authorAnalysisOptions.dataset.source.push(commit)
+          })
+          // 从新绘制图表
+          authorActivityChart.setOption(this.authorAnalysisOptions)
+        })
     },
     open () {
       this.$nextTick(() => {
         const dom = document.getElementById('author-activities')
-        this.authorActivityChart = this.$echarts.init(dom, 'infographic')
-        this.authorActivityChart.setOption(this.authorAnalysisOptions)
+        authorActivityChart = this.$echarts.init(dom, 'infographic')
+        authorActivityChart.setOption(this.authorAnalysisOptions)
         // 监听页面尺寸变化事件, 动态修改图表尺寸
         window.addEventListener('resize', () => {
           this.screenWidth = window.innerWidth
@@ -921,7 +953,7 @@ export default {
             width: this.screenWidth,
             height: this.screenHeight
           }
-          this.authorActivityChart.resize(resize)
+          authorActivityChart.resize(resize)
         })
       })
     }
@@ -934,5 +966,20 @@ export default {
 }
 .row-search {
   padding-bottom: 12px;
+}
+.infinite-list {
+  overflow: auto;
+  height: 300px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  .infinite-list-item {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    background: #e8f3fe;
+    margin: 10px;
+    color: #7dbcfc;
+  }
 }
 </style>

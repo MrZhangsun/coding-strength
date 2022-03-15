@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import 'default-passive-events'
 import App from './App.vue'
 import router from './router'
 import './plugins/element'
@@ -13,8 +12,8 @@ import { Loading } from 'element-ui'
 import * as echarts from 'echarts'
 import moment from 'moment'
 import baseURL from './config/baseUrl'
-
 import infiniteScroll from 'vue-infinite-scroll'
+
 Vue.use(infiniteScroll)
 
 /**

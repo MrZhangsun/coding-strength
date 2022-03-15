@@ -44,3 +44,18 @@ export function linkUser (link) {
       })
   })
 }
+
+/**
+ * 作者分析
+ * @param {Object}} conditions 分析条件
+ */
+export function authorAnalysis (conditions) {
+  return new Promise((resolve, reject) => {
+    axios.get('/coding/rank/author/analysis', { params: conditions })
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}
