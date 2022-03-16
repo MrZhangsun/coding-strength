@@ -164,18 +164,30 @@
           align="center"
         >
           <template slot-scope="scope">
-            <span
-              v-if="scope.row.collectStatus === 1"
-              style="color: blue"
-            >运行中</span>
-            <span
-              v-else-if="scope.row.collectStatus === 0"
-              style="color: green"
-            >已完成</span>
-            <span
-              v-else
-              style="color: red"
-            >解析失败</span>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              :content="scope.row.message"
+              placement="left"
+            >
+
+              <span
+                v-if="scope.row.collectStatus === 1"
+                style="color: blue"
+              >运行中</span>
+              <span
+                v-else-if="scope.row.collectStatus === 0"
+                style="color: green"
+              >已完成</span>
+              <span
+                v-else-if="scope.row.collectStatus === 2"
+                style="color: red"
+              >解析失败</span>
+              <span
+                v-else
+                style="color: red"
+              >错误类型</span>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
