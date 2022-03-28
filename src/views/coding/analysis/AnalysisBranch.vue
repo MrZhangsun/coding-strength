@@ -78,33 +78,17 @@
         <el-col :span="3">
           <el-button
             type="primary"
+            size="medium"
             icon="el-icon-search"
             @click="getBranchList"
           >搜索</el-button>
         </el-col>
         <el-col :span="3">
           <el-button
+            size="medium"
             type="primary"
             @click="toRankPage"
           >分支排名</el-button>
-        </el-col>
-      </el-row>
-      <!-- 分析区 -->
-      <el-row
-        :gutter="20"
-        class="row-analysis"
-      >
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >本库分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >全库分析</el-button>
         </el-col>
       </el-row>
       <!-- 列表区 -->

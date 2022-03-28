@@ -56,6 +56,7 @@
         <el-col :span="3">
           <el-button
             type="primary"
+            size="medium"
             icon="el-icon-search"
             @click="getRepositoryList"
           >搜索</el-button>
@@ -63,6 +64,7 @@
         <el-col :span="3">
           <el-button
             type="primary"
+            size="medium"
             @click="toRankPage"
           >仓库排名</el-button>
         </el-col>

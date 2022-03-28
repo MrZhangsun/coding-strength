@@ -73,43 +73,28 @@
           >
           </el-date-picker>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="2">
           <el-button
             type="primary"
+            size="medium"
             icon="el-icon-search"
             @click="getAuthorList"
           >搜索</el-button>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="2">
           <el-button
             type="primary"
+            size="medium"
             @click="toRankPage"
           >作者排名</el-button>
         </el-col>
-      </el-row>
-      <!-- 分析区 -->
-      <el-row
-        :gutter="20"
-        class="row-analysis"
-      >
-        <el-col :span="3">
+        <el-col :span="2">
           <el-button
             type="primary"
+            size="medium"
             icon="el-icon-analysis"
             @click="analysisBranch"
-          >分支分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >本库分析</el-button>
-        </el-col>
-        <el-col :span="3">
-          <el-button
-            type="primary"
-            icon="el-icon-analysis"
-          >全库分析</el-button>
+          >作者分析</el-button>
         </el-col>
       </el-row>
       <!-- 列表区 -->
@@ -535,6 +520,16 @@
           </el-tabs>
         </el-descriptions-item>
       </el-descriptions>
+      <!-- 按钮 -->
+      <span
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button
+          type="danger"
+          @click="authorAnalysisDialogVisible = false"
+        >返回</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -898,6 +893,9 @@ export default {
         this.selectRow = undefined
       }
     },
+    /**
+     * 作者分析
+     */
     analysisBranch () {
       if (!this.selectRow) {
         return this.$message.error('请选择一条记录进行分析')
