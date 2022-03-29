@@ -499,12 +499,17 @@
           label="排名统计"
           :span="8"
         >
-          <el-tabs type="card">
+          <el-tabs
+            type="card"
+            @tab-click="switchTab"
+            v-model="currentTab"
+          >
             <el-tab-pane label="今日榜">
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
                 style="overflow:auto"
+                v-if="authorAnalysisResult.authorRanks.length !== 0"
               >
                 <li
                   v-for="(rank, index) in authorAnalysisResult.authorRanks"
@@ -512,11 +517,78 @@
                   class="infinite-list-item"
                 >第{{index + 1}}名: {{ rank.account }}</li>
               </ul>
+              <span v-else>
+                暂无数据
+              </span>
             </el-tab-pane>
-            <el-tab-pane label="本周榜">本周排行</el-tab-pane>
-            <el-tab-pane label="本月榜">本月排行</el-tab-pane>
-            <el-tab-pane label="本季榜">本季排行</el-tab-pane>
-            <el-tab-pane label="历史榜">本季排行</el-tab-pane>
+            <el-tab-pane label="本周榜">
+              <ul
+                class="infinite-list"
+                v-infinite-scroll="load"
+                style="overflow:auto"
+                v-if="authorAnalysisResult.authorRanks.length !== 0"
+              >
+                <li
+                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
+                  :key="index"
+                  class="infinite-list-item"
+                >第{{index + 1}}名: {{ rank.account }}</li>
+              </ul>
+              <span v-else>
+                暂无数据
+              </span>
+            </el-tab-pane>
+            <el-tab-pane label="本月榜">
+              <ul
+                class="infinite-list"
+                v-infinite-scroll="load"
+                style="overflow:auto"
+                v-if="authorAnalysisResult.authorRanks.length !== 0"
+              >
+                <li
+                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
+                  :key="index"
+                  class="infinite-list-item"
+                >第{{index + 1}}名: {{ rank.account }}</li>
+              </ul>
+              <span v-else>
+                暂无数据
+              </span>
+            </el-tab-pane>
+            <el-tab-pane label="本季榜">
+              <ul
+                class="infinite-list"
+                v-infinite-scroll="load"
+                style="overflow:auto"
+                v-if="authorAnalysisResult.authorRanks.length !== 0"
+              >
+                <li
+                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
+                  :key="index"
+                  class="infinite-list-item"
+                >第{{index + 1}}名: {{ rank.account }}</li>
+              </ul>
+              <span v-else>
+                暂无数据
+              </span>
+            </el-tab-pane>
+            <el-tab-pane label="历史榜">
+              <ul
+                class="infinite-list"
+                v-infinite-scroll="load"
+                style="overflow:auto"
+                v-if="authorAnalysisResult.authorRanks.length !== 0"
+              >
+                <li
+                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
+                  :key="index"
+                  class="infinite-list-item"
+                >第{{index + 1}}名: {{ rank.account }}</li>
+              </ul>
+              <span v-else>
+                暂无数据
+              </span>
+            </el-tab-pane>
           </el-tabs>
         </el-descriptions-item>
       </el-descriptions>
@@ -527,7 +599,7 @@
       >
         <el-button
           type="danger"
-          @click="authorAnalysisDialogVisible = false"
+          @click="onCloseAuthorAnalysis"
         >返回</el-button>
       </span>
     </el-dialog>
@@ -544,15 +616,12 @@ import { queryByConditions as queryUsers } from '../../../api/system/user'
 import { queryAll } from '../../../api/coding/repository'
 import { queryByRepositoryId } from '../../../api/coding/branch'
 import moment from 'moment'
+import { getDateRange } from '../../../utils/date'
 let authorActivityChart
 export default {
   created () {
     this.getRepositoryList()
     this.getAuthorList()
-  },
-  destroyed () {
-    // 销毁组建,防止内存泄漏
-    authorActivityChart.dispose()
   },
   data () {
     return {
@@ -600,7 +669,8 @@ export default {
       authorAnalysisResult: {
         name: '',
         totalBranches: [],
-        totalRepositories: []
+        totalRepositories: [],
+        authorRanks: []
 
       },
       authorAnalysisOptions: {
@@ -650,7 +720,10 @@ export default {
         ]
       },
       count: 10,
-      loading: false
+      loading: false,
+      currentTab: 0,
+      tabStatisticStartTime: '',
+      tabStatisticEndTime: ''
     }
   },
   computed: {
@@ -903,12 +976,19 @@ export default {
       if (this.selectRow.length > 1) {
         return this.$message.error('只能选择一条记录')
       }
-
+      const today = getDateRange(new Date(), 0, true)
+      const todayStart = today[0]
+      const todayEnd = today[1]
+      this.tabStatisticStartTime = todayStart + ' 00:00:00'
+      this.tabStatisticEndTime = todayEnd + ' 23:59:59'
+      this.queryAuthorAnalysis()
+    },
+    queryAuthorAnalysis () {
       const conditions = {
         account: this.selectRow.account,
         email: this.selectRow.email,
-        startTime: '2022-01-01 00:00:00',
-        endTime: '2022-03-15 00:00:00'
+        startTime: this.tabStatisticStartTime,
+        endTime: this.tabStatisticEndTime
       }
       authorAnalysis(conditions)
         .then(res => {
@@ -954,6 +1034,54 @@ export default {
           authorActivityChart.resize(resize)
         })
       })
+    },
+    onCloseAuthorAnalysis () {
+      this.authorAnalysisDialogVisible = false
+      // 销毁组建,防止内存泄漏
+      authorActivityChart.dispose()
+    },
+    /**
+     * 排行榜切换
+     */
+    switchTab () {
+      const now = new Date()
+      // 获取今天的日期
+      if (this.currentTab === '0') {
+        const today = getDateRange(now, 0, true)
+        const todayStart = today[0]
+        const todayEnd = today[1]
+        this.tabStatisticStartTime = todayStart + ' 00:00:00'
+        this.tabStatisticEndTime = todayEnd + ' 23:59:59'
+        this.queryAuthorAnalysis()
+      } else if (this.currentTab === '1') {
+        // 获取本周
+        const curWeek = getDateRange(now, 7, true)
+        const curWeekStart = curWeek[0]
+        const curWeekEnd = curWeek[1]
+        this.tabStatisticStartTime = curWeekStart + ' 00:00:00'
+        this.tabStatisticEndTime = curWeekEnd + ' 23:59:59'
+        this.queryAuthorAnalysis()
+      } else if (this.currentTab === '2') {
+        // 获取本月
+        const curMonth = getDateRange(now, 30, true)
+        const curMonthStart = curMonth[0]
+        const curMonthEnd = curMonth[1]
+        this.tabStatisticStartTime = curMonthStart + ' 00:00:00'
+        this.tabStatisticEndTime = curMonthEnd + ' 23:59:59'
+        this.queryAuthorAnalysis()
+      } else if (this.currentTab === '3') {
+        // 获取本季度
+        const curQuarter = getDateRange(now, 90, true)
+        const curQuarterStart = curQuarter[0]
+        const curQuarterEnd = curQuarter[1]
+        this.tabStatisticStartTime = curQuarterStart + ' 00:00:00'
+        this.tabStatisticEndTime = curQuarterEnd + ' 23:59:59'
+        this.queryAuthorAnalysis()
+      } else {
+        // 获取历史
+        this.tabStatisticStartTime = ''
+        this.tabStatisticEndTime = ''
+      }
     }
   }
 }
