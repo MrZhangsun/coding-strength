@@ -473,11 +473,63 @@
         <el-descriptions-item
           label="参与仓库"
           :span="2"
-        >{{authorAnalysisResult.totalRepositories.length}}</el-descriptions-item>
+        >
+          <el-popover
+            placement="right"
+            title="仓库列表"
+            trigger="hover"
+            width="300px"
+          >
+            <el-table :data="authorAnalysisResult.totalRepositories">
+              <el-table-column
+                property="id"
+                label="ID"
+              ></el-table-column>
+              <el-table-column
+                property="name"
+                label="仓库名称"
+              ></el-table-column>
+              <el-table-column
+                property="url"
+                label="仓库地址"
+              ></el-table-column>
+            </el-table>
+            <span
+              slot="reference"
+              style="color:blue"
+            >{{authorAnalysisResult.totalRepositories.length}}</span>
+          </el-popover>
+        </el-descriptions-item>
         <el-descriptions-item
           label="参与分支"
           :span="2"
-        >{{authorAnalysisResult.totalBranches.length}}</el-descriptions-item>
+        >
+          <el-popover
+            placement="right"
+            title="仓库列表"
+            trigger="hover"
+            width="300px"
+          >
+            <el-table :data="authorAnalysisResult.totalBranches">
+              <el-table-column
+                property="id"
+                label="ID"
+              ></el-table-column>
+              <el-table-column
+                property="name"
+                label="仓库名称"
+              ></el-table-column>
+              <el-table-column
+                property="url"
+                label="仓库地址"
+              ></el-table-column>
+            </el-table>
+            <span
+              slot="reference"
+              style="color:blue"
+            >{{authorAnalysisResult.totalBranches.length}}</span>
+          </el-popover>
+        </el-descriptions-item>
         <el-descriptions-item
           label="提交总数"
           :span="2"
@@ -573,20 +625,8 @@
               </span>
             </el-tab-pane>
             <el-tab-pane label="历史榜">
-              <ul
-                class="infinite-list"
-                v-infinite-scroll="load"
-                style="overflow:auto"
-                v-if="authorAnalysisResult.authorRanks.length !== 0"
-              >
-                <li
-                  v-for="(rank, index) in authorAnalysisResult.authorRanks"
-                  :key="index"
-                  class="infinite-list-item"
-                >第{{index + 1}}名: {{ rank.account }}</li>
-              </ul>
-              <span v-else>
-                暂无数据
+              <span>
+                开发中...
               </span>
             </el-tab-pane>
           </el-tabs>
