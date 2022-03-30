@@ -197,7 +197,7 @@
                 <svg
                   class="icon"
                   aria-hidden="true"
-                  v-if="scope.row.collectStatus === 0"
+                  v-if="scope.row.collectStatus !== 1"
                 >
                   <use xlink:href="#icon-tongbu1"></use>
                 </svg>
