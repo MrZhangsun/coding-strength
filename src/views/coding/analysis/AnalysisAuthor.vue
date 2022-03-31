@@ -557,6 +557,7 @@
             v-model="currentTab"
           >
             <el-tab-pane label="今日榜">
+
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
@@ -567,7 +568,7 @@
                   v-for="(rank, index) in authorAnalysisResult.authorRanks"
                   :key="index"
                   class="infinite-list-item"
-                >第{{index + 1}}名: {{ rank.account }}</li>
+                >第{{index + 1}}名: {{ rank.account }} (提交总数: {{rank.totalCommits}}, 添加行数: {{rank.totalAddLines}}, 删除行数: {{rank.totalRemoveLines}}, 有效行数: {{rank.totalSaveLines}})</li>
               </ul>
               <span v-else>
                 暂无数据
@@ -584,7 +585,7 @@
                   v-for="(rank, index) in authorAnalysisResult.authorRanks"
                   :key="index"
                   class="infinite-list-item"
-                >第{{index + 1}}名: {{ rank.account }}</li>
+                >第{{index + 1}}名: {{ rank.account }} (提交总数: {{rank.totalCommits}}, 添加行数: {{rank.totalAddLines}}, 删除行数: {{rank.totalRemoveLines}}, 有效行数: {{rank.totalSaveLines}})</li>
               </ul>
               <span v-else>
                 暂无数据
@@ -601,7 +602,7 @@
                   v-for="(rank, index) in authorAnalysisResult.authorRanks"
                   :key="index"
                   class="infinite-list-item"
-                >第{{index + 1}}名: {{ rank.account }}</li>
+                >第{{index + 1}}名: {{ rank.account }} (提交总数: {{rank.totalCommits}}, 添加行数: {{rank.totalAddLines}}, 删除行数: {{rank.totalRemoveLines}}, 有效行数: {{rank.totalSaveLines}})</li>
               </ul>
               <span v-else>
                 暂无数据
@@ -618,7 +619,7 @@
                   v-for="(rank, index) in authorAnalysisResult.authorRanks"
                   :key="index"
                   class="infinite-list-item"
-                >第{{index + 1}}名: {{ rank.account }}</li>
+                >第{{index + 1}}名: {{ rank.account }} (提交总数: {{rank.totalCommits}}, 添加行数: {{rank.totalAddLines}}, 删除行数: {{rank.totalRemoveLines}}, 有效行数: {{rank.totalSaveLines}})</li>
               </ul>
               <span v-else>
                 暂无数据
