@@ -557,7 +557,9 @@
             v-model="currentTab"
           >
             <el-tab-pane label="今日榜">
-
+              <span style="color: red; padding-left:10px">
+                我的排名: {{ myRank.rank }} (提交总数: {{myRank.totalCommits}}, 添加行数: {{myRank.totalAddLines}}, 删除行数: {{myRank.totalRemoveLines}}, 有效行数: {{myRank.totalSaveLines}})
+              </span>
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
@@ -575,6 +577,9 @@
               </span>
             </el-tab-pane>
             <el-tab-pane label="本周榜">
+              <span style="color: red; padding-left:10px">
+                我的排名: {{ myRank.rank }} (提交总数: {{myRank.totalCommits}}, 添加行数: {{myRank.totalAddLines}}, 删除行数: {{myRank.totalRemoveLines}}, 有效行数: {{myRank.totalSaveLines}})
+              </span>
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
@@ -592,6 +597,9 @@
               </span>
             </el-tab-pane>
             <el-tab-pane label="本月榜">
+              <span style="color: red; padding-left:10px">
+                我的排名: {{ myRank.rank }} (提交总数: {{myRank.totalCommits}}, 添加行数: {{myRank.totalAddLines}}, 删除行数: {{myRank.totalRemoveLines}}, 有效行数: {{myRank.totalSaveLines}})
+              </span>
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
@@ -609,6 +617,9 @@
               </span>
             </el-tab-pane>
             <el-tab-pane label="本季榜">
+              <span style="color: red; padding-left:10px">
+                我的排名: {{ myRank.rank }} (提交总数: {{myRank.totalCommits}}, 添加行数: {{myRank.totalAddLines}}, 删除行数: {{myRank.totalRemoveLines}}, 有效行数: {{myRank.totalSaveLines}})
+              </span>
               <ul
                 class="infinite-list"
                 v-infinite-scroll="load"
@@ -764,7 +775,14 @@ export default {
       loading: false,
       currentTab: 0,
       tabStatisticStartTime: '',
-      tabStatisticEndTime: ''
+      tabStatisticEndTime: '',
+      myRank: {
+        rank: 0,
+        totalCommits: 0,
+        totalAddLines: 0,
+        totalRemoveLines: 0,
+        totalSaveLines: 0
+      }
     }
   },
   computed: {
@@ -1039,6 +1057,25 @@ export default {
           this.authorAnalysisResult = res.data
           this.authorAnalysisDialogVisible = true
           this.authorAnalysisResult.name = this.selectRow.name
+
+          // 统计当前作者排名
+          this.myRank = {
+            rank: 0,
+            totalCommits: 0,
+            totalAddLines: 0,
+            totalRemoveLines: 0,
+            totalSaveLines: 0
+          }
+          const authorRanks = this.authorAnalysisResult.authorRanks
+          if (authorRanks !== undefined && authorRanks.length > 0) {
+            for (let i = 0; i < authorRanks.length; i++) {
+              const rank = authorRanks[i]
+              if (this.selectRow.account === rank.account && this.selectRow.email === rank.email) {
+                this.myRank = rank
+                this.myRank.rank = i + 1
+              }
+            }
+          }
 
           // 清空上次的结果
           const length = this.authorAnalysisOptions.dataset.source.length
