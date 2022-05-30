@@ -21,6 +21,8 @@ import Feedback from '../views/release/Feedback'
 import History from '../views/release/History'
 import Investigation from '../views/release/Investigation'
 import Statistic from '../views/performance/Statistic'
+import TeahShare from '../views/performance/statistic/TeahShare'
+import CommunityContribution from '../views/performance/statistic/CommunityContribution'
 import Indicator from '../views/performance/Indicator'
 import PerformanceReporter from '../views/performance/PerformanceReporter'
 import Search from '../views/terminology/Search'
@@ -145,7 +147,19 @@ const routes = [
       {
         name: '绩效统计',
         path: 'statistic',
-        component: Statistic
+        component: Statistic,
+        children: [
+          {
+            name: '技术分享',
+            path: 'sharing',
+            component: TeahShare
+          },
+          {
+            name: '社区贡献',
+            path: 'community',
+            component: CommunityContribution
+          }
+        ]
       },
       {
         name: '绩效报告',

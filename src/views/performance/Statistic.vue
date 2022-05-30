@@ -1,18 +1,4 @@
 <template>
-  <div>
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>绩效管理</el-breadcrumb-item>
-      <el-breadcrumb-item>绩效统计</el-breadcrumb-item>
-    </el-breadcrumb>
-
-    <h3>
-      <el-button icon="el-icon-loading">绩效统计规划中</el-button>
-    </h3>
-  </div>
+  <!-- 统计分析页面 -->
+  <router-view></router-view>
 </template>
-<script>
-export default {
-
-}
-</script>

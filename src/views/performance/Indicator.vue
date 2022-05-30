@@ -16,6 +16,8 @@
       <li>请假时长</li>
       <li>加班时长</li>
       <li>工时饱和度</li>
+      <li>技术分享</li>
+      <li>社区贡献</li>
     </ul>
   </div>
 </template>
