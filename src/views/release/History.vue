@@ -214,7 +214,7 @@
           prop="projectName"
         >
           <el-input
-            placeholder="eg: 刊登系统"
+            placeholder="请输入系统名称, eg: 刊登系统"
             v-model="addHistoryForm.projectName"
           ></el-input>
         </el-form-item>
@@ -223,7 +223,7 @@
           prop="projectCode"
         >
           <el-input
-            placeholder="eg: PRM"
+            placeholder="请输入项目三字码, eg: PRM"
             v-model="addHistoryForm.projectCode"
           ></el-input>
         </el-form-item>
@@ -232,7 +232,7 @@
           prop="sprint"
         >
           <el-input
-            placeholder="eg: 1.1.0"
+            placeholder="请输入版本号, eg: 1.1.0"
             v-model="addHistoryForm.sprint"
           ></el-input>
         </el-form-item>
@@ -241,7 +241,7 @@
           prop="businessOwner"
         >
           <el-input
-            placeholder="eg: 花花,草草"
+            placeholder="请输入业务方姓名"
             v-model="addHistoryForm.businessOwner"
           ></el-input>
         </el-form-item>
@@ -250,7 +250,7 @@
           prop="productManager"
         >
           <el-input
-            placeholder="eg: 花花"
+            placeholder="请输入产品经理姓名"
             v-model="addHistoryForm.productManager"
           ></el-input>
         </el-form-item>
@@ -259,7 +259,7 @@
           prop="developerManager"
         >
           <el-input
-            placeholder="eg: 花花"
+            placeholder="请输入开发经理姓名"
             v-model="addHistoryForm.developerManager"
           ></el-input>
         </el-form-item>

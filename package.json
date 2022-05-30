@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@gitgraph/js": "^1.4.0",
+    "@tinymce/tinymce-vue": "^5.0.0",
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
     "echarts": "^5.2.2",
     "element-ui": "^2.15.7",
     "three": "^0.137.5",
+    "tinymce": "^6.0.2",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.3",
     "vue-infinite-scroll": "^2.0.2",

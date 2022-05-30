@@ -23,6 +23,7 @@ import Investigation from '../views/release/Investigation'
 import Statistic from '../views/performance/Statistic'
 import Indicator from '../views/performance/Indicator'
 import PerformanceReporter from '../views/performance/PerformanceReporter'
+import Search from '../views/terminology/Search'
 
 Vue.use(VueRouter)
 
@@ -150,6 +151,18 @@ const routes = [
         name: '绩效报告',
         path: 'reporter',
         component: PerformanceReporter
+      }
+    ]
+  },
+  {
+    name: '业务术语',
+    path: '/terminology',
+    component: Home,
+    children: [
+      {
+        name: '名词检索',
+        path: 'search',
+        component: Search
       }
     ]
   },
