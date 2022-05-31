@@ -496,7 +496,7 @@
           <el-date-picker
             v-model="dateTimePicker"
             type="datetimerange"
-            range-separator="To"
+            range-separator="至"
             start-placeholder="开始时间"
             end-placeholder="上线时间"
             format="yyyy-MM-dd"
