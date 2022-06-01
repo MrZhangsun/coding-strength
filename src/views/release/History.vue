@@ -350,7 +350,7 @@
             <el-option
               v-for="item in investigationOptions"
               :key="item.id"
-              :label="item.description"
+              :label="item.name"
               :value="item.id"
             >
             </el-option>
@@ -536,7 +536,7 @@
             <el-option
               v-for="item in investigationOptions"
               :key="item.id"
-              :label="item.description"
+              :label="item.name"
               :value="item.id"
             >
             </el-option>

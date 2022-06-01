@@ -222,7 +222,7 @@
       </el-pagination>
       <!-- 添加对话框 -->
       <el-dialog
-        title="新增发布历史"
+        title="新增技术分享"
         :visible.sync="addSharingDialogVisible"
         width="50%"
         :before-close="handleClose"
@@ -374,7 +374,7 @@
                   <el-option
                     v-for="item in investigationOptions"
                     :key="item.id"
-                    :label="item.description"
+                    :label="item.name"
                     :value="item.id"
                   >
                   </el-option>
@@ -558,7 +558,7 @@
                   <el-option
                     v-for="item in investigationOptions"
                     :key="item.id"
-                    :label="item.description"
+                    :label="item.name"
                     :value="item.id"
                   >
                   </el-option>
@@ -685,6 +685,24 @@
               disabled
             ></el-switch>
           </el-descriptions-item>
+          <el-descriptions-item
+            label="反馈列表"
+            :span="4"
+          >
+            <el-select
+              placeholder="查看报告"
+              @change="showFeedbackDialog(selectedInvestId)"
+              v-model="selectedInvestId"
+            >
+              <el-option
+                v-for="item in investigationIds"
+                :key="item"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </el-descriptions-item>
         </el-descriptions>
         <!-- 按钮 -->
         <span
@@ -694,6 +712,44 @@
           <el-button
             type="danger"
             @click="sharingDetailDialogVisible = false"
+          >返回</el-button>
+        </span>
+      </el-dialog>
+      <!-- 问卷显示对话框 -->
+      <el-dialog
+        ref="accountDetailDialogRef"
+        :visible.sync="investDialogVisible"
+        width="45%"
+        title="调查问卷报告"
+      >
+        <ul
+          class="questionList"
+          v-for="(item, index) in investQuestions"
+          :key="index"
+        >
+          <li
+            :key="item.key.id"
+            style="text-align:left"
+          >
+            问题{{index + 1}}: {{ item.key.label }}
+          </li>
+
+          <li
+            v-for="val in item.value"
+            :key="val.index"
+            style="text-align:left"
+          >
+            答案{{index + 1}}: {{ val.label }}
+          </li>
+        </ul>
+        <!-- 按钮 -->
+        <span
+          slot="footer"
+          class="dialog-footer"
+        >
+          <el-button
+            type="danger"
+            @click="investDialogVisible = false"
           >返回</el-button>
         </span>
       </el-dialog>
@@ -714,9 +770,10 @@ import {
   queryInvestigationById
 } from '../../../api/release/investigation'
 import {
-  queryFeedbackUrl
+  queryFeedbackUrl,
+  queryInvestigation,
+  queryObjectFeedbacks
 } from '../../../api/release/feedback'
-
 export default {
   created () {
     this.getSharingList()
@@ -751,12 +808,15 @@ export default {
         startTime: '',
         endTime: ''
       },
+      selectedInvestId: '',
+      investigationIds: [],
       queryDateTimePicker: [],
       addDateTimePicker: [],
       editDateTimePicker: [],
       addSharingDialogVisible: false,
       editSharingDialogVisible: false,
       sharingDetailDialogVisible: false,
+      investDialogVisible: false,
       sharingList: [],
       addSharingForm: {},
       editSharingForm: {},
@@ -964,27 +1024,35 @@ export default {
     // 分享详情
     showDetailDialog (sharingId) {
       // 查询详情
-      querySharingById(sharingId).then(res => {
-        if (res.code !== 200) {
-          return new Error('查询发布历史详情失败')
-        }
-        this.detailSharingForm = res.data
-        // 判断是否已经绑定报告
-        const investigationId = res.data.investigationId
-        if (investigationId != null) {
-          queryInvestigationById(investigationId)
-            .then(res => {
-              if (res.code !== 200) {
-                this.detailSharingForm.investigationName = '未绑定'
-              } else {
-                this.detailSharingForm.investigationName = res.data.name
-              }
+      querySharingById(sharingId)
+        .then(res => {
+          if (res.code !== 200) {
+            return new Error('查询发布历史详情失败')
+          }
+          this.detailSharingForm = res.data
+          // 判断是否已经绑定报告
+          const investigationId = res.data.investigationId
+          if (investigationId != null) {
+            queryInvestigationById(investigationId)
+              .then(res => {
+                if (res.code !== 200) {
+                  this.detailSharingForm.investigationName = '未绑定'
+                } else {
+                  this.detailSharingForm.investigationName = res.data.name
+                }
 
-              // 显示详情对话框
-              this.sharingDetailDialogVisible = true
-            })
-        }
-      })
+                // 显示详情对话框
+                this.sharingDetailDialogVisible = true
+              })
+          }
+        })
+      queryObjectFeedbacks('sharing', sharingId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          this.investigationIds = res.data
+        })
     },
     // 编辑提交
     submitEditSharingRequest () {
@@ -1048,7 +1116,54 @@ export default {
               return this.$message.error(error)
             })
         })
+    },
+    /**
+    * 查询调查报告详情
+    * @param 调查报告
+    */
+    showFeedbackDialog (selectedInvestId) {
+      if (!selectedInvestId) {
+        return
+      }
+      queryInvestigation(selectedInvestId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.investQuestions = res.data
+          this.investDialogVisible = true
+        })
     }
   }
 }
 </script>
+<style lang="less" scoped>
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409eff;
+}
+.el-icon-arrow-down {
+  font-size: 12px;
+}
+.questionList {
+  margin: 0;
+  padding: 0;
+  li {
+    height: 30px;
+    list-style: none;
+  }
+  li + li {
+    border-top: none;
+  }
+  li:first-child {
+    border-radius: 4px 4px 0 0;
+    background-color: #d0f5e7d5;
+  }
+  li:last-child {
+    border-radius: 0 0 4px 4px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dcdfe6;
+  }
+}
+</style>
