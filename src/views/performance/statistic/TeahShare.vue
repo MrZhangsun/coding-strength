@@ -143,6 +143,11 @@
           </template>
         </el-table-column>
         <el-table-column
+          prop="score"
+          label="分享积分"
+          align="center"
+        />
+        <el-table-column
           prop="sharingType"
           label="分享类型"
           align="center"
@@ -469,38 +474,6 @@
             </el-col>
             <el-col :span="12">
               <el-form-item
-                label="分享范围"
-                prop="sharingLevel"
-              >
-                <el-select
-                  v-model="editSharingForm.sharingLevel"
-                  filterable
-                  clearable
-                  placeholder="请选择分享范围"
-                >
-                  <el-option
-                    :key="1"
-                    label="公司级"
-                    :value="1"
-                  >
-                  </el-option>
-                  <el-option
-                    :key="2"
-                    label="部门级"
-                    :value="2"
-                  >
-                  </el-option>
-                  <el-option
-                    :key="3"
-                    label="团队级"
-                    :value="3"
-                  >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12">
-              <el-form-item
                 label="分享者"
                 prop="teacher"
               >
@@ -595,7 +568,7 @@
       >
         <el-descriptions
           class="margin-top"
-          title="发布历史详情"
+          title="技术分享详情"
           :column="4"
           direction="horizontals"
           border
@@ -686,8 +659,12 @@
             ></el-switch>
           </el-descriptions-item>
           <el-descriptions-item
+            label="评分统计"
+            :span="2"
+          >{{detailSharingForm.updatedBy}}</el-descriptions-item>
+          <el-descriptions-item
             label="反馈列表"
-            :span="4"
+            :span="2"
           >
             <el-select
               placeholder="查看报告"
@@ -809,6 +786,7 @@ export default {
         endTime: ''
       },
       selectedInvestId: '',
+      investQuestions: [],
       investigationIds: [],
       queryDateTimePicker: [],
       addDateTimePicker: [],
@@ -1027,7 +1005,7 @@ export default {
       querySharingById(sharingId)
         .then(res => {
           if (res.code !== 200) {
-            return new Error('查询发布历史详情失败')
+            return new Error('查询技术分享详情失败')
           }
           this.detailSharingForm = res.data
           // 判断是否已经绑定报告
