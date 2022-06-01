@@ -710,12 +710,12 @@ import {
   deleteHistoryById,
   addHistory,
   editHistory,
-  queryByConditions
+  queryByConditions,
+  checkInvestBinding
 } from '../../api/release/history'
 
 import {
-  queryFeedbackUrl,
-  checkInvestBinding
+  queryFeedbackUrl
 } from '../../api/release/feedback'
 
 import {
@@ -1022,7 +1022,7 @@ export default {
      */
     theQueryFeedbackUrl (releaseId, defaultInvest) {
       // 2. 是否采用默认链接
-      queryFeedbackUrl(releaseId, defaultInvest)
+      queryFeedbackUrl('release', releaseId, defaultInvest)
         .then(res => {
           if (res.code !== 200) {
             return this.$message.error(res.message)

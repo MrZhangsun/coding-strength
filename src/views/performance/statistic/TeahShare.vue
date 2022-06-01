@@ -101,7 +101,7 @@
           >
           </el-date-picker>
         </el-col>
-        <el-col :span="2">
+        <el-col :span="6">
           <el-button
             type="primary"
             icon="el-icon-edit"
@@ -195,7 +195,7 @@
             </el-tooltip>
             <el-tooltip
               effect="dark"
-              content="生成反馈链接"
+              content="复制反馈链接"
               :enterable="false"
               placement="top"
             >
@@ -615,11 +615,11 @@
           <el-descriptions-item
             label="分享范围"
             :span="2"
-          >{{detailSharingForm.sharingLevel}}</el-descriptions-item>
+          >{{detailSharingForm.sharingLevel === 1 ? '公司级' : (detailSharingForm.sharingLevel === 2 ? '部门级' : '团队级')}}</el-descriptions-item>
           <el-descriptions-item
             label="分享类型"
             :span="2"
-          >{{detailSharingForm.sharingType}}</el-descriptions-item>
+          >{{detailSharingForm.sharingType === 1 ? '技术类型' : (detailSharingForm.sharingType === 2 ? '业务类型' : '其他类型')}}</el-descriptions-item>
           <el-descriptions-item
             label="分享摘要"
             :span="4"
@@ -706,12 +706,16 @@ import {
   deleteSharingById,
   querySharingById,
   editSharing,
-  queryByConditions
+  queryByConditions,
+  checkSharingInvestBinding
 } from '../../../api/performance/sharing'
 import {
   queryByConditions as queryInvestigations,
   queryInvestigationById
 } from '../../../api/release/investigation'
+import {
+  queryFeedbackUrl
+} from '../../../api/release/feedback'
 
 export default {
   created () {
@@ -998,6 +1002,52 @@ export default {
             this.getSharingList()
           })
       })
+    },
+    /**
+     * 生成反馈链接
+     */
+    generateFeedbackUrl (sharingId) {
+      // 1. 检查报告是否绑定
+      checkSharingInvestBinding(sharingId)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+          if (res.data) {
+            // 已经绑定
+            this.theQueryFeedbackUrl(sharingId, false)
+          } else {
+            // 未绑定报告
+            this.$confirm('当前版本还没有绑定调研问题, 是否采用默认问题? ', '友情提示', {
+              confirmButtonText: '默认',
+              cancelButtonText: '绑定',
+              type: 'warning'
+            }).then(() => {
+              this.theQueryFeedbackUrl(sharingId, true)
+            }).catch(() => {
+              this.showEditDialog(sharingId)
+            })
+          }
+        })
+    },
+    /**
+     * 查询报告链接地址
+     */
+    theQueryFeedbackUrl (sharingId, defaultInvest) {
+      // 2. 是否采用默认链接
+      queryFeedbackUrl('sharing', sharingId, defaultInvest)
+        .then(res => {
+          if (res.code !== 200) {
+            return this.$message.error(res.message)
+          }
+
+          this.$copyText(res.data)
+            .then(res => {
+              this.$message.success('链接已经复制到剪切板!')
+            }).catch(error => {
+              return this.$message.error(error)
+            })
+        })
     }
   }
 }

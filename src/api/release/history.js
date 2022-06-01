@@ -16,6 +16,7 @@ export function queryHistoryById (historyId) {
       })
   })
 }
+
 /**
    * 根据发布历史ID删除发布历史
    *
@@ -88,6 +89,23 @@ export function queryByConditions (conditions) {
 export function queryHistoryFeedback (conditions) {
   return new Promise((resolve, reject) => {
     axios.get('/release/history/feedback', { params: conditions })
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}
+
+/**
+ * 根据发布历史ID查询发布历史详情
+ *
+ * @param {Integer} releaseId 发布历史ID
+ * @returns Promise
+ */
+export function checkInvestBinding (releaseId) {
+  return new Promise((resolve, reject) => {
+    axios.get('/release/history/investigation/check/' + releaseId)
       .then(res => {
         resolve(res.data)
       }).catch(err => {

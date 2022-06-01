@@ -95,3 +95,18 @@ export function querySharingFeedback (conditions) {
       })
   })
 }
+
+/**
+ * 检查技术分享是否绑定了反馈报告
+ * @param {Integer} conditions 分享ID
+ */
+export function checkSharingInvestBinding (sharingId) {
+  return new Promise((resolve, reject) => {
+    axios.get('/performance/sharing/invest/check/' + sharingId)
+      .then(res => {
+        resolve(res.data)
+      }).catch(err => {
+        reject(err.data)
+      })
+  })
+}
