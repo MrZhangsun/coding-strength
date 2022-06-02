@@ -818,7 +818,7 @@ export default {
       addIndicatorFormRules: {
         name: [
           { required: true, message: '请输入调研问题名称', trigger: 'blur' },
-          { min: 3, max: 20, message: '请输入3~20个字符', trigger: 'blur' }
+          { min: 3, max: 60, message: '请输入3~60个字符', trigger: 'blur' }
         ],
         label: [
           { required: true, message: '请输入调研问题', trigger: 'blur' },
