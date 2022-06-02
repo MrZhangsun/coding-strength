@@ -986,9 +986,10 @@ export default {
      * 加载报告下拉框
      */
     loadInvestigation () {
-      this.pageInfo.pageNum = 1
-      this.pageInfo.pageSize = 10000
-      queryInvestigations(this.pageInfo)
+      const page = {}
+      page.pageNum = 1
+      page.pageSize = 1000
+      queryInvestigations(page)
         .then(res => {
           this.loading = false
           if (res.code !== 200) {
