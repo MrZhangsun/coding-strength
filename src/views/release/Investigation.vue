@@ -594,7 +594,7 @@
           prop="weight"
         >
           <el-input-number
-            placeholder="预设权重"
+            placeholder="预设权重(%)"
             v-model="addIndicatorForm.weight"
             @input="onInput"
             clearable
@@ -826,6 +826,9 @@ export default {
         ],
         type: [
           { required: true, message: '请选择问题类型', trigger: 'change' }
+        ],
+        weight: [
+          { required: true, message: '请设置权重(%)', trigger: 'blur' }
         ]
       }
     }

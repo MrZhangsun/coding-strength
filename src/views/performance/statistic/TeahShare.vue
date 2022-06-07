@@ -240,10 +240,7 @@
           :rules="addSharingFormRules"
           label-width="120px"
         >
-          <el-row
-            align="left"
-            :gutter="30"
-          >
+          <el-row :gutter="30">
             <el-col :span="24">
               <el-form-item
                 label="分享标题"
@@ -661,7 +658,7 @@
           <el-descriptions-item
             label="评分统计"
             :span="2"
-          >{{detailSharingForm.updatedBy}}</el-descriptions-item>
+          >{{detailSharingForm.scoreLabel}}</el-descriptions-item>
           <el-descriptions-item
             label="反馈列表"
             :span="2"
@@ -672,7 +669,7 @@
               v-model="selectedInvestId"
             >
               <el-option
-                v-for="item in investigationIds"
+                v-for="item in detailSharingForm.feedbackCodes"
                 :key="item"
                 :label="item"
                 :value="item"
@@ -748,8 +745,7 @@ import {
 } from '../../../api/release/investigation'
 import {
   queryFeedbackUrl,
-  queryInvestigation,
-  queryObjectFeedbacks
+  queryInvestigation
 } from '../../../api/release/feedback'
 export default {
   created () {
@@ -787,7 +783,6 @@ export default {
       },
       selectedInvestId: '',
       investQuestions: [],
-      investigationIds: [],
       queryDateTimePicker: [],
       addDateTimePicker: [],
       editDateTimePicker: [],
@@ -1019,18 +1014,10 @@ export default {
                 } else {
                   this.detailSharingForm.investigationName = res.data.name
                 }
-
-                // 显示详情对话框
-                this.sharingDetailDialogVisible = true
               })
           }
-        })
-      queryObjectFeedbacks('sharing', sharingId)
-        .then(res => {
-          if (res.code !== 200) {
-            return this.$message.error(res.message)
-          }
-          this.investigationIds = res.data
+          // 显示详情对话框
+          this.sharingDetailDialogVisible = true
         })
     },
     // 编辑提交
