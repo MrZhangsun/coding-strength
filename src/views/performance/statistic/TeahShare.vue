@@ -1014,10 +1014,13 @@ export default {
                 } else {
                   this.detailSharingForm.investigationName = res.data.name
                 }
+                // 显示详情对话框
+                this.sharingDetailDialogVisible = true
               })
+          } else {
+            // 显示详情对话框
+            this.sharingDetailDialogVisible = true
           }
-          // 显示详情对话框
-          this.sharingDetailDialogVisible = true
         })
     },
     // 编辑提交
