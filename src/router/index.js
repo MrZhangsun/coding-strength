@@ -5,6 +5,7 @@ import Home from '../views/system/Home'
 import Rank from '../views/coding/Rank'
 import Graph from '../views/coding/Graph'
 import Repository from '../views/coding/Repository'
+import monitor from '../views/monitor/index'
 import Reporter from '../views/coding/Reporter'
 import Analysis from '../views/coding/Analysis'
 import Inspect from '../views/coding/Inspect'
@@ -55,6 +56,11 @@ const routes = [
         name: 'Git Graph',
         path: 'graph',
         component: Graph
+      },
+      {
+        name: '指标监控',
+        path: 'monitor',
+        component: monitor
       }
     ]
   },
