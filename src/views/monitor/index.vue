@@ -6,7 +6,7 @@
       <el-breadcrumb-item>指标显示</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="main">
-      <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
+      <!-- <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
         <template v-for="(item,index) in tabPaneData">
           <el-tab-pane :key="index" :label="item.label" :name="item.name">
             <div v-if="item.tabPaneNextData">
@@ -19,22 +19,33 @@
                           {{ i.name }}
                         </el-radio-button>
                       </el-radio-group>
-                      <!-- <el-date-picker
-                        v-model="dateTime"
-                        type="daterange"
-                        align="right"
-                        unlink-panels
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
-                        value-format="yyyy-MM-dd"
-                        @focus="dateTimeFocus"
-                        @change="dateTimeChange"
-                        :picker-options="pickerOptions">
-                      </el-date-picker> -->
                     </div>
                     <div v-loading="loading">
                       <div :id="`chart${items.name}`" style="width:100%;height:500px;"></div>
+                    </div>
+                  </el-tab-pane>
+                </template>
+              </el-tabs>
+            </div>
+          </el-tab-pane>
+        </template>
+      </el-tabs> -->
+      <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
+        <template v-for="(item,index) in tabPaneDataList">
+          <el-tab-pane :key="index" :label="item.key" :name="item.key">
+            <div v-if="item.value">
+              <el-tabs v-model="activeNameType" tab-position="left" @tab-click="handleClick">
+                <template v-for="(items,indexs) in (item.value)">
+                  <el-tab-pane :key="indexs" :label="items.indicatorName" :name="items.id + ''" :lazy="true">
+                    <div class="selectClass">
+                      <el-radio-group v-model="valueDate">
+                        <el-radio-button v-for="(i,index) in options" :key="index" :label="i.label">
+                          {{ i.name }}
+                        </el-radio-button>
+                      </el-radio-group>
+                    </div>
+                    <div v-loading="loading">
+                      <div :id="`chart${items.indicatorName}`" style="width:100%;height:500px;"></div>
                     </div>
                     <!-- <div v-if="items.chartType === 'broken'">
                       <div :id="`chart${indexs}`" style="width:100%;height:500px;">
@@ -59,6 +70,12 @@
   </div>
 </template>
 <script>
+import {
+  indicators,
+  indicatorId,
+  indicatorIdBar,
+  indicatorIdPie
+} from '../../api/monitor/index'
 export default {
   data () {
     return {
@@ -80,7 +97,7 @@ export default {
         name: '月'
       }, {
         label: 'quarter',
-        name: '季度'
+        name: '季'
       }, {
         label: 'year',
         name: '年'
@@ -144,6 +161,22 @@ export default {
               label: '映射管理增量',
               chartType: 'broken',
               option: {
+                // dataZoom: {
+                //   xAxisIndex: 0,
+                //   show: true,
+                //   type: 'slider',
+                //   startValue: 0,
+                //   endValue: 6
+                // },
+                timeline: {
+                  data: [1, 2, 3, 4],
+                  label: {
+                    formatter: function (s) { return '第' + s + '页' }
+                  },
+                  autoPlay: false,
+                  playInterval: 1000,
+                  tooltip: { formatter: function (s) { return '第' + s.value + '页' } }
+                },
                 title: {
                   text: 'Stacked Line'
                 },
@@ -154,11 +187,9 @@ export default {
                   data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
                 },
                 grid: {
-                  left: '3%',
-                  right: '4%',
-                  bottom: '3%',
-                  containLabel: true
+                  y2: 80
                 },
+                calculable: true,
                 toolbox: {
                   feature: {
                     saveAsImage: {}
@@ -494,7 +525,8 @@ export default {
           label: '优惠卷系统',
           tabPaneNextData: []
         }
-      ]
+      ],
+      tabPaneDataList: []
     }
   },
   destroyed () {
@@ -503,11 +535,45 @@ export default {
     // this.$nextTick(() => {
     //   this.defaultChart(0)
     // })
-    setTimeout(() => {
-      this.initChart()
-    }, 0)
+    this.getMainData()
+    // setTimeout(() => {
+    //   this.initChart()
+    // }, 0)
   },
   methods: {
+    getMainData () {
+      indicators()
+        .then(res => {
+          this.tabPaneDataList = res.data
+        })
+    },
+    getindicatorId (e, o) {
+      indicatorId(e)
+        .then(res => {
+          const arr = res.data
+          if (arr) {
+            this.initChartList(arr, o)
+          }
+        })
+    },
+    getindicatorIdBar (e, o) {
+      indicatorIdBar(e)
+        .then(res => {
+          const arr = res.data
+          if (arr) {
+            this.initChartList(arr, o)
+          }
+        })
+    },
+    getindicatorIdPie (e, o) {
+      indicatorIdPie(e)
+        .then(res => {
+          const arr = res.data
+          if (arr) {
+            this.initChartList(arr, o)
+          }
+        })
+    },
     dateTimeFocus () {
       this.loading = false
     },
@@ -516,6 +582,26 @@ export default {
       if ((this.dateTime).length > 0) {
         this.loading = false
       }
+    },
+    initChartList (arrs, name) {
+      console.log(arrs, name)
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const arr = this.tabPaneDataList
+          arr.forEach((q, w) => {
+            if ((q.value).length > 0) {
+              (q.value).forEach((i, o) => {
+                if (name === i.indicatorName) {
+                  const myChart = this.$echarts.init(document.getElementById(`chart${i.indicatorName}`))
+                  q.value[o].option = arrs
+                  console.log(q.value[o].option, '渲染cavans的数据')
+                  myChart.setOption(q.value[o].option, true)
+                }
+              })
+            }
+          })
+        }, 0)
+      })
     },
     initChart () {
       this.$nextTick(() => {
@@ -751,10 +837,38 @@ export default {
     },
     handleClickActive () {},
     handleClick (e) {
-      // 办法2
-      this.$nextTick(() => {
-        this.initChart()
+      console.log(e, '我是谁')
+      const dataList = this.tabPaneDataList
+      dataList.forEach(i => {
+        if (i.value) {
+          (i.value).forEach(l => {
+            if (l.indicatorName === e.label) {
+              if (l.chartType === 1) {
+                this.getindicatorId((e.name) * 1, e.label)
+              }
+              if (l.chartType === 2) {
+                this.getindicatorIdPie((e.name) * 1, e.label)
+              }
+              if (l.chartType === 3) {
+                this.getindicatorIdBar((e.name) * 1, e.label)
+              }
+            }
+          })
+        }
       })
+      // if ((e.name) * 1 === 1) {
+      //   this.getindicatorId((e.name) * 1, e.label)
+      // }
+      // if ((e.name) * 1 === 2) {
+      //   this.getindicatorId((e.name) * 1, e.label)
+      // }
+      // if ((e.name) * 1 === 4) {
+      //   this.getindicatorIdPie((e.name) * 1, e.label)
+      // }
+      // 办法2
+      // this.$nextTick(() => {
+      //   this.initChart()
+      // })
       // if (this.activeNameType === 'circular') {
       //   this.$nextTick(() => {
       //     this.circularChart(e.index)
