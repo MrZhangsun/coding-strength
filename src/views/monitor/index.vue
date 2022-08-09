@@ -6,30 +6,6 @@
       <el-breadcrumb-item>指标显示</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="main">
-      <!-- <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
-        <template v-for="(item,index) in tabPaneData">
-          <el-tab-pane :key="index" :label="item.label" :name="item.name">
-            <div v-if="item.tabPaneNextData">
-              <el-tabs v-model="activeNameType" tab-position="left" @tab-click="handleClick">
-                <template v-for="(items,indexs) in (item.tabPaneNextData)">
-                  <el-tab-pane :key="indexs" :label="items.label" :name="items.name" :lazy="true">
-                    <div class="selectClass">
-                      <el-radio-group v-model="valueDate">
-                        <el-radio-button v-for="(i,index) in options" :key="index" :label="i.label">
-                          {{ i.name }}
-                        </el-radio-button>
-                      </el-radio-group>
-                    </div>
-                    <div v-loading="loading">
-                      <div :id="`chart${items.name}`" style="width:100%;height:500px;"></div>
-                    </div>
-                  </el-tab-pane>
-                </template>
-              </el-tabs>
-            </div>
-          </el-tab-pane>
-        </template>
-      </el-tabs> -->
       <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
         <template v-for="(item,index) in tabPaneDataList">
           <el-tab-pane :key="index" :label="item.key" :name="item.key">
@@ -38,7 +14,7 @@
                 <template v-for="(items,indexs) in (item.value)">
                   <el-tab-pane :key="indexs" :label="items.indicatorName" :name="items.id + ''" :lazy="true">
                     <div class="selectClass">
-                      <el-radio-group v-model="valueDate">
+                      <el-radio-group v-model="valueDate" @change="radioChange(items,valueDate)">
                         <el-radio-button v-for="(i,index) in options" :key="index" :label="i.label">
                           {{ i.name }}
                         </el-radio-button>
@@ -47,18 +23,6 @@
                     <div v-loading="loading">
                       <div :id="`chart${items.indicatorName}`" style="width:100%;height:500px;"></div>
                     </div>
-                    <!-- <div v-if="items.chartType === 'broken'">
-                      <div :id="`chart${indexs}`" style="width:100%;height:500px;">
-                      </div>
-                    </div>
-                    <div v-if="items.chartType === 'circular'">
-                      <div :id="`chart${indexs}`" style="width:100%;height:500px;">
-                      </div>
-                    </div>
-                    <div v-if="items.chartType === 'column'">
-                      <div :id="`chart${indexs}`" style="width:100%;height:500px;">
-                      </div>
-                    </div> -->
                   </el-tab-pane>
                 </template>
               </el-tabs>
@@ -87,19 +51,19 @@ export default {
       // 单选框模式的筛选条件
       valueDate: '',
       options: [{
-        label: 'day',
+        label: 'DAY',
         name: '日'
       }, {
-        label: 'week',
+        label: 'WEEK',
         name: '周'
       }, {
-        label: 'month',
+        label: 'MONTH',
         name: '月'
       }, {
-        label: 'quarter',
+        label: 'SEASON',
         name: '季'
       }, {
-        label: 'year',
+        label: 'YEAR',
         name: '年'
       }],
       // 日期范围模式的筛选条件
@@ -532,15 +496,56 @@ export default {
   destroyed () {
   },
   mounted () {
-    // this.$nextTick(() => {
-    //   this.defaultChart(0)
-    // })
     this.getMainData()
-    // setTimeout(() => {
-    //   this.initChart()
-    // }, 0)
   },
   methods: {
+    radioChange (i, e) {
+      if (i.chartType === 1) {
+        const data = {
+          dimension: e,
+          indicatorId: i.id,
+          pageSize: 10,
+          currentPageMaxId: 9999
+        }
+        indicatorId((i.id), data)
+          .then(res => {
+            const arr = res.data
+            if (arr) {
+              this.initChartList(arr, i.indicatorName)
+            }
+          })
+      }
+      if (i.chartType === 2) {
+        const data = {
+          dimension: e,
+          indicatorId: i.id,
+          pageSize: 10,
+          currentPageMaxId: 9999
+        }
+        indicatorIdPie((i.id), data)
+          .then(res => {
+            const arr = res.data
+            if (arr) {
+              this.initChartList(arr, i.indicatorName)
+            }
+          })
+      }
+      if (i.chartType === 3) {
+        const data = {
+          dimension: e,
+          indicatorId: i.id,
+          pageSize: 10,
+          currentPageMaxId: 9999
+        }
+        indicatorIdBar((i.id), data)
+          .then(res => {
+            const arr = res.data
+            if (arr) {
+              this.initChartList(arr, i.indicatorName)
+            }
+          })
+      }
+    },
     getMainData () {
       indicators()
         .then(res => {
@@ -584,7 +589,6 @@ export default {
       }
     },
     initChartList (arrs, name) {
-      console.log(arrs, name)
       this.$nextTick(() => {
         setTimeout(() => {
           const arr = this.tabPaneDataList
@@ -594,8 +598,8 @@ export default {
                 if (name === i.indicatorName) {
                   const myChart = this.$echarts.init(document.getElementById(`chart${i.indicatorName}`))
                   q.value[o].option = arrs
-                  console.log(q.value[o].option, '渲染cavans的数据')
                   myChart.setOption(q.value[o].option, true)
+                  this.$forceUpdate()
                 }
               })
             }
@@ -603,242 +607,10 @@ export default {
         }, 0)
       })
     },
-    initChart () {
-      this.$nextTick(() => {
-        setTimeout(() => {
-          const arr = this.tabPaneData
-          arr.forEach((q, w) => {
-            if ((q.tabPaneNextData).length > 0) {
-              (q.tabPaneNextData).forEach((i, o) => {
-                const myChart = this.$echarts.init(document.getElementById(`chart${i.name}`))
-                myChart.setOption(q.tabPaneNextData[o].option, true)
-              })
-            }
-          })
-        }, 0)
-      })
-    },
-    defaultChart (indexs) {
-      this.chartDomDefault = this.$echarts.init(document.getElementById(`chart${indexs}`))
-      var option
-      var abs = [
-        {
-          name: 'Email',
-          type: 'line',
-          stack: 'Total',
-          data: [120, 132, 101, 134, 90, 230, 210]
-        },
-        {
-          name: 'Union Ads',
-          type: 'line',
-          stack: 'Total',
-          data: [220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-          name: 'Video Ads',
-          type: 'line',
-          stack: 'Total',
-          data: [150, 232, 201, 154, 190, 330, 410]
-        },
-        {
-          name: 'Direct',
-          type: 'line',
-          stack: 'Total',
-          data: [320, 332, 301, 334, 390, 330, 320]
-        },
-        {
-          name: 'Search Engine',
-          type: 'line',
-          stack: 'Total',
-          data: [820, 932, 901, 934, 1290, 1330, 1320]
-        }
-      ]
-      option = JSON.parse(JSON.stringify({
-        title: {
-          text: 'Stacked Line'
-        },
-        tooltip: {
-          trigger: 'axis'
-        },
-        legend: {
-          data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        toolbox: {
-          feature: {
-            saveAsImage: {}
-          }
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: []
-      }))
-      option.series = abs
-      this.chartDomDefault.setOption(option)
-    },
-    circularChart (indexs) {
-      this.chartCircular = this.$echarts.init(document.getElementById(`chart${indexs}`))
-      var option
-      option = {
-        title: {
-          text: 'Referer of a Website',
-          subtext: 'Fake Data',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left'
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' }
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
-        ]
-      }
-      this.chartCircular.setOption(option)
-    },
-    columnChart (indexs) {
-      this.chartDomColumn = this.$echarts.init(document.getElementById(`chart${indexs}`))
-      const colors = ['#5470C6', '#91CC75', '#EE6666']
-      var option
-      option = {
-        color: colors,
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross'
-          }
-        },
-        grid: {
-          right: '20%'
-        },
-        toolbox: {
-          feature: {
-            dataView: { show: true, readOnly: false },
-            restore: { show: true },
-            saveAsImage: { show: true }
-          }
-        },
-        legend: {
-          data: ['Evaporation', 'Precipitation', 'Temperature']
-        },
-        xAxis: [
-          {
-            type: 'category',
-            axisTick: {
-              alignWithLabel: true
-            },
-            data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-          }
-        ],
-        yAxis: [
-          {
-            type: 'value',
-            name: 'Evaporation',
-            position: 'right',
-            alignTicks: true,
-            axisLine: {
-              show: true,
-              lineStyle: {
-                color: '#5470C6'
-              }
-            },
-            axisLabel: {
-              formatter: '{value} ml'
-            }
-          },
-          {
-            type: 'value',
-            name: 'Precipitation',
-            position: 'right',
-            alignTicks: true,
-            offset: 80,
-            axisLine: {
-              show: true,
-              lineStyle: {
-                color: '#5470C6'
-              }
-            },
-            axisLabel: {
-              formatter: '{value} ml'
-            }
-          },
-          {
-            type: 'value',
-            name: '温度',
-            position: 'left',
-            alignTicks: true,
-            axisLine: {
-              show: true,
-              lineStyle: {
-                color: '#5470C6'
-              }
-            },
-            axisLabel: {
-              formatter: '{value} °C'
-            }
-          }
-        ],
-        series: [
-          {
-            name: 'Evaporation',
-            type: 'bar',
-            data: [
-              2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3
-            ]
-          },
-          {
-            name: 'Precipitation',
-            type: 'bar',
-            yAxisIndex: 1,
-            data: [
-              2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3
-            ]
-          },
-          {
-            name: 'Temperature',
-            type: 'line',
-            yAxisIndex: 2,
-            data: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 23.4, 23.0, 16.5, 12.0, 6.2]
-          }
-        ]
-      }
-      this.chartDomColumn.setOption(option)
-    },
     handleClickActive () {},
     handleClick (e) {
-      console.log(e, '我是谁')
       const dataList = this.tabPaneDataList
+      this.valueDate = ''
       dataList.forEach(i => {
         if (i.value) {
           (i.value).forEach(l => {
@@ -856,32 +628,6 @@ export default {
           })
         }
       })
-      // if ((e.name) * 1 === 1) {
-      //   this.getindicatorId((e.name) * 1, e.label)
-      // }
-      // if ((e.name) * 1 === 2) {
-      //   this.getindicatorId((e.name) * 1, e.label)
-      // }
-      // if ((e.name) * 1 === 4) {
-      //   this.getindicatorIdPie((e.name) * 1, e.label)
-      // }
-      // 办法2
-      // this.$nextTick(() => {
-      //   this.initChart()
-      // })
-      // if (this.activeNameType === 'circular') {
-      //   this.$nextTick(() => {
-      //     this.circularChart(e.index)
-      //   })
-      // } else if (this.activeNameType === 'column') {
-      //   this.$nextTick(() => {
-      //     this.columnChart(e.index)
-      //   })
-      // } else {
-      //   this.$nextTick(() => {
-      //     this.defaultChart(e.index)
-      //   })
-      // }
     }
   }
 }

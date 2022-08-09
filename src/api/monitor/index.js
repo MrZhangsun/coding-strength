@@ -15,9 +15,9 @@ export function indicators () {
   })
 }
 // 折线图
-export function indicatorId (indicatorId) {
+export function indicatorId (indicatorId, searchMessage) {
   return new Promise((resolve, reject) => {
-    axios.get('chart/line/' + indicatorId, {})
+    axios.get('chart/line/' + indicatorId, { params: searchMessage })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -26,9 +26,9 @@ export function indicatorId (indicatorId) {
   })
 }
 // 柱状图
-export function indicatorIdBar (indicatorId) {
+export function indicatorIdBar (indicatorId, searchMessage) {
   return new Promise((resolve, reject) => {
-    axios.get('chart/bar/' + indicatorId, {})
+    axios.get('chart/bar/' + indicatorId, { params: searchMessage })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
@@ -37,9 +37,9 @@ export function indicatorIdBar (indicatorId) {
   })
 }
 // 柱状图
-export function indicatorIdPie (indicatorId) {
+export function indicatorIdPie (indicatorId, searchMessage) {
   return new Promise((resolve, reject) => {
-    axios.get('chart/pie/' + indicatorId, {})
+    axios.get('chart/pie/' + indicatorId, { params: searchMessage })
       .then(res => {
         resolve(res.data)
       }).catch(err => {
