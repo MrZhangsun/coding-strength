@@ -13,7 +13,7 @@
               <el-tabs v-model="activeNameType" tab-position="left" @tab-click="handleClick">
                 <template v-for="(items,indexs) in (item.value)">
                   <el-tab-pane :key="indexs" :label="items.indicatorName" :name="items.id + ''" :lazy="true">
-                    <div class="selectClass">
+                    <div class="selectClass" v-if="items.dimensionShow == 1">
                       <el-radio-group v-model="valueDate" @change="radioChange(items,valueDate)">
                         <el-radio-button v-for="(i,index) in options" :key="index" :label="i.label">
                           {{ i.name }}
@@ -65,6 +65,9 @@ export default {
       }, {
         label: 'YEAR',
         name: '年'
+      }, {
+        label: 'clear',
+        name: '重置'
       }],
       // 日期范围模式的筛选条件
       dateTime: '',
@@ -125,13 +128,6 @@ export default {
               label: '映射管理增量',
               chartType: 'broken',
               option: {
-                // dataZoom: {
-                //   xAxisIndex: 0,
-                //   show: true,
-                //   type: 'slider',
-                //   startValue: 0,
-                //   endValue: 6
-                // },
                 timeline: {
                   data: [1, 2, 3, 4],
                   label: {
@@ -500,50 +496,80 @@ export default {
   },
   methods: {
     radioChange (i, e) {
-      if (i.chartType === 1) {
-        const data = {
-          dimension: e,
-          indicatorId: i.id,
-          pageSize: 10,
-          currentPageMaxId: 9999
+      if (e === 'clear') {
+        if (i.chartType === 1) {
+          indicatorId((i.id))
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
         }
-        indicatorId((i.id), data)
-          .then(res => {
-            const arr = res.data
-            if (arr) {
-              this.initChartList(arr, i.indicatorName)
-            }
-          })
-      }
-      if (i.chartType === 2) {
-        const data = {
-          dimension: e,
-          indicatorId: i.id,
-          pageSize: 10,
-          currentPageMaxId: 9999
+        if (i.chartType === 2) {
+          indicatorIdPie((i.id))
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
         }
-        indicatorIdPie((i.id), data)
-          .then(res => {
-            const arr = res.data
-            if (arr) {
-              this.initChartList(arr, i.indicatorName)
-            }
-          })
-      }
-      if (i.chartType === 3) {
-        const data = {
-          dimension: e,
-          indicatorId: i.id,
-          pageSize: 10,
-          currentPageMaxId: 9999
+        if (i.chartType === 3) {
+          indicatorIdBar((i.id))
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
         }
-        indicatorIdBar((i.id), data)
-          .then(res => {
-            const arr = res.data
-            if (arr) {
-              this.initChartList(arr, i.indicatorName)
-            }
-          })
+      } else {
+        if (i.chartType === 1) {
+          const data = {
+            dimension: e,
+            indicatorId: i.id,
+            pageSize: 10,
+            currentPageMaxId: ''
+          }
+          indicatorId((i.id), data)
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
+        }
+        if (i.chartType === 2) {
+          const data = {
+            dimension: e,
+            indicatorId: i.id,
+            pageSize: 10,
+            currentPageMaxId: ''
+          }
+          indicatorIdPie((i.id), data)
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
+        }
+        if (i.chartType === 3) {
+          const data = {
+            dimension: e,
+            indicatorId: i.id,
+            pageSize: 10,
+            currentPageMaxId: ''
+          }
+          indicatorIdBar((i.id), data)
+            .then(res => {
+              const arr = res.data
+              if (arr) {
+                this.initChartList(arr, i.indicatorName)
+              }
+            })
+        }
       }
     },
     getMainData () {
@@ -598,6 +624,38 @@ export default {
                 if (name === i.indicatorName) {
                   const myChart = this.$echarts.init(document.getElementById(`chart${i.indicatorName}`))
                   q.value[o].option = arrs
+                  console.log(i.chartType)
+                  if (i.chartType === 1 || i.chartType === 3) {
+                    q.value[o].option.dataZoom = [
+                      {
+                        width: '15',
+                        type: 'slider',
+                        show: false,
+                        xAxisIndex: [0],
+                        left: 33,
+                        bottom: 40,
+                        height: 20,
+                        start: 0,
+                        showDataShadow: false,
+                        showDetail: false,
+                        end: 50
+                      },
+                      {
+                        type: 'inside',
+                        show: true,
+                        xAxisIndex: [0],
+                        start: 0,
+                        end: 0.25
+                      }
+                    ]
+                  } else if (i.chartType === 2) {
+                    q.value[o].option.tooltip = {
+                      trigger: 'item',
+                      formatter: function (params) {
+                        return params.value.name + ' : ' + params.value.value + ' (' + params.percent + '%)'
+                      }
+                    }
+                  }
                   myChart.setOption(q.value[o].option, true)
                   this.$forceUpdate()
                 }
