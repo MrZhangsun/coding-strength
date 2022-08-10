@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test": "vue-cli-service build --mode test",
-    "lint": "vue-cli-service lint"
+    "lint": "eslint --fix --ext .js,.vue src"
   },
   "dependencies": {
     "@gitgraph/js": "^1.4.0",
@@ -21,7 +21,7 @@
     "vue-clipboard2": "^0.3.3",
     "vue-infinite-scroll": "^2.0.2",
     "vue-moment": "^4.1.0",
-    "vue-router": "^3.2.0"
+    "vue-router": "^3.0.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import Login from '../views/system/Login'
+import Login from '../views/system/Login'
 import Home from '../views/system/Home'
 import Rank from '../views/coding/Rank'
 import Graph from '../views/coding/Graph'
@@ -27,20 +27,26 @@ import CommunityContribution from '../views/performance/statistic/CommunityContr
 import Indicator from '../views/performance/Indicator'
 import PerformanceReporter from '../views/performance/PerformanceReporter'
 import Search from '../views/terminology/Search'
-
+// const originalPush = VueRouter.prototype.push
+// VueRouter.prototype.push = function push (location, onResolve, onReject) {
+//   if (onResolve || onReject) {
+//     return originalPush.call(this, location, onResolve, onReject)
+//   }
+//   return originalPush.call(this, location).catch(err => err)
+// }
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
     name: '系统入口',
-    redirect: '/home'
+    redirect: '/login'
   },
-  // {
-  //   name: '登录',
-  //   path: '/login',
-  //   component: Login
-  // },
+  {
+    name: '登录',
+    path: '/login',
+    component: Login
+  },
   {
     name: '首页',
     path: '/home',
@@ -218,28 +224,27 @@ const routes = [
 const router = new VueRouter({
   routes
 })
-
 // 路由访问拦截器
 router.beforeEach((to, from, next) => {
-  console.log(to, from)
   // to : 将要访问的路径
   // from: 从哪个页面来
   // next: 放行
-  if (to.path !== '/login') {
+  if (to.path === '/login' || to.path === '/home/monitor') {
     return next()
+  } else {
+    // 拦截认证
+    const token = window.sessionStorage.getItem('token')
+    if (!token) {
+      return next('/login')
+    }
   }
 
   if (to.path.startsWith('/api')) {
     return next()
   }
 
-  // 拦截认证
-  // const token = window.sessionStorage.getItem('token')
-  // if (!token) {
-  //   return next('/login')
-  // }
-
   // 放行
   next()
 })
+
 export default router
