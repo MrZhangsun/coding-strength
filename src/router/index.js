@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/system/Login'
+// import Login from '../views/system/Login'
 import Home from '../views/system/Home'
 import Rank from '../views/coding/Rank'
 import Graph from '../views/coding/Graph'
@@ -34,13 +34,13 @@ const routes = [
   {
     path: '/',
     name: '系统入口',
-    redirect: '/login'
+    redirect: '/home'
   },
-  {
-    name: '登录',
-    path: '/login',
-    component: Login
-  },
+  // {
+  //   name: '登录',
+  //   path: '/login',
+  //   component: Login
+  // },
   {
     name: '首页',
     path: '/home',
@@ -221,10 +221,11 @@ const router = new VueRouter({
 
 // 路由访问拦截器
 router.beforeEach((to, from, next) => {
+  console.log(to, from)
   // to : 将要访问的路径
   // from: 从哪个页面来
   // next: 放行
-  if (to.path === '/login') {
+  if (to.path !== '/login') {
     return next()
   }
 
@@ -233,10 +234,10 @@ router.beforeEach((to, from, next) => {
   }
 
   // 拦截认证
-  const token = window.sessionStorage.getItem('token')
-  if (!token) {
-    return next('/login')
-  }
+  // const token = window.sessionStorage.getItem('token')
+  // if (!token) {
+  //   return next('/login')
+  // }
 
   // 放行
   next()

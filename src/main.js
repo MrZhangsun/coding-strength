@@ -63,7 +63,7 @@ const loadOption = {
 
 // HTTP认证拦截器
 axios.interceptors.request.use(config => {
-  config.headers.Authorization = window.sessionStorage.getItem('token')
+  // config.headers.Authorization = window.sessionStorage.getItem('token')
   if (loadingSwitch) {
     loading = Loading.service(loadOption)
   }
