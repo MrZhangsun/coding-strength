@@ -624,7 +624,6 @@ export default {
                 if (name === i.indicatorName) {
                   const myChart = this.$echarts.init(document.getElementById(`chart${i.indicatorName}`))
                   q.value[o].option = arrs
-                  console.log(i.chartType)
                   if (i.chartType === 1 || i.chartType === 3) {
                     q.value[o].option.dataZoom = [
                       {
