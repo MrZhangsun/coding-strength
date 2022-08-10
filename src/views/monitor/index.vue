@@ -3,7 +3,7 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>指标</el-breadcrumb-item>
-      <el-breadcrumb-item>指标显示</el-breadcrumb-item>
+      <el-breadcrumb-item>指标监控</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="main">
       <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
