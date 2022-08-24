@@ -6,9 +6,9 @@
       <el-breadcrumb-item>指标监控</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="main">
-      <el-tabs v-model="activeName" type="border-card" @tab-click="handleClickActive(activeName)">
+      <el-tabs v-model="activeName" :tab-position="tabPosition" type="border-card" style="min-height:560px;" @tab-click="handleClickActive(activeName)">
         <template v-for="(item,index) in tabPaneDataList">
-          <el-tab-pane :key="index" :label="item.key" :name="item.key">
+          <el-tab-pane :key="index" :label="item.key" :name="item.key" style="min-height:560px;" >
             <div v-if="item.value">
               <el-tabs v-model="activeNameType" tab-position="left" @tab-click="handleClick">
                 <template v-for="(items,indexs) in (item.value)">
@@ -43,11 +43,12 @@ import {
 export default {
   data () {
     return {
-      activeName: '0',
+      activeName: '刊登系统',
       chartDomDefault: '',
       chartDomColumn: '',
       chartCircular: '',
-      activeNameType: 'broken',
+      activeNameType: '1',
+      tabPosition: 'top',
       // 单选框模式的筛选条件
       valueDate: '',
       options: [{
@@ -493,6 +494,9 @@ export default {
   },
   mounted () {
     this.getMainData()
+    if (this.activeName === '刊登系统' && this.activeNameType === '1') {
+      this.getOneList()
+    }
   },
   methods: {
     radioChange (i, e) {
@@ -577,6 +581,10 @@ export default {
         .then(res => {
           this.tabPaneDataList = res.data
         })
+    },
+    getOneList () {
+      const a = '平台刊登Listing历史数量变化趋势图'
+      this.getindicatorId(1, a)
     },
     getindicatorId (e, o) {
       indicatorId(e)
@@ -664,7 +672,8 @@ export default {
         }, 0)
       })
     },
-    handleClickActive () {},
+    handleClickActive () {
+    },
     handleClick (e) {
       const dataList = this.tabPaneDataList
       this.valueDate = ''
