@@ -13,6 +13,13 @@
               <el-tabs v-model="activeNameType" tab-position="left" @tab-click="handleClick">
                 <template v-for="(items,indexs) in (item.value)">
                   <el-tab-pane :key="indexs" :label="items.indicatorName" :name="items.id + ''" :lazy="true">
+                      <template slot="label">
+                        <el-tooltip :content="items.indicatorName" placement="bottom">
+                          <span style="display: block;width: 80px;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;">
+                            {{ items.indicatorName }}
+                          </span>
+                        </el-tooltip>
+                      </template>
                     <div class="selectClass" v-if="items.dimensionShow == 1">
                       <el-radio-group v-model="valueDate" @change="radioChange(items,valueDate)">
                         <el-radio-button v-for="(i,index) in options" :key="index" :label="i.label">
