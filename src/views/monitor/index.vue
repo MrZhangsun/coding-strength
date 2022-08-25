@@ -501,9 +501,6 @@ export default {
   },
   mounted () {
     this.getMainData()
-    if (this.activeName === '刊登系统' && this.activeNameType === '1') {
-      this.getOneList()
-    }
   },
   methods: {
     radioChange (i, e) {
@@ -587,6 +584,11 @@ export default {
       indicators()
         .then(res => {
           this.tabPaneDataList = res.data
+          if (this.tabPaneDataList) {
+            if (this.activeName === '刊登系统' && this.activeNameType === '1') {
+              this.getOneList()
+            }
+          }
         })
     },
     getOneList () {
